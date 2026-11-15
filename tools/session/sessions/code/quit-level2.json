@@ -1,0 +1,8 @@
+{
+  "part": "CODE",
+  "start": "decode-v1",
+  "note": "Level 2 (homophones): Alt-Q, the quit box's second line chosen: the game is left from inside the part.",
+  "handoff": {"level": 2},
+  "unix_time": 612345678,
+  "keys": "{wait 3}{alt-q}{wait 2}{down}{enter}{wait 2}{enter}{wait 3}"
+}

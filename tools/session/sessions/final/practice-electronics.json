@@ -1,0 +1,8 @@
+{
+  "part": "FINAL",
+  "start": "campaign-v1",
+  "note": "Practice, third difficulty, Electronics (an Up on the first line first, then three Downs): the wiretap practice is handed over.",
+  "handoff": {},
+  "unix_time": 662688000,
+  "keys": " {wait 2}{down}{down}{enter}{wait 2}{down}{down}{enter}{wait 2}{up}{down}{down}{down}{enter}{wait 10}"
+}

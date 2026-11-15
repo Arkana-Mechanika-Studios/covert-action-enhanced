@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- The player's settings and the launcher (the settings screen shown before the game): the settings file, where it is
+       looked for and what wins over it (csharp/docs/SETTINGS.md), and the screen, drawn into its own pixels and read
+       through ILauncherSurface, so it knows no window library and nothing of the game. Only the SDL host references it.
+       Its types are internal: the host and the tests see them (InternalsVisibleTo). -->
+  <ItemGroup>
+    <InternalsVisibleTo Include="CovertAction" />
+    <InternalsVisibleTo Include="CovertAction.Settings.Tests" />
+  </ItemGroup>
+  <ItemGroup>
+    <!-- art for the launcher, supplied later (none is in the repository: everything is drawn in code when a picture is
+         missing); csharp/docs/SETTINGS.md "The launcher" names them -->
+    <EmbeddedResource Include="Resources/art/*.png" LogicalName="CovertAction.Settings.art.%(Filename)%(Extension)" />
+  </ItemGroup>
+</Project>

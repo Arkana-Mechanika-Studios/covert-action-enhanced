@@ -1,0 +1,8 @@
+{
+  "part": "FINAL",
+  "start": "campaign-v1",
+  "note": "Practice, the first difficulty (no Down), Electronics (an Up on the first line first, then three Downs): the wiretap practice at level 0 is handed over (as practice-electronics at level 2).",
+  "handoff": {},
+  "unix_time": 657878400,
+  "keys": " {wait 2}{down}{down}{enter}{wait 2}{enter}{wait 2}{up}{down}{down}{down}{enter}{wait 10}"
+}

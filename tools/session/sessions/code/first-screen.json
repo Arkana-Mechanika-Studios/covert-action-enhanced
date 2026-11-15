@@ -1,0 +1,8 @@
+{
+  "part": "CODE",
+  "start": "decode-v1",
+  "note": "The practice workstation at level 0 is drawn; the player looks at it for a moment and closes the window.",
+  "handoff": {"level": 0},
+  "unix_time": 600000000,
+  "keys": "{wait 5}"
+}

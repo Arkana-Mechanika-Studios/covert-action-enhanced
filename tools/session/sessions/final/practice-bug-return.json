@@ -1,0 +1,11 @@
+{
+  "part": "FINAL",
+  "start": "campaign-v1",
+  "handoff_from": {
+    "recording": "BUG/practice-solved"
+  },
+  "note": "Back from BUG/practice-solved (the electronics practice's hand-off to the menus part, code 0x11): the menus part back at its main menu; Practice, the difficulty menu, Esc.",
+  "handoff": {},
+  "unix_time": 657880000,
+  "keys": "{wait 5}{down}{down}{enter}{wait 12}{esc}{wait 12}"
+}

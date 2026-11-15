@@ -1,0 +1,8 @@
+{
+  "part": "FINAL",
+  "start": "campaign-v1",
+  "note": "Practice, Regional Conflict (one Down), Breaking In: the building raid's practice at level 1 is handed over.",
+  "handoff": {},
+  "unix_time": 657950400,
+  "keys": " {wait 2}{down}{down}{enter}{wait 3}{down}{enter}{wait 3}{enter}{wait 10}"
+}

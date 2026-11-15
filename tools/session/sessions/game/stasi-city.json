@@ -1,0 +1,8 @@
+{
+  "part": "GAME",
+  "start": "stasi-v1",
+  "note": "The loaded Stasi case at noon (the compact start image): Stay here twice (time passes), the city's Check Data (the clue board, a clue, the documents), the hotel, the travel map, the MI6 office's building: Break into building, the hand-off to the raid (code 1).",
+  "handoff": {},
+  "unix_time": 658000000,
+  "keys": "{wait 5}{enter}{wait 12}{enter}{wait 12}{down}{down}{down}{down}{down}{down}{down}{down}{enter}{wait 12}{enter}{wait 12}{enter}{wait 12}{esc}{wait 12}{esc}{wait 12}{down}{down}{enter}{wait 12}{enter}{wait 12}{enter}{wait 12}{esc}{wait 12}{esc}{wait 12}{down}{enter}{wait 12}{enter}{wait 12}{esc}{wait 12}{esc}{wait 12}{down}{down}{down}{enter}{wait 12}{down}{enter}{wait 12}{down}{down}{down}{enter}{wait 12}{enter}{wait 12}{down}{down}{enter}{wait 12}{enter}{wait 12}"
+}

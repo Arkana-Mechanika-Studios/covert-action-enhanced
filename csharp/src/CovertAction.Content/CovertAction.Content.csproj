@@ -1,0 +1,7 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- The player's game files: finding them and (as the modules are ported) decoding pictures, fonts, texts and crime files. -->
+  <ItemGroup>
+    <ProjectReference Include="..\CovertAction.Core\CovertAction.Core.csproj" />
+    <ProjectReference Include="..\CovertAction.Msc\CovertAction.Msc.csproj" />
+  </ItemGroup>
+</Project>

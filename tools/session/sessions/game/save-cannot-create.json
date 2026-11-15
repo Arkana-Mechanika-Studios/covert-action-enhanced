@@ -1,0 +1,9 @@
+{
+  "part": "GAME",
+  "start": "campaign-v1",
+  "note": "Item 14: travel-save's keys on a disk that refuses to make CV0.SVE (a read-only save: DOS error 5, access denied). A new case (14:00): the flight to Cairo, its hotel: Save Game into the first slot: the drive prompt, the slot list, and the original's answer to a save that cannot be made: 'File Error: c:cv0.sve' (GAME 00f7:a833), nothing written; the rest of the keys go on from there.",
+  "handoff": {},
+  "dos": {"cannot_create": ["CV0.SVE"]},
+  "unix_time": 657900000,
+  "keys": "{wait 2}{enter}{wait 2}{enter}{wait 2}{enter}{wait 2}{enter}{wait 2}{enter}{wait 2}{enter}{wait 2}{enter}{wait 2}{enter}{wait 2}{enter}{wait 12}{enter}{wait 12}{enter}{wait 12}{enter}{wait 12}{enter}{wait 12}{enter}{wait 12}{down}{down}{down}{enter}{wait 12}{enter}{wait 12}{down}{down}{down}{down}{down}{down}{enter}{wait 40}{enter}{wait 12}{enter}{wait 12}{down}{enter}{wait 12}{down}{down}{down}{enter}{wait 12}{enter}{wait 12}{enter}{wait 12}{enter}{wait 12}{down}{enter}{wait 12}{down}{down}{down}{down}{enter}{wait 12}{enter}{wait 12}{esc}{wait 12}{esc}{wait 12}{down}{enter}{wait 12}{down}{down}{enter}{wait 12}{enter}{wait 12}{enter}{wait 12}{enter}{wait 12}{enter}{wait 30}{alt-q}{wait 5}{down}{enter}{wait 5}{enter}{wait 5}"
+}

@@ -1,0 +1,11 @@
+{
+  "part": "GAME",
+  "start": "stasi-v1",
+  "handoff_from": {
+    "recording": "TAC/stasi-capture"
+  },
+  "note": "Back from TAC/stasi-capture (the agent captured in the raid): the capture scene, the captors' offer answered \"No thanks, Squinty.\", the spells in jail, the escape scene: the hand-off to the escape raid (code 7).",
+  "handoff": {},
+  "unix_time": 658012000,
+  "keys": "{wait 5}{enter}{wait 12}{enter}{wait 12}{enter}{wait 12}{enter}{wait 12}{enter}{wait 12}{enter}{wait 12}{enter}{wait 12}{enter}{wait 12}{enter}{wait 12}{enter}{wait 12}{enter}{wait 12}{enter}{wait 12}{enter}{wait 12}{enter}{wait 12}{enter}{wait 12}{enter}{wait 12}{enter}{wait 12}{enter}{wait 12}{enter}{wait 12}{enter}{wait 12}"
+}

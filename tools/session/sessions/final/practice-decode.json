@@ -1,0 +1,8 @@
+{
+  "part": "FINAL",
+  "start": "campaign-v1",
+  "note": "Late at night; Practice, second difficulty, Cryptography: the decode practice is handed over to the cryptography workstation.",
+  "handoff": {},
+  "unix_time": 660366000,
+  "keys": "{wait 6} {wait 4}{down}{down}{enter}{wait 2}{down}{enter}{wait 2}{down}{down}{enter}{wait 10}"
+}

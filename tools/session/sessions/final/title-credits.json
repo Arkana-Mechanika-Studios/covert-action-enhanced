@@ -1,0 +1,8 @@
+{
+  "part": "FINAL",
+  "start": "campaign-v1",
+  "note": "The title and then the credits play untouched to their end; the main menu comes up and is looked at, then Esc (taken as the menu's first choice: the gender box).",
+  "handoff": {},
+  "unix_time": 600000000,
+  "keys": "{wait 400}{esc}{wait 20}"
+}

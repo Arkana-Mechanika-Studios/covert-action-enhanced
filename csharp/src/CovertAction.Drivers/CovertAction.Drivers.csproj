@@ -1,0 +1,10 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- The rewrite's own drivers behind the boundary interfaces: the MCGA graphics driver, keyboard, a silent sound driver,
+       the machine and the game's files. They talk to a host only through the small interfaces in Host/. -->
+  <ItemGroup>
+    <ProjectReference Include="..\CovertAction.Core\CovertAction.Core.csproj" />
+    <ProjectReference Include="..\CovertAction.Msc\CovertAction.Msc.csproj" />
+    <ProjectReference Include="..\CovertAction.Platform\CovertAction.Platform.csproj" />
+    <ProjectReference Include="..\CovertAction.Content\CovertAction.Content.csproj" />
+  </ItemGroup>
+</Project>

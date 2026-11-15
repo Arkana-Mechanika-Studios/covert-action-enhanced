@@ -1,0 +1,11 @@
+{
+  "part": "TAC",
+  "start": "stasi-v1",
+  "handoff_from": {
+    "recording": "GAME/stasi-city"
+  },
+  "note": "A campaign raid from GAME/stasi-city's hand-off (the compact start image): walking, Alt-Q answered No (the raid goes on), Alt-Q answered Yes: the game ends from inside the raid (the original's exit code is whatever its exit() finds).",
+  "handoff": {},
+  "unix_time": 658003000,
+  "keys": "{wait 3}{esc}{wait 5}{enter}{wait 20}{kp6}{wait 3}{kp6}{wait 3}{kp6}{wait 3}{kp6}{wait 3}{kp6}{wait 3}{kp6}{wait 3}{kp6}{wait 3}{kp6}{wait 3}{kp6}{wait 3}{kp6}{wait 3}{kp8}{wait 3}{kp8}{wait 3}{kp8}{wait 3}{kp8}{wait 3}{kp8}{wait 3}{kp8}{wait 3}{kp8}{wait 3}{kp8}{wait 3}{kp8}{wait 3}{kp8}{wait 3}{alt-q}{wait 5}{enter}{wait 5}{kp9}{wait 3}{kp9}{wait 3}{kp9}{wait 3}{kp9}{wait 3}{kp9}{wait 3}{kp9}{wait 3}{kp9}{wait 3}{kp9}{wait 3}{kp9}{wait 3}{kp9}{wait 3}{alt-q}{wait 5}{down}{enter}{wait 5}"
+}

@@ -1,0 +1,11 @@
+{
+  "part": "CHASE",
+  "start": "chase-v1",
+  "handoff_from": {
+    "recording": "GAME/stakeout-follow"
+  },
+  "note": "The campaign's car chase: GAME/stakeout-follow's hand-off block (Follow car, code 3). The first cars offered, then no key for 6000 polls: the tail cars follow the quarry by themselves, he pulls over and walks into a building; Enter: the part hands back to the campaign (code 0, outcome 1).",
+  "handoff": {},
+  "unix_time": 657951000,
+  "keys": "{wait 3}{enter}{wait 3}{enter}{wait 3}{enter}{wait 6000}{enter}"
+}

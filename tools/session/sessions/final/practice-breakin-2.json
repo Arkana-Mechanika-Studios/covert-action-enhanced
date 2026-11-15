@@ -1,0 +1,8 @@
+{
+  "part": "FINAL",
+  "start": "campaign-v1",
+  "note": "Practice, the third difficulty (two Downs), Breaking In: the building raid's practice at level 2 is handed over.",
+  "handoff": {},
+  "unix_time": 658031400,
+  "keys": "{wait 4} {wait 3}{down}{down}{enter}{wait 2}{down}{down}{enter}{wait 2}{enter}{wait 10}"
+}

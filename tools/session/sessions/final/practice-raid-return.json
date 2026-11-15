@@ -1,0 +1,11 @@
+{
+  "part": "FINAL",
+  "start": "campaign-v1",
+  "handoff_from": {
+    "recording": "TAC/practice-wounded"
+  },
+  "note": "Back from TAC/practice-wounded (the practice raid's hand-off to the menus part, code 0x11): the menus part goes straight back to its main menu (no result screen); Create a New Character, the code name box, Esc.",
+  "handoff": {},
+  "unix_time": 658033000,
+  "keys": "{wait 5}{enter}{wait 12}{enter}{wait 12}{esc}{wait 12}"
+}

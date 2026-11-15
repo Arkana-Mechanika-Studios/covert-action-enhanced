@@ -1,0 +1,8 @@
+{
+  "part": "CODE",
+  "start": "decode-v1",
+  "note": "The captured explore route: a hint, clear, a wrong guess, sound toggled, another guess, sound toggled, a hint, pause, the quit box answered with its first line, then Esc.",
+  "handoff": {},
+  "unix_time": 657835200,
+  "keys": "{wait 2}{f1}{wait 2}{f10}{wait 2}ux{wait 2}{alt-s}ab{alt-s}{f1}{wait 2}{alt-p}{wait 3} {wait 2}{alt-q}{wait 2}{enter}{wait 2}{esc}{wait 5}"
+}

@@ -1,0 +1,93 @@
+module,match,reason
+BUG,00e8:0244,"sets one colour register through the video BIOS (int 10h, AX 1010h): nothing in the program calls it (the part sets its colours through the graphics driver, select_palette), and the rewrite has no video BIOS"
+BUG,00e8:0287,an empty function without a name and without a caller
+BUG,0000:05b9,attach_driver_segment: patches the thunk table for a driver the launcher loaded; the rewrite has no driver programs to attach (D-2)
+BUG,0000:0000,not code: zero bytes at the start of the code segment
+BUG,0000:00ca,the palette loader of the display modes: it forwards to the graphics driver's palette routine for MCGA (IGraphicsDriver.SetPalette) and programs the EGA or Tandy palette registers through the ports for the other modes; the rewrite has the 256-colour MCGA display only (DECISIONS.md)
+BUG,0000:0156,driver-call trampoline behind some thunk slots; the thunks are the boundary interfaces
+BUG,0000:0a8a,"part of the picture decoder (an assembly routine behind the thunk table) or of its read hook: the picture file is read to its end and decoded at once by Content (PictureFile), without the row loop and the 512-byte block reader (D-12)"
+BUG,0000:0b1a,"part of the picture decoder (an assembly routine behind the thunk table) or of its read hook: the picture file is read to its end and decoded at once by Content (PictureFile), without the row loop and the 512-byte block reader (D-12)"
+BUG,0000:0b62,"part of the picture decoder (an assembly routine behind the thunk table) or of its read hook: the picture file is read to its end and decoded at once by Content (PictureFile), without the row loop and the 512-byte block reader (D-12)"
+BUG,0000:0b7c,"part of the picture decoder (an assembly routine behind the thunk table) or of its read hook: the picture file is read to its end and decoded at once by Content (PictureFile), without the row loop and the 512-byte block reader (D-12)"
+BUG,00e8:3c9e,"no caller in the original (dead code); the text builder of an intercepted message; no program calls its copy (FINAL 7668, TAC a522)"
+BUG,00e8:7066,"no caller in the original (dead code); its only caller is save_file, which has none"
+BUG,00e8:70b4,no caller in the original (dead code)
+BUG,00e8:70f8,no caller in the original (dead code)
+BUG,00e8:713e,no caller in the original (dead code)
+BUG,00e8:7224,no caller in the original (dead code)
+BUG,00e8:72a2,no caller in the original (dead code)
+BUG,00e8:72fe,no caller in the original (dead code)
+BUG,00e8:7362,"the 512-byte block reader behind the picture and animation loaders: the files are read to their end and taken apart at once (D-12, D-13)"
+BUG,00e8:7380,"part of the picture decoder (an assembly routine behind the thunk table) or of its read hook: the picture file is read to its end and decoded at once by Content (PictureFile), without the row loop and the 512-byte block reader (D-12)"
+BUG,00e8:73b4,"the 512-byte block reader behind the picture and animation loaders: the files are read to their end and taken apart at once (D-12, D-13)"
+BUG,00e8:73c4,"the 512-byte block reader behind the picture and animation loaders: the files are read to their end and taken apart at once (D-12, D-13)"
+BUG,00e8:740e,switches the display to text mode (int 10h) for the fatal-error message of a failed file: the rewrite prints the name and ends (D-12)
+BUG,00e8:77a2,C run-time start-up/exit table walker: no counterpart in a .NET process
+BUG,00e8:9614,"MSC library DOS wrapper (int 21h function 41h, delete a file): nothing in the game's own code calls it"
+BUG,00e8:9788,run-time long shift-assign helper: C# long arithmetic
+BUG,lib:__FF_MSGBANNER,"C run-time start-up, exit, error messages and DOS return helpers: no counterpart in a .NET process"
+BUG,lib:__NMSG_TEXT,"C run-time start-up, exit, error messages and DOS return helpers: no counterpart in a .NET process"
+BUG,lib:__NMSG_WRITE,"C run-time start-up, exit, error messages and DOS return helpers: no counterpart in a .NET process"
+BUG,lib:___tzset,internals of the library's time(); time() itself is a boundary call (IGameTimer.Time)
+BUG,lib:__aNlshr,run-time long shift helper: C# long arithmetic
+BUG,lib:__amalloc,C run-time heap: C# objects replace the near heap
+BUG,lib:__amallocbrk,C run-time heap: C# objects replace the near heap
+BUG,lib:__amexpand,C run-time heap: C# objects replace the near heap
+BUG,lib:__amlink,C run-time heap: C# objects replace the near heap
+BUG,lib:__amsg_exit,"C run-time start-up, exit, error messages and DOS return helpers: no counterpart in a .NET process"
+BUG,lib:__astart,"C run-time start-up, exit, error messages and DOS return helpers: no counterpart in a .NET process"
+BUG,lib:__cXENIXtoDOSmode,C run-time: translates the file mode of open() for the DOS call; the rewrite opens files through IFiles
+BUG,lib:__catox,library number parsing used only by tzset (the TZ variable)
+BUG,lib:__chkstk,C run-time stack check: a .NET process has no 16-bit stack to check
+BUG,lib:__cinit,"C run-time start-up, exit, error messages and DOS return helpers: no counterpart in a .NET process"
+BUG,lib:__cintDIV,"C run-time start-up, exit, error messages and DOS return helpers: no counterpart in a .NET process"
+BUG,lib:__cltoasub,internal entry of the number-to-text routines
+BUG,lib:__copensub,"internals of the C library's stream reading (fopen, fscanf, fclose): the rewrite reads the text file through IFiles in one piece (D-16)"
+BUG,lib:__ctermsub,"C run-time start-up, exit, error messages and DOS return helpers: no counterpart in a .NET process"
+BUG,lib:__dos_creat,the DOS call under open() that creates a file: the rewrite creates files through IFiles.Open
+BUG,lib:__dos_creatnew,the DOS call under open() that creates a file: the rewrite creates files through IFiles.Open
+BUG,lib:__dos_write,the DOS call under write(): the rewrite writes through IFiles.Write
+BUG,lib:__dosret0,C run-time DOS return helper (carry flag to errno): no counterpart in a .NET process
+BUG,lib:__dosretax,C run-time DOS return helper (carry flag to errno): no counterpart in a .NET process
+BUG,lib:__dosreturn,C run-time DOS return helper (carry flag to errno): no counterpart in a .NET process
+BUG,lib:__dtoxtime,internals of the library's time(); time() itself is a boundary call (IGameTimer.Time)
+BUG,lib:__exit,ends the program: the C# throws ProgramExitException where the original calls it
+BUG,lib:__filbuf,"internals of the C library's stream reading (fopen, fscanf, fclose): the rewrite reads the text file through IFiles in one piece (D-16)"
+BUG,lib:__freebuf,"internals of the C library's stream reading (fopen, fscanf, fclose): the rewrite reads the text file through IFiles in one piece (D-16)"
+BUG,lib:__getbuf,"internals of the C library's stream reading (fopen, fscanf, fclose): the rewrite reads the text file through IFiles in one piece (D-16)"
+BUG,lib:__getstream,"internals of the C library's stream reading (fopen, fscanf, fclose): the rewrite reads the text file through IFiles in one piece (D-16)"
+BUG,lib:__input,"the scanf engine of the C library (fscanf behind the ""security clearance"" text reader): LibraryText.ReadClearedText reads the text itself (D-16)"
+BUG,lib:__isindst,internals of the library's time(); time() itself is a boundary call (IGameTimer.Time)
+BUG,lib:__maperror,C run-time: maps a DOS error number to errno; the boundary reports the DOS number itself
+BUG,lib:__myalloc,C run-time heap: C# objects replace the near heap
+BUG,lib:__nfree,C run-time heap: C# objects replace the near heap
+BUG,lib:__nullcheck,C run-time check of the null segment at exit: no counterpart in a .NET process
+BUG,lib:__openfile,"internals of the C library's stream reading (fopen, fscanf, fclose): the rewrite reads the text file through IFiles in one piece (D-16)"
+BUG,lib:__setargv,C run-time start-up: builds argv from the command line; the launcher starts the part itself
+BUG,lib:__setenvp,C run-time start-up: builds the environment table; the rewrite reads no environment variable
+BUG,lib:brkctl,C run-time heap: C# objects replace the near heap
+BUG,lib:burn,"internals of the scanf engine (fscanf behind the ""security clearance"" text reader): LibraryText.ReadClearedText reads the text itself (D-16)"
+BUG,lib:ch_ok,"internals of the scanf engine (fscanf behind the ""security clearance"" text reader): LibraryText.ReadClearedText reads the text itself (D-16)"
+BUG,lib:exit,ends the program: the C# throws ProgramExitException where the original calls it
+BUG,lib:f_in,"internals of the scanf engine (fscanf behind the ""security clearance"" text reader): LibraryText.ReadClearedText reads the text itself (D-16)"
+BUG,lib:fflush,"internals of the C library's stream reading (fopen, fscanf, fclose): the rewrite reads the text file through IFiles in one piece (D-16)"
+BUG,lib:flushall,"internals of the C library's stream reading (fopen, fscanf, fclose): the rewrite reads the text file through IFiles in one piece (D-16)"
+BUG,lib:getenv,reads an environment variable (used by tzset): the rewrite reads none
+BUG,lib:i_in,"internals of the scanf engine (fscanf behind the ""security clearance"" text reader): LibraryText.ReadClearedText reads the text itself (D-16)"
+BUG,lib:inc,"internals of the scanf engine (fscanf behind the ""security clearance"" text reader): LibraryText.ReadClearedText reads the text itself (D-16)"
+BUG,lib:inp,reads a hardware port: the rewrite has no ports; the readings the game takes this way are named services
+BUG,lib:int86,calls a software interrupt: the rewrite has no interrupts; the services the game uses are the boundary interfaces
+BUG,lib:intdos,calls DOS through a software interrupt: the rewrite has no interrupts; the services the game uses are IFiles and the boundary interfaces
+BUG,lib:malloc,C run-time heap: C# objects replace the near heap
+BUG,lib:memcpy,"a library copy, compare, fill or search: the ported code does the same with C# arrays, spans and strings"
+BUG,lib:memset,"a library copy, compare, fill or search: the ported code does the same with C# arrays, spans and strings"
+BUG,lib:movedata,"a library copy, compare, fill or search: the ported code does the same with C# arrays, spans and strings"
+BUG,lib:perror,prints a DOS error text for the fatal-error exit of a failed file: the rewrite prints the file's name and ends (D-12)
+BUG,lib:s_in,"internals of the scanf engine (fscanf behind the ""security clearance"" text reader): LibraryText.ReadClearedText reads the text itself (D-16)"
+BUG,lib:stackavail,free space of the 16-bit stack: no counterpart in a .NET process
+BUG,lib:strnicmp,"a library copy, compare, fill or search: the ported code does the same with C# arrays, spans and strings"
+BUG,lib:strstr,"a library copy, compare, fill or search: the ported code does the same with C# arrays, spans and strings"
+BUG,lib:tzset,internals of the library's time(); time() itself is a boundary call (IGameTimer.Time)
+BUG,lib:ungetc,"internals of the C library's stream reading (fopen, fscanf, fclose): the rewrite reads the text file through IFiles in one piece (D-16)"
+BUG,lib:wgood,"internals of the scanf engine (fscanf behind the ""security clearance"" text reader): LibraryText.ReadClearedText reads the text itself (D-16)"
+BUG,lib:whiteout,"internals of the scanf engine (fscanf behind the ""security clearance"" text reader): LibraryText.ReadClearedText reads the text itself (D-16)"

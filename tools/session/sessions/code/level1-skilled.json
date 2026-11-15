@@ -1,0 +1,8 @@
+{
+  "part": "CODE",
+  "start": "decode-v1",
+  "note": "Level 1 with the best cryptography skill (difficulty -1: the most frequent letter and one more are given away), F10, Esc.",
+  "handoff": {"level": 1, "skill_bits": 48},
+  "unix_time": 631152000,
+  "keys": "{wait 5}{f10}{wait 3}{esc}{wait 5}"
+}

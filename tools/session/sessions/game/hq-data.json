@@ -1,0 +1,8 @@
+{
+  "part": "GAME",
+  "start": "campaign-v1",
+  "note": "A new case (20:00): the clues, the Chief's office (BRIEFING, HQ, OFFICEF animations) and her pages; the CIA building's Data Section (the clue board and a clue, the suspect files, the documents); the city screen; back into the CIA building (HQ.PAN no longer loads: D-11); the Mossad cell's building: Place wiretap, the guards box and the hand-off to the electronics part (code 4).",
+  "handoff": {},
+  "unix_time": 657835200,
+  "keys": "{wait 2}{enter}{wait 2}{enter}{wait 2}{enter}{wait 2}{enter}{wait 2}{enter}{wait 2}{enter}{wait 2}{enter}{wait 2}{enter}{wait 2}{enter}{wait 12}{enter}{wait 12}{enter}{wait 12}{enter}{wait 12}{enter}{wait 12}{enter}{wait 12}{enter}{wait 12}{enter}{wait 12}{enter}{wait 6}{esc}{wait 6}{esc}{wait 12}{down}{enter}{wait 12}{enter}{wait 12}{esc}{wait 12}{esc}{wait 12}{down}{down}{enter}{wait 12}{enter}{wait 12}{esc}{wait 12}{esc}{wait 12}{down}{down}{down}{enter}{wait 12}{enter}{wait 12}{esc}{wait 12}{esc}{wait 12}{down}{down}{down}{down}{enter}{wait 12}{enter}{wait 12}{esc}{wait 12}{esc}{wait 12}{down}{down}{down}{down}{down}{enter}{wait 12}{enter}{wait 12}{esc}{wait 12}{esc}{wait 12}{down}{down}{down}{down}{down}{down}{enter}{wait 12}{enter}{wait 12}{esc}{wait 12}{esc}{wait 12}{esc}{wait 12}{down}{down}{enter}{wait 12}{enter}{wait 12}{enter}{wait 12}{enter}{wait 30}"
+}

@@ -1,0 +1,11 @@
+{
+  "part": "TAC",
+  "start": "tacphoto-v1",
+  "handoff_from": {
+    "recording": "GAME/regional-breakin"
+  },
+  "note": "The level-2 raid from GAME/regional-breakin (the Rev. Guards hideout): the kit as offered, ten shots; the guards come and shoot: \"You slump to the ground, overcome by your wounds.\", the hand-off to GAME (code 0, person -1: captured).",
+  "handoff": {},
+  "unix_time": 657910000,
+  "keys": "{wait 3}{esc}{wait 5}{enter}{wait 20} {wait 4} {wait 4} {wait 4} {wait 4} {wait 4} {wait 4} {wait 4} {wait 4} {wait 4} {wait 4}{wait 1100}"
+}

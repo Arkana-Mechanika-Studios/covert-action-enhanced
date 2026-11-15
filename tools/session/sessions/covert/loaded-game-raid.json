@@ -1,0 +1,18 @@
+{
+  "part": "COVERT",
+  "note": "The set-up screen, then FINAL: Load a Saved Game, the save new-case-tap-save wrote (slot 1); GAME in Washington: the Stasi hideout, Break into building; TAC: the kit as offered, Door #1, the agent walks down (keypad 2, Num Lock cleared by the launcher) and slips out of the building; back in GAME at the hideout (the keypad's 2 now moves the menu): Alt-Q, Yes, the farewell picture: the game ends.",
+  "graphics_key": "2",
+  "unix_time": 657990000,
+  "part_times": [
+    657990000,
+    657990100,
+    657990200,
+    657990300
+  ],
+  "disk": {
+    "CV0.SVE": {
+      "recording": "COVERT/new-case-tap-save"
+    }
+  },
+  "keys": "12{wait 2} {wait 2}{down}{enter}{wait 3}{enter}{wait 5}{enter}{wait 3}{down}{down}{down}{down}{down}{down}{enter}{wait 12}{down}{enter}{wait 60}{esc}{wait 5}{enter}{wait 20}{kp2}{wait 3}{kp2}{wait 3}{kp2}{wait 3}{kp2}{wait 3}{kp2}{wait 3}{kp2}{wait 3}{kp2}{wait 3}{kp2}{wait 23}{alt-q}{wait 5}{down}{enter}{wait 5}{enter}{wait 5}"
+}

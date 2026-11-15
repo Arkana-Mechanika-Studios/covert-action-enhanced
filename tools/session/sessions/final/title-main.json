@@ -1,0 +1,8 @@
+{
+  "part": "FINAL",
+  "start": "campaign-v1",
+  "note": "The title plays untouched for a while, then Space skips it; the main menu is shown and looked at.",
+  "handoff": {},
+  "unix_time": 657835200,
+  "keys": "{wait 40} {wait 10}"
+}

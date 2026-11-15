@@ -1,0 +1,8 @@
+{
+  "part": "FINAL",
+  "start": "campaign-v1",
+  "note": "Title skipped; Practice a skill, Local Disturbance, Breaking In: the menus part hands the building raid's practice over and ends.",
+  "handoff": {},
+  "unix_time": 631152000,
+  "keys": "{wait 3} {wait 5}{down}{wait 2}{down}{wait 2}{enter}{wait 5}{enter}{wait 5}{enter}{wait 10}"
+}

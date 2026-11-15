@@ -1,0 +1,8 @@
+{
+  "part": "CODE",
+  "start": "decode-v1",
+  "note": "Level 3 without cryptography skill (difficulty 4: homophones): guesses, two hints, the cursor keys, Esc.",
+  "handoff": {"level": 3, "skill_bits": 0},
+  "unix_time": 600000123,
+  "keys": "{wait 3}ab{wait 2}cd{wait 2}{f1}{wait 3}{f1}{wait 3}{down}{down}{up}{wait 2}{esc}{wait 5}"
+}

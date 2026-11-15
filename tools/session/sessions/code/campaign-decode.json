@@ -1,0 +1,11 @@
+{
+  "part": "CODE",
+  "start": "decode-v1",
+  "handoff_from": {
+    "recording": "GAME/stasi-crypto"
+  },
+  "note": "The coded message chosen in the Crypto Branch of GAME/stasi-crypto (its hand-off block, code 2), decoded: for each plain letter of the message its cipher letter is typed, then the plain letter (the cipher of this time of day, read from the part's cipher_alphabet before writing the script); MESSAGE DECODED, Enter: the part hands back to the campaign (code 0, value 1).",
+  "handoff": {},
+  "unix_time": 658063000,
+  "keys": "{wait 3}oafbmckdgeafcgnhtiekwlhmdnxojpyqzrssitrulvbwuy{wait 3}{enter}{wait 3}{enter}{wait 3}"
+}

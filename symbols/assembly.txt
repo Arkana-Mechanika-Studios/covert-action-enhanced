@@ -1,0 +1,94 @@
+# Functions the function database would call C that are not compiler output.
+# Hand-written routines of the original that are not compiler output; read by tools/source_map.py.
+# Evidence is from the original bytes (the routine's instructions in the module's EXE).
+sub_bug_0000_0000 data ; zero bytes, not code (start of the code segment; null far-call target)
+sub_bug_0000_0156 asm ; stores its return address in CS-relative words and continues through a far jump/call: overlay or run-time support, no frame
+sub_bug_0000_0268 asm ; thunk table entry: a near call followed by inline data words, no frame
+sub_bug_0000_026f asm ; thunk table entry: a near call followed by inline data words, no frame
+sub_bug_0000_068a asm ; loads ES with a constant paragraph and works in DI, no frame: register interface
+sub_bug_0000_09c4 asm ; argument in BX, result in AL, no frame: register interface
+sub_bug_00e8_77a2 asm ; C run-time start-up/exit table walker: far pointers between SI and DI called in reverse, no frame
+sub_bug_00e8_9614 asm ; MSC library DOS wrapper: int 21h with one argument from [bp+4], then jmp to the library's shared DOS return tail (CF -> errno); too short for the library matcher
+sub_bug_00e8_9622 asm ; MSC library DOS wrapper: int 21h with one argument from [bp+4], then jmp to the library's shared DOS return tail (CF -> errno); too short for the library matcher
+sub_bug_00e8_9788 asm ; run-time long shift-assign helper: loads a long through [bp+4], calls the long shift helper with CL from [bp+6], callee pops (ret 4)
+sub_chase_0000_0000 data ; zero bytes, not code (start of the code segment; null far-call target)
+sub_chase_0000_00ca asm ; stores its return address in CS-relative words and continues through a far jump/call: overlay or run-time support, no frame
+sub_chase_0000_0134 asm ; thunk table entry: a near call followed by inline data words, no frame
+sub_chase_0000_01dc asm ; thunk table entry: a near call followed by inline data words, no frame
+sub_chase_0000_05fe asm ; loads ES with a constant paragraph and works in DI, no frame: register interface
+sub_chase_0000_0938 asm ; argument in BX, result in AL, no frame: register interface
+sub_chase_00df_4aaa asm ; C run-time start-up/exit table walker: far pointers between SI and DI called in reverse, no frame
+sub_chase_00df_5770 asm ; MSC library DOS wrapper: int 21h with one argument from [bp+4], then jmp to the library's shared DOS return tail (CF -> errno); too short for the library matcher
+sub_chase_00df_57da asm ; MSC library DOS wrapper: int 21h with one argument from [bp+4], then jmp to the library's shared DOS return tail (CF -> errno); too short for the library matcher
+sub_code_0000_0000 data ; zero bytes, not code (start of the code segment; null far-call target)
+sub_code_0000_00ca asm ; stores its return address in CS-relative words and continues through a far jump/call: overlay or run-time support, no frame
+sub_code_0000_01dc asm ; thunk table entry: a near call followed by inline data words, no frame
+sub_code_0000_05fe asm ; loads ES with a constant paragraph and works in DI, no frame: register interface
+sub_code_0000_0938 asm ; argument in BX, result in AL, no frame: register interface
+sub_code_0000_2cce asm ; C run-time start-up/exit table walker: far pointers between SI and DI called in reverse, no frame
+sub_covert_0000_0000 data ; zero bytes, not code (start of the code segment; null far-call target)
+sub_covert_0000_0402 asm ; C run-time start-up/exit table walker: far pointers between SI and DI called in reverse, no frame
+sub_covert_011a_0411 asm ; file loader: int 21h open (3D00h) and read (3Fh) in 32 KB blocks, advancing DS by paragraphs, no frame
+sub_final_0000_0000 data ; zero bytes, not code (start of the code segment; null far-call target)
+sub_final_0000_0156 asm ; stores its return address in CS-relative words and continues through a far jump/call: overlay or run-time support, no frame
+sub_final_0000_01c0 asm ; thunk table entry: a near call followed by inline data words, no frame
+sub_final_0000_0268 asm ; thunk table entry: a near call followed by inline data words, no frame
+sub_final_0000_026f asm ; thunk table entry: a near call followed by inline data words, no frame
+sub_final_0000_068a asm ; loads ES with a constant paragraph and works in DI, no frame: register interface
+sub_final_0000_09c4 asm ; argument in BX, result in AL, no frame: register interface
+sub_final_0000_0d40 asm ; stores its return address in CS-relative words and continues through a far jump/call: overlay or run-time support, no frame
+sub_final_0000_0d4f asm ; reloads BP from its own return address: hand-written stack walking
+sub_final_0000_0d5e asm ; stores its return address in CS-relative words and continues through a far jump/call: overlay or run-time support, no frame
+sub_final_0000_0d6d asm ; reloads BP from its own return address: hand-written stack walking
+sub_final_0000_0d8b asm ; reads the caller's saved BP ([bp] without its own frame): hand-written
+sub_final_0100_0019 asm ; installs the INT 24h critical-error handler once (xchg on a flag byte, int 21h AH=35h/25h), no frame
+sub_final_0100_003e asm ; restores the saved INT 24h handler (xchg on a flag byte, lds dx, int 21h AH=25h), no frame
+sub_final_0100_c93c asm ; C run-time start-up/exit table walker: far pointers between SI and DI called in reverse, no frame
+sub_final_0100_e920 asm ; MSC library DOS wrapper: int 21h with one argument from [bp+4], then jmp to the library's shared DOS return tail (CF -> errno); too short for the library matcher
+sub_final_0100_e9a0 asm ; MSC library DOS wrapper: int 21h with one argument from [bp+4], then jmp to the library's shared DOS return tail (CF -> errno); too short for the library matcher
+sub_final_0100_ea0a asm ; MSC library DOS wrapper: int 21h with one argument from [bp+4], then jmp to the library's shared DOS return tail (CF -> errno); too short for the library matcher
+sub_final_0100_eb14 asm ; run-time long shift-assign helper: loads a long through [bp+4], calls the long shift helper with CL from [bp+6], callee pops (ret 4)
+sub_game_0000_0000 data ; zero bytes, not code (start of the code segment; null far-call target)
+sub_game_0000_00ca asm ; stores its return address in CS-relative words and continues through a far jump/call: overlay or run-time support, no frame
+sub_game_0000_0134 asm ; thunk table entry: a near call followed by inline data words, no frame
+sub_game_0000_01dc asm ; thunk table entry: a near call followed by inline data words, no frame
+sub_game_0000_01e3 asm ; thunk table entry: a near call followed by inline data words, no frame
+sub_game_0000_05fe asm ; loads ES with a constant paragraph and works in DI, no frame: register interface
+sub_game_0000_0938 asm ; argument in BX, result in AL, no frame: register interface
+sub_game_0000_0cb4 asm ; stores its return address in CS-relative words and continues through a far jump/call: overlay or run-time support, no frame
+sub_game_0000_0cc3 asm ; reloads BP from its own return address: hand-written stack walking
+sub_game_0000_0cd2 asm ; stores its return address in CS-relative words and continues through a far jump/call: overlay or run-time support, no frame
+sub_game_0000_0ce1 asm ; reloads BP from its own return address: hand-written stack walking
+sub_game_0000_0cff asm ; reads the caller's saved BP ([bp] without its own frame): hand-written
+sub_game_00f7_001d asm ; installs the INT 24h critical-error handler once (xchg on a flag byte, int 21h AH=35h/25h), no frame
+sub_game_00f7_0042 asm ; restores the saved INT 24h handler (xchg on a flag byte, lds dx, int 21h AH=25h), no frame
+sub_game_00f7_dcbe asm ; C run-time start-up/exit table walker: far pointers between SI and DI called in reverse, no frame
+sub_game_00f7_fc92 asm ; MSC library DOS wrapper: int 21h with one argument from [bp+4], then jmp to the library's shared DOS return tail (CF -> errno); too short for the library matcher
+sub_game_00f7_fd12 asm ; MSC library DOS wrapper: int 21h with one argument from [bp+4], then jmp to the library's shared DOS return tail (CF -> errno); too short for the library matcher
+sub_game_00f7_fd7c asm ; MSC library DOS wrapper: int 21h with one argument from [bp+4], then jmp to the library's shared DOS return tail (CF -> errno); too short for the library matcher
+sub_game_00f7_fe86 asm ; run-time long shift-assign helper: loads a long through [bp+4], calls the long shift helper with CL from [bp+6], callee pops (ret 4)
+sub_intro_0000_0000 data ; zero bytes, not code (start of the code segment; null far-call target)
+sub_intro_0000_0482 asm ; uppercases a string through SI without saving SI (MSC saves SI when used); sets ES=DS for nothing
+sub_intro_0000_051f asm ; strlen keeping the start pointer in AX across the loop back-edge, result by sub ax,bx; not ax; mov sp,bp with no locals
+sub_intro_0000_0579 asm ; strchr-like: mov ax,0 (b8 00 00; MSC emits sub ax,ax), jmp short + nop forward-jump pad (MASM), AL live across the loop, SI pushed but unused
+sub_intro_0000_059c asm ; memset by rep stosb through DI without saving DI; pushes SI it never uses
+sub_intro_0000_05b2 asm ; far memset by les di / rep stosb without saving DI
+sub_intro_0000_05e6 asm ; far-to-near copy with lds si / rep movsb, DS switched and restored by hand
+sub_intro_0000_0602 asm ; word compare loop with loope and CX count
+sub_intro_0000_062d asm ; interrupt dispatcher: loads AX..DX from a struct, compare ladder chooses literal int 10h/21h/16h/1Ah, saves registers back
+sub_intro_0000_0692 asm ; number-to-string by radix (10, 16, 2) calling the frameless helpers 06d2, 06fd, 0745 that read this routine's [bp+4]
+sub_intro_0000_06fd asm ; reads [bp+N] without its own frame (the caller's BP) and uses BX as a pointer
+sub_intro_0000_0745 asm ; reads [bp+N] without its own frame (the caller's BP) and uses BX as a pointer
+sub_intro_0000_07b2 asm ; DOS print string: int 21h AH=09h with DX from [bp+4]
+sub_intro_0000_09cc asm ; C run-time start-up/exit table walker: far pointers between SI and DI called in reverse, no frame
+sub_intro_00cb_0419 asm ; file loader: int 21h open (3D00h) and read (3Fh) in 32 KB blocks, advancing DS by paragraphs, no frame
+sub_tac_0000_0000 data ; zero bytes, not code (start of the code segment; null far-call target)
+sub_tac_0000_0156 asm ; stores its return address in CS-relative words and continues through a far jump/call: overlay or run-time support, no frame
+sub_tac_0000_0268 asm ; thunk table entry: a near call followed by inline data words, no frame
+sub_tac_0000_026f asm ; thunk table entry: a near call followed by inline data words, no frame
+sub_tac_0000_068a asm ; loads ES with a constant paragraph and works in DI, no frame: register interface
+sub_tac_0000_09c4 asm ; argument in BX, result in AL, no frame: register interface
+sub_tac_00e8_d9d6 asm ; C run-time start-up/exit table walker: far pointers between SI and DI called in reverse, no frame
+sub_tac_00e8_fd6e asm ; MSC library DOS wrapper: int 21h with one argument from [bp+4], then jmp to the library's shared DOS return tail (CF -> errno); too short for the library matcher
+sub_tac_00e8_fd7c asm ; MSC library DOS wrapper: int 21h with one argument from [bp+4], then jmp to the library's shared DOS return tail (CF -> errno); too short for the library matcher
+sub_tac_00e8_ff84 asm ; run-time long shift-assign helper: loads a long through [bp+4], calls the long shift helper with CL from [bp+6], callee pops (ret 4)

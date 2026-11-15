@@ -1,0 +1,8 @@
+{
+  "part": "GAME",
+  "start": "campaign-v1",
+  "note": "A new case (04:00): the Mossad cell's building (BLDING03.PAN), Watch the building three times (the binoculars, BINOS3.PAN, do not load in the start image's memory: D-11), Follow car: the box on the quarry and the hand-off to the car chase (code 3).",
+  "handoff": {},
+  "unix_time": 657950400,
+  "keys": "{wait 2}{enter}{wait 2}{enter}{wait 2}{enter}{wait 2}{enter}{wait 2}{enter}{wait 2}{enter}{wait 2}{enter}{wait 2}{enter}{wait 2}{enter}{wait 12}{enter}{wait 12}{enter}{wait 12}{enter}{wait 12}{enter}{wait 12}{enter}{wait 12}{down}{down}{down}{enter}{wait 12}{down}{down}{down}{down}{enter}{wait 12}{down}{down}{enter}{wait 30}{enter}{wait 30}{enter}{wait 12}{down}{enter}{wait 12}{enter}{wait 12}{enter}{wait 12}{enter}{wait 12}"
+}

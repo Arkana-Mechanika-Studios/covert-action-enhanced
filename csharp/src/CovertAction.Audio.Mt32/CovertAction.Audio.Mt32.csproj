@@ -1,0 +1,10 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- The MT-32 / CM-32L emulation (Munt's mt32emu, LGPL-2.1-or-later) the Roland driver's MIDI plays on, used as a
+       separate library through its NuGet binding (which brings the native libmt32emu); none of its source is part of
+       this repository, and no ROM: the player supplies them (THIRD_PARTY_NOTICES.md). The only product assembly that
+       links a third-party library (ARCHITECTURE.md "Layers"). -->
+  <ItemGroup>
+    <ProjectReference Include="..\CovertAction.Audio\CovertAction.Audio.csproj" />
+    <PackageReference Include="Mt32emu.net" Version="1.0.0-rc.1" />
+  </ItemGroup>
+</Project>

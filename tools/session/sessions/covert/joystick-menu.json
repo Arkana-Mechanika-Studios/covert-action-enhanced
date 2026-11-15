@@ -1,0 +1,11 @@
+{
+  "part": "COVERT",
+  "note": "The joystick moving (item 12): the set-up with the IBM sound and 1, joystick and keyboard; a stick on the game port, at rest; FINAL calibrates it at rest (Enter answers each corner box), the title, Space; at the main menu the stick moves the highlight: down twice, held down for four entries (two steps: the second stops at the last line), held up for two entries (one step), then the first button takes Practice a skill; the first button takes the first level, the stick pushed down and right twice and the first button take the cryptography; in CODE (the workstation) the second button and Enter change nothing but its clock; Alt-Q, Yes: the game is left from CODE.",
+  "graphics_key": "2",
+  "unix_time": 670000000,
+  "part_times": [
+    670000000
+  ],
+  "stick": [0, 0, 0],
+  "keys": "21{wait 2}{enter}{wait 2}{enter}{wait 3} {wait 4}{stick 0 1}{wait}{stick 0 0}{wait 2}{stick 0 1}{wait}{stick 0 0}{wait 2}{stick 0 1}{wait 4}{stick 0 0}{wait 2}{stick 0 -1}{wait 2}{stick 0 0}{wait 2}{stick 0 0 1}{wait}{stick 0 0}{wait 3}{stick 0 0 1}{wait}{stick 0 0}{wait 3}{stick 1 1}{wait}{stick 0 0}{wait 2}{stick 1 1}{wait}{stick 0 0}{wait 2}{stick 0 0 1}{wait}{stick 0 0}{wait 6}{stick 0 0 2}{wait}{stick 0 0}{wait 3}{enter}{wait 6}{alt-q}{wait 3}{down}{enter}{wait 6}"
+}

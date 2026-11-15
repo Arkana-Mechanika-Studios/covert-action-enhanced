@@ -1,0 +1,33 @@
+member,reason
+CovertAction.Core.Crypto.CryptoRules.CipherLetterOf,"reads one entry of the cipher table as a letter number; the original writes cipher_alphabet[i] - 0x41 in place at each use"
+CovertAction.Core.Shared.TextBuffer.CopyFrom,an operation of the text buffer type (the original copies the 512 bytes in a loop)
+CovertAction.Core.Shared.TextBuffer.RemoveAt,"an operation of the text buffer type (the original moves the rest of the text with two strcpy calls)"
+CovertAction.Core.Shared.TextBuffer.Truncate,an operation of the text buffer type (the original stores an end mark)
+CovertAction.Core.Shared.TextBuffer.UpperCase,"an operation of the text buffer type (the C library routine strupr, CStr.Strupr)"
+CovertAction.Core.Records.Activity.CopyFrom,copies a record field by field (the original copies the tables with movedata; a part keeps its own copies)
+CovertAction.Core.Records.Activity2.CopyFrom,copies a record field by field (the original copies the tables with movedata; a part keeps its own copies)
+CovertAction.Core.Records.City.CopyFrom,copies a record field by field (the original copies the tables with movedata; a part keeps its own copies)
+CovertAction.Core.Records.Clue.CopyFrom,copies a record field by field (the original copies the tables with movedata; a part keeps its own copies)
+CovertAction.Core.Records.Event.CopyFrom,copies a record field by field (the original copies the tables with movedata; a part keeps its own copies)
+CovertAction.Core.Records.Location.CopyFrom,copies a record field by field (the original copies the tables with movedata; a part keeps its own copies)
+CovertAction.Core.Records.MacGuffins.CopyFrom,copies a record field by field (the original copies the tables with movedata; a part keeps its own copies)
+CovertAction.Core.Records.Org.CopyFrom,copies a record field by field (the original copies the tables with movedata; a part keeps its own copies)
+CovertAction.Core.Records.Person.CopyFrom,copies a record field by field (the original copies the tables with movedata; a part keeps its own copies)
+CovertAction.Core.Records.Plot.CopyFrom,copies a record field by field (the original copies the tables with movedata; a part keeps its own copies)
+CovertAction.Core.Records.Synopsis.CopyFrom,copies a record field by field (the original copies the tables with movedata; a part keeps its own copies)
+CovertAction.Core.Graphics.ImageRegister.For,the image a stored word stands for (the original keeps an image as its place in memory; needed where a state is read from the original's bytes)
+CovertAction.Core.Graphics.ImageRegister.NameOf,the word of an image (needed where a state is written as the original's bytes)
+CovertAction.Core.Graphics.ImageRegister.Set,gives a word its image (oracle tests that read images from the original's memory)
+CovertAction.Presentation.Library.LibraryPictures.ReadToEnd,"reads a file to its end for the loaders that decode at once (D-12, D-13); the original reads through a 512-byte buffer"
+CovertAction.Presentation.Library.TextStream.ScanWord,"the C library's fscanf for the format %32s; the routine's coordinates are claimed by ScanLine, its other format (one original routine, one C# method per format the game reads with)"
+CovertAction.Presentation.Game.CampaignSaves.SaveScreens,"builds the library's save screens on the campaign's own load and save routines (the original has the screens' calls to load_game and save_to_named_file written into its copies of them)"
+CovertAction.Core.Shared.TextBufferTable.Add,"an operation of the list the library's text routines take the placeholder values through (the original's table of pointers to fixed buffers; adding and removing are not supported)"
+CovertAction.Core.Shared.TextBufferTable.Clear,"an operation of the list the library's text routines take the placeholder values through (the original's table of pointers to fixed buffers; adding and removing are not supported)"
+CovertAction.Core.Shared.TextBufferTable.Contains,"an operation of the list the library's text routines take the placeholder values through (the original's table of pointers to fixed buffers; adding and removing are not supported)"
+CovertAction.Core.Shared.TextBufferTable.CopyTo,"an operation of the list the library's text routines take the placeholder values through (the original's table of pointers to fixed buffers; adding and removing are not supported)"
+CovertAction.Core.Shared.TextBufferTable.GetEnumerator,"an operation of the list the library's text routines take the placeholder values through (the original's table of pointers to fixed buffers; adding and removing are not supported)"
+CovertAction.Core.Shared.TextBufferTable.IndexOf,"an operation of the list the library's text routines take the placeholder values through (the original's table of pointers to fixed buffers; adding and removing are not supported)"
+CovertAction.Core.Shared.TextBufferTable.Insert,"an operation of the list the library's text routines take the placeholder values through (the original's table of pointers to fixed buffers; adding and removing are not supported)"
+CovertAction.Core.Shared.TextBufferTable.Remove,"an operation of the list the library's text routines take the placeholder values through (the original's table of pointers to fixed buffers; adding and removing are not supported)"
+CovertAction.Core.Shared.TextBufferTable.RemoveAt,"an operation of the list the library's text routines take the placeholder values through (the original's table of pointers to fixed buffers; adding and removing are not supported)"
+CovertAction.Presentation.Intro.HardwareSetup.ShowTitle,"the set-up screen without its questions (D-600, D-603): the title and the last words of hardware_setup_menu, two seconds, and the launcher's settings as the answers"

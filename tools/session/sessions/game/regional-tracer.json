@@ -1,0 +1,11 @@
+{
+  "part": "GAME",
+  "start": "stasi-v1",
+  "handoff_from": {
+    "recording": "FINAL/plain-new-case"
+  },
+  "note": "The level-2 case of FINAL/plain-new-case: the Rev. Guards hideout, Watch the building (GAME 00f7:23c9 watch_building_exit), someone leaves: Wait, then Trace car (TRACE scene): the hand-off to the electronics part as the car tracer (code 0x0c). Started in the compact start image (stasi-v1), where the TRACE animation (BUGCAR.PAN) loads: under the legacy image it does not (D-11), and the half-loaded animation is still on the screen at the hand-off.",
+  "handoff": {},
+  "unix_time": 657900000,
+  "keys": "{wait 5}{enter}{wait 12}{enter}{wait 12}{enter}{wait 12}{enter}{wait 12}{enter}{wait 12}{wait 10}{down}{down}{down}{enter}{wait 30}{down}{down}{down}{down}{down}{down}{enter}{wait 30}{down}{down}{enter}{wait 30}{down}{down}{enter}{wait 60}{enter}{wait 5}"
+}

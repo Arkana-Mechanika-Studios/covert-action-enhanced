@@ -1,0 +1,13 @@
+{
+  "part": "FINAL",
+  "start": "campaign-v1",
+  "disk": {
+    "CV0.SVE": {
+      "recording": "GAME/travel-save"
+    }
+  },
+  "note": "Loading a saved game written in play: CV0.SVE as GAME/travel-save saved it (in Cairo) lies on the player's disk. Load a Saved Game, the drive prompt, the slot list naming the save, Enter: the campaign is read from the file and handed to GAME (code 1).",
+  "handoff": {},
+  "unix_time": 657990000,
+  "keys": "{wait 2} {wait 2}{down}{enter}{wait 3}{enter}{wait 5}{enter}{wait 5}"
+}

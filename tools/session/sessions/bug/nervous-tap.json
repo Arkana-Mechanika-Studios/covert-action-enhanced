@@ -1,0 +1,9 @@
+{
+  "part": "BUG",
+  "start": "bug-v1",
+  "handoff_from": {"recording": "GAME/tap-alarm-return"},
+  "note": "The second wiretap at the Stasi hideout after the alarm (GAME/tap-alarm-return, code 4): the guards very nervous, two minutes on the clock; Alt-S, the cursor moved, then the time runs out with no swap: \"Time expired. 0 phones tapped. No Alarms\", Enter: the hand-off back to the campaign (code 0).",
+  "handoff": {},
+  "unix_time": 657930600,
+  "keys": "{wait 5}{alt-s}{wait 2}{down}{wait 2}{right}{wait 2}{wait 1000}{enter}{wait 5}{enter}{wait 5}"
+}

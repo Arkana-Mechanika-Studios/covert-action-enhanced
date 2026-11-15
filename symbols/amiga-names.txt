@@ -1,0 +1,638 @@
+# symbols/amiga-names.txt - original names from the Amiga version of Covert Action
+#
+# Source: amiga/files/disk1/covert (not committed), a stale debug build left on disk 1 of
+# "Covert Action v447.101 (1992)": an AmigaOS hunk executable that declares 138 hunks but holds
+# only hunks 0-7; it carries a SYMBOL table (232 names) and SAS/C 5.10 HUNK_DEBUG blocks for
+# SPIES:game/covert.c (the global data of every module, with full struct types) and
+# SPIES:code/main.c.  The game program amiga/files/disk1/game has the same data hunks 2/3
+# byte for byte, so the names apply to it; its 68k code was matched against our C through
+# its relocations.  Method and evidence in docs/amiga.md.
+#
+# Format:  <our label>  <original name>  ; <confidence>: <evidence>
+#   our label: as in symbols/names.txt (labels not yet named there are marked); a struct field
+#     is <table label>.<our field> (the campaign structs under the GAME table, the raid structs
+#     under TAC, the port record under CODE 1250); D_game_760a+<off> = a field of the 0x28e-byte
+#     scalar block (struct Plot in the original).
+#   original name: in the rename section the OMF name exactly as in the Amiga symbol table
+#     (leading underscore, case kept, e.g. _TheOrg1); in the fields section pl.field /
+#     table[].field for a label inside a table and Struct.field for a struct member.
+#   confidence: certain = the 68k code does what our C does with it (same constants, strings,
+#     call order) or a reader copies it at the same shared offset; likely = same role and
+#     layout without a statement-level match; guess = plausible only (not to be applied).
+# In the evidence, F_<hunk>_<offset> is the 68k function at that hunk and hex offset of `game`,
+# and 4-hex numbers like 6cb1 are our function stems.
+# Name collisions to watch when applying them: docs/amiga.md, "Applying the names".
+# One original variable can stand for several of our labels: the Amiga build is one program,
+# the PC one has a private copy of each table and scalar in every module.
+
+# ==== labels and functions (rename candidates: original OMF name with its underscore)
+D_game_1094            _cl                  ; certain: game loader aebb reads table "activity" into it; Amiga covert.c declares struct Clue[80], 12 bytes
+D_game_97a6            _ac                  ; certain: game loader aebb reads table "cast" into it; Amiga covert.c declares struct Activity[32], 48 bytes
+D_game_a55e            _ac2                 ; certain: game loader aebb reads table "cast_prog" into it; Amiga covert.c declares struct Activity2[32], 6 bytes
+D_game_7a9e            _ct                  ; certain: game loader aebb reads table "cities" into it; Amiga covert.c declares struct City[16], 34 bytes
+D_game_a628            _active              ; certain: game loader aebb reads table "counters" into it; Amiga covert.c declares int active[2][16]: first 16 ints = per-city counters (active[0]); the label is the start of active
+D_game_83c6            _ev                  ; certain: game loader aebb reads table "events" into it; Amiga covert.c declares struct Event[64], 44 bytes
+D_game_0494            _lc                  ; certain: game loader aebb reads table "links" into it; Amiga covert.c declares struct Location[256], 12 bytes
+D_game_7cc2            _sn                  ; certain: game loader aebb reads table "messages" into it; Amiga covert.c declares struct Synopsis[128], 14 bytes
+D_game_a414            _mc                  ; certain: game loader aebb reads table "objects" into it; Amiga covert.c declares struct MacGuffins[4], 18 bytes
+D_game_9fb4            _org                 ; certain: game loader aebb reads table "orgs" into it; Amiga covert.c declares struct Org[16], 35+1 bytes
+D_game_0094            _ps                  ; certain: game loader aebb reads table "persons" into it; Amiga covert.c declares struct Person[64], 16 bytes
+D_game_760a            _pl                  ; certain: game loader aebb reads table "scalar" into it; Amiga covert.c declares struct Plot, 0x28e
+D_tac_16fe             _cl                  ; certain: tac loader cbb9 reads table "activity" into it; Amiga covert.c declares struct Clue[80], 12 bytes
+D_tac_bdf6             _ac                  ; certain: tac loader cbb9 reads table "cast" into it; Amiga covert.c declares struct Activity[32], 48 bytes
+D_tac_caea             _ac2                 ; certain: tac loader cbb9 reads table "cast_prog" into it; Amiga covert.c declares struct Activity2[32], 6 bytes
+D_tac_9e18             _ct                  ; certain: tac loader cbb9 reads table "cities" into it; Amiga covert.c declares struct City[16], 34 bytes
+D_tac_cbbc             _active              ; certain: tac loader cbb9 reads table "counters" into it; Amiga covert.c declares int active[2][16]: first 16 ints = per-city counters (active[0]); the label is the start of active
+D_tac_a8f0             _ev                  ; certain: tac loader cbb9 reads table "events" into it; Amiga covert.c declares struct Event[64], 44 bytes
+D_tac_0afe             _lc                  ; certain: tac loader cbb9 reads table "links" into it; Amiga covert.c declares struct Location[256], 12 bytes
+D_tac_a1e6             _sn                  ; certain: tac loader cbb9 reads table "messages" into it; Amiga covert.c declares struct Synopsis[128], 14 bytes
+D_tac_c99e             _mc                  ; certain: tac loader cbb9 reads table "objects" into it; Amiga covert.c declares struct MacGuffins[4], 18 bytes
+D_tac_c604             _org                 ; certain: tac loader cbb9 reads table "orgs" into it; Amiga covert.c declares struct Org[16], 35+1 bytes
+D_tac_06fe             _ps                  ; certain: tac loader cbb9 reads table "persons" into it; Amiga covert.c declares struct Person[64], 16 bytes
+D_tac_98d8             _pl                  ; certain: tac loader cbb9 reads table "scalar" into it; Amiga covert.c declares struct Plot, 0x28e
+D_bug_1172             _cl                  ; certain: bug loader 6985 reads table "activity" into it; Amiga covert.c declares struct Clue[80], 12 bytes
+D_bug_77b4             _ac                  ; certain: bug loader 6985 reads table "cast" into it; Amiga covert.c declares struct Activity[32], 48 bytes
+D_bug_8378             _ac2                 ; certain: bug loader 6985 reads table "cast_prog" into it; Amiga covert.c declares struct Activity2[32], 6 bytes
+D_bug_5e32             _ct                  ; certain: bug loader 6985 reads table "cities" into it; Amiga covert.c declares struct City[16], 34 bytes
+D_bug_8c10             _active              ; certain: bug loader 6985 reads table "counters" into it; Amiga covert.c declares int active[2][16]: first 16 ints = per-city counters (active[0]); the label is the start of active
+D_bug_6760             _ev                  ; certain: bug loader 6985 reads table "events" into it; Amiga covert.c declares struct Event[64], 44 bytes
+D_bug_0572             _lc                  ; certain: bug loader 6985 reads table "links" into it; Amiga covert.c declares struct Location[256], 12 bytes
+D_bug_6058             _sn                  ; certain: bug loader 6985 reads table "messages" into it; Amiga covert.c declares struct Synopsis[128], 14 bytes
+D_bug_822c             _mc                  ; certain: bug loader 6985 reads table "objects" into it; Amiga covert.c declares struct MacGuffins[4], 18 bytes
+D_bug_7fc0             _org                 ; certain: bug loader 6985 reads table "orgs" into it; Amiga covert.c declares struct Org[16], 35+1 bytes
+D_bug_0172             _ps                  ; certain: bug loader 6985 reads table "persons" into it; Amiga covert.c declares struct Person[64], 16 bytes
+D_bug_5992             _pl                  ; certain: bug loader 6985 reads table "scalar" into it; Amiga covert.c declares struct Plot, 0x28e
+D_chase_5c6a           _ac                  ; certain: chase loader 04a4 reads table "cast" into it; Amiga covert.c declares struct Activity[32], 48 bytes
+D_chase_673e           _ac2                 ; certain: chase loader 04a4 reads table "cast_prog" into it; Amiga covert.c declares struct Activity2[32], 6 bytes
+D_chase_4562           _ct                  ; certain: chase loader 04a4 reads table "cities" into it; Amiga covert.c declares struct City[16], 34 bytes
+D_chase_50e0           _ev                  ; certain: chase loader 04a4 reads table "events" into it; Amiga covert.c declares struct Event[64], 44 bytes
+D_chase_648a           _org                 ; certain: chase loader 04a4 reads table "orgs" into it; Amiga covert.c declares struct Org[16], 35+1 bytes
+D_chase_42ce           _pl                  ; certain: chase loader 04a4 reads table "scalar" into it; Amiga covert.c declares struct Plot, 0x28e
+D_final_1188           _cl                  ; certain: final loader a6dd reads table "activity" into it; Amiga covert.c declares struct Clue[80], 12 bytes
+D_final_9fa6           _ac                  ; certain: final loader a6dd reads table "cast" into it; Amiga covert.c declares struct Activity[32], 48 bytes
+D_final_ad6c           _ac2                 ; certain: final loader a6dd reads table "cast_prog" into it; Amiga covert.c declares struct Activity2[32], 6 bytes
+D_final_8294           _ct                  ; certain: final loader a6dd reads table "cities" into it; Amiga covert.c declares struct City[16], 34 bytes
+D_final_ae38           _active              ; certain: final loader a6dd reads table "counters" into it; Amiga covert.c declares int active[2][16]: first 16 ints = per-city counters (active[0]); the label is the start of active
+D_final_8bca           _ev                  ; certain: final loader a6dd reads table "events" into it; Amiga covert.c declares struct Event[64], 44 bytes
+D_final_0588           _lc                  ; certain: final loader a6dd reads table "links" into it; Amiga covert.c declares struct Location[256], 12 bytes
+D_final_84b8           _sn                  ; certain: final loader a6dd reads table "messages" into it; Amiga covert.c declares struct Synopsis[128], 14 bytes
+D_final_ac20           _mc                  ; certain: final loader a6dd reads table "objects" into it; Amiga covert.c declares struct MacGuffins[4], 18 bytes
+D_final_a7be           _org                 ; certain: final loader a6dd reads table "orgs" into it; Amiga covert.c declares struct Org[16], 35+1 bytes
+D_final_0188           _ps                  ; certain: final loader a6dd reads table "persons" into it; Amiga covert.c declares struct Person[64], 16 bytes
+D_final_7df2           _pl                  ; certain: final loader a6dd reads table "scalar" into it; Amiga covert.c declares struct Plot, 0x28e
+D_game_a626            _InCity              ; certain: game loader aebb reads shared word 0x20 into it; Amiga F_115_172 (state reader) moves WD+0x20 into _InCity, F_115_0 writes it back
+D_game_aa58            _AtLoc               ; certain: game loader aebb reads shared word 0x22 into it; Amiga F_115_172 (state reader) moves WD+0x22 into _AtLoc, F_115_0 writes it back
+D_game_789a            _Status              ; certain: game loader aebb reads shared word 0x24 into it; Amiga F_115_172 (state reader) moves WD+0x24 into _Status, F_115_0 writes it back
+D_game_9690            _TheCrime            ; certain: game loader aebb reads shared word 0x26 into it; Amiga F_115_172 (state reader) moves WD+0x26 into _TheCrime, F_115_0 writes it back
+D_game_9694            _TheOrg1             ; certain: game loader aebb reads shared word 0x28 into it; Amiga F_115_172 (state reader) moves WD+0x28 into _TheOrg1, F_115_0 writes it back
+D_game_9698            _TheOrg2             ; certain: game loader aebb reads shared word 0x2a into it; Amiga F_115_172 (state reader) moves WD+0x2a into _TheOrg2, F_115_0 writes it back
+D_game_8edc            _TheCity1            ; certain: game loader aebb reads shared word 0x2c into it; Amiga F_115_172 (state reader) moves WD+0x2c into _TheCity1, F_115_0 writes it back
+D_game_8ede            _TheCity2            ; certain: game loader aebb reads shared word 0x2e into it; Amiga F_115_172 (state reader) moves WD+0x2e into _TheCity2, F_115_0 writes it back
+D_game_7608            _Gtime               ; certain: game loader aebb reads shared word 0x30 into it; Amiga F_115_172 (state reader) moves WD+0x30 into _Gtime, F_115_0 writes it back
+D_game_7cc0            _Nperson             ; certain: game loader aebb reads shared word 0x32 into it; Amiga F_115_172 (state reader) moves WD+0x32 into _Nperson, F_115_0 writes it back
+D_game_8ece            _Nloc                ; certain: game loader aebb reads shared word 0x34 into it; Amiga F_115_172 (state reader) moves WD+0x34 into _Nloc, F_115_0 writes it back
+D_game_8ed0            _ChronTime           ; certain: game loader aebb reads shared word 0x36 into it; Amiga F_115_172 (state reader) moves WD+0x36 into _ChronTime, F_115_0 writes it back
+D_game_a86e            _MacGuffin           ; certain: game loader aebb reads shared word 0x38 into it; Amiga F_115_172 (state reader) moves WD+0x38 into _MacGuffin, F_115_0 writes it back
+D_game_7604            _diff                ; certain: game loader aebb reads shared word 0x3a into it; Amiga F_115_172 (state reader) moves WD+0x3a into _diff, F_115_0 writes it back
+D_game_968a            _TheSeed             ; certain: game loader aebb reads shared word 0x3c into it; Amiga F_115_172 (state reader) moves WD+0x3c into _TheSeed, F_115_0 writes it back
+D_game_97a2            _NACTIVITY           ; certain: game loader aebb reads shared word 0x3e into it; Amiga F_115_172 (state reader) moves WD+0x3e into _NACTIVITY, F_115_0 writes it back
+D_game_9688            _NEVENT              ; certain: game loader aebb reads shared word 0x40 into it; Amiga F_115_172 (state reader) moves WD+0x40 into _NEVENT, F_115_0 writes it back
+D_game_1454            _Sprung              ; certain: game loader aebb reads shared word 0x42 into it; Amiga F_115_172 (state reader) moves WD+0x42 into _Sprung, F_115_0 writes it back
+D_game_a61e            _GMode               ; certain: game loader aebb reads shared word 0x44 into it; Amiga F_115_172 (state reader) moves WD+0x44 into _GMode, F_115_0 writes it back
+D_game_8ec6            _NextSyn             ; certain: game loader aebb reads shared word 0x46 into it; Amiga F_115_172 (state reader) moves WD+0x46 into _NextSyn, F_115_0 writes it back
+D_game_97a0            _Doubles             ; certain: game loader aebb reads shared word 0x4a into it; Amiga F_115_172 (state reader) moves WD+0x4a into _Doubles, F_115_0 writes it back
+D_game_a668            _InterPol            ; certain: game loader aebb reads shared word 0x4c into it; Amiga F_115_172 (state reader) moves WD+0x4c into _InterPol, F_115_0 writes it back
+D_game_9fb0            _skills              ; certain: game loader aebb reads shared word 0x4e into it; Amiga F_115_172 (state reader) moves WD+0x4e into _skills, F_115_0 writes it back
+D_game_978c            _Alerted             ; certain: game loader aebb reads shared word 0x52 into it; Amiga F_115_172 (state reader) moves WD+0x52 into _Alerted, F_115_0 writes it back
+D_tac_cbba             _InCity              ; certain: tac loader cbb9 reads shared word 0x20 into it; Amiga F_115_172 (state reader) moves WD+0x20 into _InCity, F_115_0 writes it back
+D_tac_d48a             _AtLoc               ; certain: tac loader cbb9 reads shared word 0x22 into it; Amiga F_115_172 (state reader) moves WD+0x22 into _AtLoc, F_115_0 writes it back
+D_tac_9b68             _Status              ; certain: tac loader cbb9 reads shared word 0x24 into it; Amiga F_115_172 (state reader) moves WD+0x24 into _Status, F_115_0 writes it back
+D_tac_bb7e             _TheCrime            ; certain: tac loader cbb9 reads shared word 0x26 into it; Amiga F_115_172 (state reader) moves WD+0x26 into _TheCrime, F_115_0 writes it back
+D_tac_bb84             _TheOrg1             ; certain: tac loader cbb9 reads shared word 0x28 into it; Amiga F_115_172 (state reader) moves WD+0x28 into _TheOrg1, F_115_0 writes it back
+D_tac_bb88             _TheOrg2             ; certain: tac loader cbb9 reads shared word 0x2a into it; Amiga F_115_172 (state reader) moves WD+0x2a into _TheOrg2, F_115_0 writes it back
+D_tac_b918             _TheCity1            ; certain: tac loader cbb9 reads shared word 0x2c into it; Amiga F_115_172 (state reader) moves WD+0x2c into _TheCity1, F_115_0 writes it back
+D_tac_b94a             _TheCity2            ; certain: tac loader cbb9 reads shared word 0x2e into it; Amiga F_115_172 (state reader) moves WD+0x2e into _TheCity2, F_115_0 writes it back
+D_tac_91e8             _Gtime               ; certain: tac loader cbb9 reads shared word 0x30 into it; Amiga F_115_172 (state reader) moves WD+0x30 into _Gtime, F_115_0 writes it back
+D_tac_a1e2             _Nperson             ; certain: tac loader cbb9 reads shared word 0x32 into it; Amiga F_115_172 (state reader) moves WD+0x32 into _Nperson, F_115_0 writes it back
+D_tac_b400             _Nloc                ; certain: tac loader cbb9 reads shared word 0x34 into it; Amiga F_115_172 (state reader) moves WD+0x34 into _Nloc, F_115_0 writes it back
+D_tac_b404             _ChronTime           ; certain: tac loader cbb9 reads shared word 0x36 into it; Amiga F_115_172 (state reader) moves WD+0x36 into _ChronTime, F_115_0 writes it back
+D_tac_ce00             _MacGuffin           ; certain: tac loader cbb9 reads shared word 0x38 into it; Amiga F_115_172 (state reader) moves WD+0x38 into _MacGuffin, F_115_0 writes it back
+D_tac_bb74             _TheSeed             ; certain: tac loader cbb9 reads shared word 0x3c into it; Amiga F_115_172 (state reader) moves WD+0x3c into _TheSeed, F_115_0 writes it back
+D_tac_bdf2             _NACTIVITY           ; certain: tac loader cbb9 reads shared word 0x3e into it; Amiga F_115_172 (state reader) moves WD+0x3e into _NACTIVITY, F_115_0 writes it back
+D_tac_bb68             _NEVENT              ; certain: tac loader cbb9 reads shared word 0x40 into it; Amiga F_115_172 (state reader) moves WD+0x40 into _NEVENT, F_115_0 writes it back
+D_tac_1abe             _Sprung              ; certain: tac loader cbb9 reads shared word 0x42 into it; Amiga F_115_172 (state reader) moves WD+0x42 into _Sprung, F_115_0 writes it back
+D_tac_cbae             _GMode               ; certain: tac loader cbb9 reads shared word 0x44 into it; Amiga F_115_172 (state reader) moves WD+0x44 into _GMode, F_115_0 writes it back
+D_tac_b3f0             _NextSyn             ; certain: tac loader cbb9 reads shared word 0x46 into it; Amiga F_115_172 (state reader) moves WD+0x46 into _NextSyn, F_115_0 writes it back
+D_tac_bdf0             _Doubles             ; certain: tac loader cbb9 reads shared word 0x4a into it; Amiga F_115_172 (state reader) moves WD+0x4a into _Doubles, F_115_0 writes it back
+D_tac_cbfc             _InterPol            ; certain: tac loader cbb9 reads shared word 0x4c into it; Amiga F_115_172 (state reader) moves WD+0x4c into _InterPol, F_115_0 writes it back
+D_tac_c600             _skills              ; certain: tac loader cbb9 reads shared word 0x4e into it; Amiga F_115_172 (state reader) moves WD+0x4e into _skills, F_115_0 writes it back
+D_tac_bde0             _Alerted             ; certain: tac loader cbb9 reads shared word 0x52 into it; Amiga F_115_172 (state reader) moves WD+0x52 into _Alerted, F_115_0 writes it back
+D_bug_8c0e             _InCity              ; certain: bug loader 6985 reads shared word 0x20 into it; Amiga F_115_172 (state reader) moves WD+0x20 into _InCity, F_115_0 writes it back
+D_bug_8fd8             _AtLoc               ; certain: bug loader 6985 reads shared word 0x22 into it; Amiga F_115_172 (state reader) moves WD+0x22 into _AtLoc, F_115_0 writes it back
+D_bug_5c26             _Status              ; certain: bug loader 6985 reads shared word 0x24 into it; Amiga F_115_172 (state reader) moves WD+0x24 into _Status, F_115_0 writes it back
+D_bug_7640             _TheCrime            ; certain: bug loader 6985 reads shared word 0x26 into it; Amiga F_115_172 (state reader) moves WD+0x26 into _TheCrime, F_115_0 writes it back
+D_bug_7644             _TheOrg1             ; certain: bug loader 6985 reads shared word 0x28 into it; Amiga F_115_172 (state reader) moves WD+0x28 into _TheOrg1, F_115_0 writes it back
+D_bug_764a             _TheOrg2             ; certain: bug loader 6985 reads shared word 0x2a into it; Amiga F_115_172 (state reader) moves WD+0x2a into _TheOrg2, F_115_0 writes it back
+D_bug_7270             _TheCity1            ; certain: bug loader 6985 reads shared word 0x2c into it; Amiga F_115_172 (state reader) moves WD+0x2c into _TheCity1, F_115_0 writes it back
+D_bug_7272             _TheCity2            ; certain: bug loader 6985 reads shared word 0x2e into it; Amiga F_115_172 (state reader) moves WD+0x2e into _TheCity2, F_115_0 writes it back
+D_bug_594a             _Gtime               ; certain: bug loader 6985 reads shared word 0x30 into it; Amiga F_115_172 (state reader) moves WD+0x30 into _Gtime, F_115_0 writes it back
+D_bug_6054             _Nperson             ; certain: bug loader 6985 reads shared word 0x32 into it; Amiga F_115_172 (state reader) moves WD+0x32 into _Nperson, F_115_0 writes it back
+D_bug_7268             _Nloc                ; certain: bug loader 6985 reads shared word 0x34 into it; Amiga F_115_172 (state reader) moves WD+0x34 into _Nloc, F_115_0 writes it back
+D_bug_726a             _ChronTime           ; certain: bug loader 6985 reads shared word 0x36 into it; Amiga F_115_172 (state reader) moves WD+0x36 into _ChronTime, F_115_0 writes it back
+D_bug_8e54             _MacGuffin           ; certain: bug loader 6985 reads shared word 0x38 into it; Amiga F_115_172 (state reader) moves WD+0x38 into _MacGuffin, F_115_0 writes it back
+D_bug_1652             _diff                ; certain: bug loader 6985 reads shared word 0x3a into it; Amiga F_115_172 (state reader) moves WD+0x3a into _diff, F_115_0 writes it back
+D_bug_763a             _TheSeed             ; certain: bug loader 6985 reads shared word 0x3c into it; Amiga F_115_172 (state reader) moves WD+0x3c into _TheSeed, F_115_0 writes it back
+D_bug_77b0             _NACTIVITY           ; certain: bug loader 6985 reads shared word 0x3e into it; Amiga F_115_172 (state reader) moves WD+0x3e into _NACTIVITY, F_115_0 writes it back
+D_bug_7638             _NEVENT              ; certain: bug loader 6985 reads shared word 0x40 into it; Amiga F_115_172 (state reader) moves WD+0x40 into _NEVENT, F_115_0 writes it back
+D_bug_1532             _Sprung              ; certain: bug loader 6985 reads shared word 0x42 into it; Amiga F_115_172 (state reader) moves WD+0x42 into _Sprung, F_115_0 writes it back
+D_bug_8438             _GMode               ; certain: bug loader 6985 reads shared word 0x44 into it; Amiga F_115_172 (state reader) moves WD+0x44 into _GMode, F_115_0 writes it back
+D_bug_7260             _NextSyn             ; certain: bug loader 6985 reads shared word 0x46 into it; Amiga F_115_172 (state reader) moves WD+0x46 into _NextSyn, F_115_0 writes it back
+D_bug_77ac             _Doubles             ; certain: bug loader 6985 reads shared word 0x4a into it; Amiga F_115_172 (state reader) moves WD+0x4a into _Doubles, F_115_0 writes it back
+D_bug_8c50             _InterPol            ; certain: bug loader 6985 reads shared word 0x4c into it; Amiga F_115_172 (state reader) moves WD+0x4c into _InterPol, F_115_0 writes it back
+D_bug_7fbe             _skills              ; certain: bug loader 6985 reads shared word 0x4e into it; Amiga F_115_172 (state reader) moves WD+0x4e into _skills, F_115_0 writes it back
+D_bug_779c             _Alerted             ; certain: bug loader 6985 reads shared word 0x52 into it; Amiga F_115_172 (state reader) moves WD+0x52 into _Alerted, F_115_0 writes it back
+D_chase_6844           _InCity              ; certain: chase loader 04a4 reads shared word 0x20 into it; Amiga F_115_172 (state reader) moves WD+0x20 into _InCity, F_115_0 writes it back
+D_chase_69d2           _AtLoc               ; certain: chase loader 04a4 reads shared word 0x22 into it; Amiga F_115_172 (state reader) moves WD+0x22 into _AtLoc, F_115_0 writes it back
+D_chase_455e           _Status              ; certain: chase loader 04a4 reads shared word 0x24 into it; Amiga F_115_172 (state reader) moves WD+0x24 into _Status, F_115_0 writes it back
+D_chase_5c06           _TheCrime            ; certain: chase loader 04a4 reads shared word 0x26 into it; Amiga F_115_172 (state reader) moves WD+0x26 into _TheCrime, F_115_0 writes it back
+D_chase_5c0a           _TheOrg1             ; certain: chase loader 04a4 reads shared word 0x28 into it; Amiga F_115_172 (state reader) moves WD+0x28 into _TheOrg1, F_115_0 writes it back
+D_chase_5c0e           _TheOrg2             ; certain: chase loader 04a4 reads shared word 0x2a into it; Amiga F_115_172 (state reader) moves WD+0x2a into _TheOrg2, F_115_0 writes it back
+D_chase_5bee           _TheCity1            ; certain: chase loader 04a4 reads shared word 0x2c into it; Amiga F_115_172 (state reader) moves WD+0x2c into _TheCity1, F_115_0 writes it back
+D_chase_5bf0           _TheCity2            ; certain: chase loader 04a4 reads shared word 0x2e into it; Amiga F_115_172 (state reader) moves WD+0x2e into _TheCity2, F_115_0 writes it back
+D_chase_428e           _Gtime               ; certain: chase loader 04a4 reads shared word 0x30 into it; Amiga F_115_172 (state reader) moves WD+0x30 into _Gtime, F_115_0 writes it back
+D_chase_4786           _Nperson             ; certain: chase loader 04a4 reads shared word 0x32 into it; Amiga F_115_172 (state reader) moves WD+0x32 into _Nperson, F_115_0 writes it back
+D_chase_5be6           _Nloc                ; certain: chase loader 04a4 reads shared word 0x34 into it; Amiga F_115_172 (state reader) moves WD+0x34 into _Nloc, F_115_0 writes it back
+D_chase_5be8           _ChronTime           ; certain: chase loader 04a4 reads shared word 0x36 into it; Amiga F_115_172 (state reader) moves WD+0x36 into _ChronTime, F_115_0 writes it back
+D_chase_684c           _MacGuffin           ; certain: chase loader 04a4 reads shared word 0x38 into it; Amiga F_115_172 (state reader) moves WD+0x38 into _MacGuffin, F_115_0 writes it back
+D_chase_4288           _diff                ; certain: chase loader 04a4 reads shared word 0x3a into it; Amiga F_115_172 (state reader) moves WD+0x3a into _diff, F_115_0 writes it back
+D_chase_5be4           _TheSeed             ; certain: chase loader 04a4 reads shared word 0x3c into it; Amiga F_115_172 (state reader) moves WD+0x3c into _TheSeed, F_115_0 writes it back
+D_chase_5c66           _NACTIVITY           ; certain: chase loader 04a4 reads shared word 0x3e into it; Amiga F_115_172 (state reader) moves WD+0x3e into _NACTIVITY, F_115_0 writes it back
+D_chase_5bfe           _NEVENT              ; certain: chase loader 04a4 reads shared word 0x40 into it; Amiga F_115_172 (state reader) moves WD+0x40 into _NEVENT, F_115_0 writes it back
+D_chase_684a           _Sprung              ; certain: chase loader 04a4 reads shared word 0x42 into it; Amiga F_115_172 (state reader) moves WD+0x42 into _Sprung, F_115_0 writes it back
+D_chase_5bea           _GMode               ; certain: chase loader 04a4 reads shared word 0x44 into it; Amiga F_115_172 (state reader) moves WD+0x44 into _GMode, F_115_0 writes it back
+D_chase_5be0           _NextSyn             ; certain: chase loader 04a4 reads shared word 0x46 into it; Amiga F_115_172 (state reader) moves WD+0x46 into _NextSyn, F_115_0 writes it back
+D_chase_5c64           _Doubles             ; certain: chase loader 04a4 reads shared word 0x4a into it; Amiga F_115_172 (state reader) moves WD+0x4a into _Doubles, F_115_0 writes it back
+D_chase_6848           _InterPol            ; certain: chase loader 04a4 reads shared word 0x4c into it; Amiga F_115_172 (state reader) moves WD+0x4c into _InterPol, F_115_0 writes it back
+D_chase_647e           _skills              ; certain: chase loader 04a4 reads shared word 0x4e into it; Amiga F_115_172 (state reader) moves WD+0x4e into _skills, F_115_0 writes it back
+D_final_ae36           _InCity              ; certain: final loader a6dd reads shared word 0x20 into it; Amiga F_115_172 (state reader) moves WD+0x20 into _InCity, F_115_0 writes it back
+D_final_b374           _AtLoc               ; certain: final loader a6dd reads shared word 0x22 into it; Amiga F_115_172 (state reader) moves WD+0x22 into _AtLoc, F_115_0 writes it back
+D_final_8090           _Status              ; certain: final loader a6dd reads shared word 0x24 into it; Amiga F_115_172 (state reader) moves WD+0x24 into _Status, F_115_0 writes it back
+D_final_9e90           _TheCrime            ; certain: final loader a6dd reads shared word 0x26 into it; Amiga F_115_172 (state reader) moves WD+0x26 into _TheCrime, F_115_0 writes it back
+D_final_9e94           _TheOrg1             ; certain: final loader a6dd reads shared word 0x28 into it; Amiga F_115_172 (state reader) moves WD+0x28 into _TheOrg1, F_115_0 writes it back
+D_final_9e98           _TheOrg2             ; certain: final loader a6dd reads shared word 0x2a into it; Amiga F_115_172 (state reader) moves WD+0x2a into _TheOrg2, F_115_0 writes it back
+D_final_96da           _TheCity1            ; certain: final loader a6dd reads shared word 0x2c into it; Amiga F_115_172 (state reader) moves WD+0x2c into _TheCity1, F_115_0 writes it back
+D_final_96dc           _TheCity2            ; certain: final loader a6dd reads shared word 0x2e into it; Amiga F_115_172 (state reader) moves WD+0x2e into _TheCity2, F_115_0 writes it back
+D_final_7df0           _Gtime               ; certain: final loader a6dd reads shared word 0x30 into it; Amiga F_115_172 (state reader) moves WD+0x30 into _Gtime, F_115_0 writes it back
+D_final_84b6           _Nperson             ; certain: final loader a6dd reads shared word 0x32 into it; Amiga F_115_172 (state reader) moves WD+0x32 into _Nperson, F_115_0 writes it back
+D_final_96d0           _Nloc                ; certain: final loader a6dd reads shared word 0x34 into it; Amiga F_115_172 (state reader) moves WD+0x34 into _Nloc, F_115_0 writes it back
+D_final_96d2           _ChronTime           ; certain: final loader a6dd reads shared word 0x36 into it; Amiga F_115_172 (state reader) moves WD+0x36 into _ChronTime, F_115_0 writes it back
+D_final_b07e           _MacGuffin           ; certain: final loader a6dd reads shared word 0x38 into it; Amiga F_115_172 (state reader) moves WD+0x38 into _MacGuffin, F_115_0 writes it back
+D_final_7de6           _diff                ; certain: final loader a6dd reads shared word 0x3a into it; Amiga F_115_172 (state reader) moves WD+0x3a into _diff, F_115_0 writes it back
+D_final_9e8a           _TheSeed             ; certain: final loader a6dd reads shared word 0x3c into it; Amiga F_115_172 (state reader) moves WD+0x3c into _TheSeed, F_115_0 writes it back
+D_final_9fa2           _NACTIVITY           ; certain: final loader a6dd reads shared word 0x3e into it; Amiga F_115_172 (state reader) moves WD+0x3e into _NACTIVITY, F_115_0 writes it back
+D_final_9e88           _NEVENT              ; certain: final loader a6dd reads shared word 0x40 into it; Amiga F_115_172 (state reader) moves WD+0x40 into _NEVENT, F_115_0 writes it back
+D_final_1548           _Sprung              ; certain: final loader a6dd reads shared word 0x42 into it; Amiga F_115_172 (state reader) moves WD+0x42 into _Sprung, F_115_0 writes it back
+D_final_ae2c           _GMode               ; certain: final loader a6dd reads shared word 0x44 into it; Amiga F_115_172 (state reader) moves WD+0x44 into _GMode, F_115_0 writes it back
+D_final_96ca           _NextSyn             ; certain: final loader a6dd reads shared word 0x46 into it; Amiga F_115_172 (state reader) moves WD+0x46 into _NextSyn, F_115_0 writes it back
+D_final_9fa0           _Doubles             ; certain: final loader a6dd reads shared word 0x4a into it; Amiga F_115_172 (state reader) moves WD+0x4a into _Doubles, F_115_0 writes it back
+D_final_ae78           _InterPol            ; certain: final loader a6dd reads shared word 0x4c into it; Amiga F_115_172 (state reader) moves WD+0x4c into _InterPol, F_115_0 writes it back
+D_final_a7b2           _skills              ; certain: final loader a6dd reads shared word 0x4e into it; Amiga F_115_172 (state reader) moves WD+0x4e into _skills, F_115_0 writes it back
+D_final_9f8c           _Alerted             ; certain: final loader a6dd reads shared word 0x52 into it; Amiga F_115_172 (state reader) moves WD+0x52 into _Alerted, F_115_0 writes it back
+sub_code_0000_0b5a     _DoCode              ; certain: main.c entry: CD[0]=-1, env.sve reader, clamp(WD+0x3a - (WD+0x4e>>4&3) + 1, -3, 5), loop until CODEQuit, CD[9]=CODESuccess, CD[0xf]=CODERtime, CD[0] = flags&0x20 ? 0x11 : 0 - the same statements as main 0b5a
+D_code_1dbe            _CODEQuit            ; certain: DoCode loops until it is set (leave_flag)
+D_code_1d8e            _CODESuccess         ; certain: DoCode stores it in CD[9] (solved -> shared+09)
+D_code_1d90            _CODERtime           ; certain: DoCode stores it in CD[0xf] (elapsed_minutes -> shared+0f)
+D_code_1d72            _CODEdiff            ; certain: DoCode: clamp(level - (skill_bits>>4&3) + 1, -3, 5) (difficulty)
+D_code_1d78            _CODEstatus          ; certain: DoCode: = WD+0x24 (flags); bit 0x20 selects next module 0x11 (option_flags)
+D_code_1042            _CODEMyDisk          ; guess: static int = 2 in main.c data; PC default_disk has initial 2; no Amiga code reads it
+D_code_1262            _Rp1                 ; certain: DoCode sets Rp1->FontNr = 1, Rp1->BPen = 15 where 0b5a sets screen_port->font / fill_color
+D_code_1250            _Rp1X                ; likely: the record Rp1 points to (Rp1X page 0, 0,0,319,199,0,15,4,0); PC record right before the pointer
+D_code_1044            _RpBackX             ; likely: page-1 port record (RpBackX = 1,0,0,319,199,0,15,4,0); backup_port
+D_code_1056            _RpBack              ; likely: pointer to the page-1 record (screen_backup)
+sub_covert_0000_0010   _main                ; likely: covert.c main loops on CD[0] (18-entry switch 0..0x11, ends at -1) and runs each module, like launch_programs; Amiga calls the modules as functions instead of spawning EXEs
+sub_final_0100_46b5    _SetChron            ; certain: for i < NEVENT: ev[i].chron = 0x3e7 - reset_event_steps sets every events[].step to 999
+sub_game_00f7_b27e     _CheckForDisk        ; likely: CheckForDisk(disk, musthave) draws "Please insert Disk " + letter and sets NoHi, as prompt_insert_disk(disk, 1L); called with (1,1)/(2,1) by main
+sub_code_0000_26ba     _CheckForDisk        ; likely: CheckForDisk(disk, musthave) draws "Please insert Disk " + letter and sets NoHi, as prompt_insert_disk(disk, 1L); called with (1,1)/(2,1) by main
+sub_tac_00e8_cf7c      _CheckForDisk        ; likely: CheckForDisk(disk, musthave) draws "Please insert Disk " + letter and sets NoHi, as prompt_insert_disk(disk, 1L); called with (1,1)/(2,1) by main
+sub_bug_00e8_6d48      _CheckForDisk        ; likely: CheckForDisk(disk, musthave) draws "Please insert Disk " + letter and sets NoHi, as prompt_insert_disk(disk, 1L); called with (1,1)/(2,1) by main
+sub_chase_00df_3f08    _CheckForDisk        ; likely: CheckForDisk(disk, musthave) draws "Please insert Disk " + letter and sets NoHi, as prompt_insert_disk(disk, 1L); called with (1,1)/(2,1) by main
+sub_final_0100_aaa0    _CheckForDisk        ; likely: CheckForDisk(disk, musthave) draws "Please insert Disk " + letter and sets NoHi, as prompt_insert_disk(disk, 1L); called with (1,1)/(2,1) by main
+sub_game_00f7_0337     _DoSound             ; likely: DoSound(n, vol, pan, pitch) plays only when Status bit 0x04 (OPT_SOUND, Alt-S) is set, like play_sound_effect / play_sound
+sub_code_0000_0cbd     _DoSound             ; likely: DoSound(n, vol, pan, pitch) plays only when Status bit 0x04 (OPT_SOUND, Alt-S) is set, like play_sound_effect / play_sound
+sub_tac_00e8_0662      _DoSound             ; likely: DoSound(n, vol, pan, pitch) plays only when Status bit 0x04 (OPT_SOUND, Alt-S) is set, like play_sound_effect / play_sound
+sub_bug_00e8_020e      _DoSound             ; likely: DoSound(n, vol, pan, pitch) plays only when Status bit 0x04 (OPT_SOUND, Alt-S) is set, like play_sound_effect / play_sound
+sub_chase_00df_0467    _DoSound             ; likely: DoSound(n, vol, pan, pitch) plays only when Status bit 0x04 (OPT_SOUND, Alt-S) is set, like play_sound_effect / play_sound
+sub_final_0100_041d    _DoSound             ; likely: DoSound(n, vol, pan, pitch) plays only when Status bit 0x04 (OPT_SOUND, Alt-S) is set, like play_sound_effect / play_sound
+sub_code_0000_0ca4     _GoodBye             ; likely: GoodBye(altq): stops the sound, then CD[0] = -1 if altq != 0 - signal_quit_game(quit)
+sub_tac_00e8_063d      _GoodBye             ; guess: exit_cleanup optionally stores -1 in shared byte 0 like GoodBye(altq)
+sub_bug_00e8_020d      _FukSnd              ; guess: FukSnd stops the music when efx is set; shutdown_sound is the empty PC stub called at the same points
+D_game_7202            _Txt                 ; certain: char Txt[1024]; the clues screen (98c8) clears Txt[0] and strcpy(Txt, "ARRESTED") as with text_buffer
+D_tac_8dda             _Txt                 ; likely: TAC text assembly buffer (take_photo appends " first." to Txt)
+D_final_79e2           _Txt                 ; likely: FINAL text_buffer; the Amiga has one Txt for every module
+D_bug_5542             _Txt                 ; likely: BUG text_buffer; the Amiga has one Txt for every module
+D_game_969a            _Mindex              ; certain: clues screen (98c8 = Amiga F_91_0): Mindex = 0, Mitem[Mindex++] = cast index (clue_list_count)
+D_game_a9b0            _Mitem               ; certain: clues screen: Mitem[] = cast index per listed row (clue_list_cast); the Amiga reuses Mitem/Mindex for other lists (F_76, F_88)
+D_game_93ee            _pic                 ; certain: F_82_130 = popup_menu_on_clean_screen (3c87): if pic != -1 clear the screen, pic = -1; main sets it to -1 (screen_state)
+D_game_93ec            _NoHi                ; certain: popup c6ae = F_97_80: no selection when NoHi || NoWait (popup_no_select)
+D_game_9fae            _NoWait              ; certain: popup c6ae: return -1 at once and clear it (popup_no_wait)
+D_game_83c2            _picface             ; certain: popup c6ae: draw_face(picface, FaceX, FaceY) when != -1, then picface = -1 (speaker_face)
+D_game_9fac            _FaceX               ; certain: popup c6ae draw_face x (face_x)
+D_game_9fb2            _FaceY               ; certain: popup c6ae draw_face y (face_y)
+D_tac_bb5a             _NoHi                ; likely: menu_message_only: set by prompt_insert_disk before the popup, no item highlighted - the role of NoHi (Amiga CheckForDisk sets NoHi)
+D_final_9bec           _NoHi                ; likely: menu_message_only: set by prompt_insert_disk before the popup, no item highlighted - the role of NoHi (Amiga CheckForDisk sets NoHi)
+D_chase_5bf4           _NoHi                ; likely: menu_message_only: set by prompt_insert_disk before the popup, no item highlighted - the role of NoHi (Amiga CheckForDisk sets NoHi)
+D_code_1d96            _NoHi                ; likely: menu_message_only: set by prompt_insert_disk before the popup, no item highlighted - the role of NoHi (Amiga CheckForDisk sets NoHi)
+D_tac_c5fe             _NoWait              ; likely: plain_box is set by 0f4c 283 and 34e2 39; the Amiga twins F_28_b0a and F_31_b10 set NoWait there
+D_tac_a8e6             _picface             ; likely: TAC speaker_face; the Amiga TAC code (F_31) sets picface before its popups
+D_game_a66a            _Sleepy              ; certain: F_88_0 = 624a: Sleepy = 1 around the hotel wait loop, 0 after; cleared by 3b76 (F_82_0), tested by the plot step (in_hotel_wait)
+D_final_ae7a           _Sleepy              ; certain: FINAL 0906 87 zeroes n_msgs, clock, plot_step, n_links, D_ae7a, D_96d6, mask_4c; Amiga F_49_314 zeroes InterPol, VP, Sleepy, Nloc, ChronTime, Gtime, NextSyn in the same order (label not yet named in names.txt)
+D_final_96d6           _VP                  ; certain: same zeroing sequence as D_final_ae7a (one slot after Sleepy) (label not yet named in names.txt)
+D_game_a3e8            _Begun               ; certain: set to 1 by GAME main on re-entry (005a 78 = F_70_0) and by the case briefing (3b76 53 = F_82_0) (label not yet named in names.txt)
+D_game_7606            _day                 ; certain: format_game_time (95ab = F_94_150c): minutes/1440 + 1 (clock_day)
+D_game_9682            _hour                ; certain: format_game_time: (n/60) % 24 (clock_hour)
+D_game_93ea            _min                 ; certain: format_game_time: n % 60 (clock_minute)
+D_tac_bb62             _hour                ; certain: TAC main: Gtime / 60 % 24, then Night = hour < 8 || hour >= 20 (hour_of_day)
+D_game_969c            _sprite              ; certain: unsigned sprite[300]: F_103_7e cuts facesf.pic into sprite[0..39], faces.pic into [40..79], icons [80..95], strips [96..], tags [104..107]/[112..115], singles [108..111] - the PC arrays 969c, 96ec, 973c, 975c, 976c, 9774..977a, 977c are slices of it at the same word indices
+D_bug_764c             _sprite              ; likely: BUG image_table has the same 0x74-entry layout (facesf 0x00, faces 0x28, tiles 0x50, ...)
+D_game_789c            _CGA                 ; likely: cga_mode: the Amiga keeps the flag and its tests in the same places but never writes it (always 0)
+D_tac_9b6c             _CGA                 ; likely: is_cga: the Amiga keeps the flag and its tests in the same places but never writes it (always 0)
+D_bug_5c2c             _CGA                 ; likely: is_cga: the Amiga keeps the flag and its tests in the same places but never writes it (always 0)
+D_chase_4560           _CGA                 ; likely: is_cga: the Amiga keeps the flag and its tests in the same places but never writes it (always 0)
+D_final_8092           _CGA                 ; likely: cga_mode: the Amiga keeps the flag and its tests in the same places but never writes it (always 0)
+D_tac_91de             _Night               ; certain: TAC main: Night = hour < 8 || hour >= 20 (night)
+D_chase_4286           _Night               ; certain: CHASE main F_16_0 sets Night from the hour (night)
+D_tac_4334             _willy               ; certain: TAC password input F_31_199a: cursor index of the edit line (input_cursor)
+D_tac_4338             _willyX              ; certain: cursor blink recolour(Rp1, willyX, y+1, willyW, 10, ...) = 4078 recolor_rect(screen_port, cursor_x, y+1, cursor_width, 10, ...)
+D_tac_4336             _willyW              ; certain: same call (cursor_width)
+D_final_5cb6           _willy               ; likely: FINAL text field editor F_49_9a6 uses willy/willyX/willyW (edit_cursor)
+D_final_5cba           _willyX              ; likely: edit_cursor_x
+D_final_5cb8           _willyW              ; likely: edit_cursor_width
+D_covert_04c0          _CDX                 ; guess: the shared block: CD = &CDX (char[1024]) is the byte view (CD[0] next module, CD[1] entered, CD[7] game_mode, CD[8..0xf] results)
+D_covert_04c0          _WDX                 ; guess: WD = &WDX (int[512]) holds the word view (WD+0x20..0x52 scalars); the Amiga keeps the two views in separate 1 KB buffers
+D_final_abf6           _TheOrgF             ; certain: setup_new_case (3f4c = F_64_0): TheOrgF = random(15) + 1, retried while the map distance to org 1 > 10 or == 1 (plot_org_1); place_cast_member (46df = F_64_952) uses it for role bit 0x0001
+D_final_ac1e           _TheCityF            ; certain: setup_new_case: TheCityF drawn until building_level(TheCityF, TheOrgF) != 0 (plot_city_1)
+D_game_436e            _Rp1                 ; certain: GAME main F_70_0: Rp1->FontNr = 1, Rp1->BPen = 15 (screen_port->font, fill_color)
+D_tac_37b0             _Rp1                 ; certain: TAC main: copy_rect(RpBack, 0,0,0x140,0xc8, Rp1, 0,0) = copy_rect(tac_backdrop, ..., screen_port, 0, 0)
+D_final_4b58           _Rp1                 ; likely: screen port (page 0)
+D_chase_1a08           _Rp1                 ; likely: screen port (page 0)
+D_bug_2f08             _Rp1                 ; likely: draw_ctx: BUG main sets Rp1->FontNr / BPen like draw_ctx->font / fill_color
+D_tac_1ae6             _RpBack              ; certain: TAC main: copy_rect(RpSprite, 0,0xa0,0x140,0x28, RpBack, 0,0xa0) = copy_rect(tile_sheet, ..., tac_backdrop, 0, 0xa0)
+D_tac_06d4             _RpSprite            ; certain: same call (tile_sheet)
+D_tac_06e8             _RpGuys              ; certain: frame_step 0bcb 145-154 recolor_rect(portrait_port, 0, 0xa0, 0x140, 0x28, 9, 0xc) = Amiga F_28_63c on RpGuys
+D_game_147c            _RpBack              ; likely: page-1 off-screen copy (offscreen_port)
+D_game_1468            _RpPic               ; likely: page-2 picture port of the GAME screens (picture_port)
+D_chase_1612           _RpBack              ; likely: page-1 backup (screen_backup)
+D_chase_17ee           _RpSprite            ; likely: page-2 sheet used by the CHASE code (tile_sheet)
+D_chase_1802           _RpGrid              ; likely: page-3 sheet; RpGridX is the only page-3 port (view_sheet)
+D_bug_155a             _RpBack              ; likely: page-1 backup (screen_backup)
+D_bug_1650             _RpSprite            ; likely: page-2 sheet of bugs.pic used by the BUG puzzle (sheet_port)
+D_final_1570           _RpBack              ; likely: page-1 backup (screen_backup)
+D_tac_a1e4             _GameMode            ; certain: TAC main: 1/2/3 for CD[0] = 7/8/0xa, 0 when Status & 0x20 (mission_kind)
+D_tac_91e0             _Diff                ; certain: TAC main: Diff = diff - (skills & 3) + 1, +1 for GameMode 2, clamp 0..4; raise_alert scales by Diff + 4 (level); the PC loader also puts shared 0x3a here, the Amiga keeps that in diff
+D_tac_cf42             _diff                ; certain: TAC main keeps the campaign level (campaign_level) before lowering; Amiga reads diff directly
+D_tac_bddc             _Who                 ; certain: TAC main: Who = person with ps.org == AtLoc && ps.loc == InCity, -1 if arrested; CD[0xc] for GameMode 2 (target_person)
+D_tac_bb6a             _MacHere             ; certain: TAC main: set when Status & 0x20, Who == 0 or Doubles & 1 << InCity (target_present)
+D_tac_b3fa             _nroom               ; certain: loops p <= nroom over rm[] marking rooms seen from lc[].seen (room_count)
+D_tac_cf46             _ndoor               ; certain: raise_alert (6cb1 = F_40_1748) loops c < ndoor over dr[] (door_count)
+D_tac_b912             _MacGuff             ; certain: raise_alert: room = MacGuff in mission kind 2 (target_room); 44e4: target_room = guard_home_room = 1 = Amiga F_34_0 MacGuff = Guard = 1
+D_tac_96ee             _Guard               ; certain: generator F_34_0 / F_34_a06 as 44e4 / 4d3a (guard_home_room); update_guard frame 0 raise_alert(Guard, 0)
+D_tac_c86e             _ToRoom              ; certain: raise_alert: ToRoom = room (alarm_room)
+D_tac_91ea             _Eseen               ; certain: raise_alert: Eseen = clamp(Eseen, amount, 9999) (alert_level)
+D_tac_cbb8             _Alarm               ; certain: TAC main: CD[9] = Alarm ? clamp((Alarm + 2) * 10, 0, guards*10) : 0 = violence_count * 10 + 20 (violence_count)
+D_tac_cbac             _Wounds              ; certain: TAC main: CD[0xb] = Wounds (hit_count)
+D_tac_a8ec             _Rtime               ; certain: TAC main: CD[0xf] = Rtime / 60 (frame_tick)
+D_tac_a038             _PhotosTaken         ; certain: take_photo (3081 = F_31_4f4): "Out of film." at 0x24, ++ (film_used)
+D_tac_8dd2             _PhotoVal            ; certain: take_photo: += rms[rm[InRoom].type].intel (photo_value)
+D_tac_bb58             _BugVal              ; certain: plant_bug (32e6 = F_31_7ec): += rms[type].intel; 34e2 copies it to the result (bug_value)
+D_tac_a8ea             _BugsPlanted         ; certain: plant_bug: ++ after a bug is planted (bugs_planted)
+D_tac_bb6e             _Bugs                ; certain: plant_bug: needs Bugs > 0, then -- (bugs_left)
+D_tac_96f6             _Bullets             ; certain: update_player (0f4c = F_28_b0a): if !Bullets && Clips: Bullets = 6, Clips-- (rounds_loaded)
+D_tac_8dd6             _Clips               ; certain: same reload (spare_clips)
+D_tac_9d76             _Gtype               ; certain: update_player: Grenades[Gtype]-- on a throw (cur_weapon)
+D_tac_b94c             _Grenades            ; certain: int Grenades[3], indexed by Gtype (ammo[3])
+D_tac_9b72             _Equip               ; certain: choose_door (070e = F_28_0): Equip = 0xc1 / 0xc2 by mission kind (equipment_bits)
+D_tac_91dc             _Disguised           ; certain: raise_alert: if amount, Disguised = 0 (disguised)
+D_tac_bdde             _InRoom              ; certain: take_photo / plant_bug use rm[InRoom]; update_guard compares MacGuff with InRoom (player_room)
+D_tac_bb72             _Px                  ; certain: choose_door: Px = 0x148, Py = 0x108; frame_step Cx = Px / 16 (player_x)
+D_tac_bb7c             _Py                  ; certain: same (player_y)
+D_tac_b3fc             _Cx                  ; certain: frame_step (0bcb = F_28_63c): Cx = Px / 16 (player_cell_x)
+D_tac_b408             _Cy                  ; certain: frame_step: Cy = Py / 16 (player_cell_y)
+D_tac_c5fa             _BaseX               ; certain: draw_room (5674 = F_37_0): BaseX = 0x58 - (rm.dx << 4) / 2 (room_origin_x)
+D_tac_c602             _BaseY               ; certain: draw_room: BaseY = 0x6c - (rm.dy << 4) / 2 (room_origin_y)
+D_tac_c870             _bg                  ; certain: struct BadGuy bg[9], 28 bytes; update_guard indexes bg[guard] (actors)
+D_tac_a05e             _rm                  ; certain: struct Room rm[24], 14 bytes; raise_alert sets rm[].toDist (rooms)
+D_tac_96f8             _dr                  ; certain: struct Door dr[96], 5 bytes; raise_alert walks dr[].room1/room2 (doors)
+D_tac_9d78             _gr                  ; certain: struct Grenade gr[16], 10 bytes (projectiles)
+D_tac_00b2             _rms                 ; certain: struct Rooms rms[10], 22 bytes, initialised data; take_photo adds rms[type].intel (room_types)
+D_tac_018e             _ob                  ; certain: struct Object ob[62], 20 bytes, initialised data (tile_types)
+D_tac_0666             _MoveX               ; certain: int MoveX[9] = 0,0,2,3,2,0,-2,-3,-2 (walk_dx)
+D_tac_0678             _MoveY               ; certain: int MoveY[9] = 0,-3,-2,0,2,3,2,0,-2 (walk_dy)
+D_tac_068a             _Move8X              ; certain: int Move8X[9] = 0,0,1,1,1,0,-1,-1,-1; used by the Amiga twins of 0f4c, 1b32, 5ca6, 6ec9 like dir_dx
+D_tac_069c             _Move8Y              ; certain: int Move8Y[9] = 0,-1,-1,0,1,1,1,0,-1 (dir_dy)
+D_tac_06ae             _Mve4X               ; certain: int Mve4X[5] = 0,1,0,-1,0 (nbr4_dx, entry 4 repeats entry 0)
+D_tac_06b8             _Mve4Y               ; certain: int Mve4Y[5] = -1,0,1,0,-1 (nbr4_dy)
+D_bug_843c             _board               ; certain: int board[40][25] (wire_grid[40][25]), used only by the BUG puzzle hunk
+D_bug_594c             _BUGchip             ; certain: int BUGchip[7][5] (chips[7][5])
+D_bug_750a             _pin                 ; certain: int pin[14][10] (signals[14][10])
+D_bug_747e             _connect             ; certain: int connect[7][10] (wire_dest[7][10]); the puzzle steps it by 0x14 bytes
+D_bug_0092             _BUGMoveX            ; certain: int BUGMoveX[8] = 0,1,1,1,0,-1,-1,-1 (dir_dx)
+D_bug_00a2             _BUGMoveY            ; certain: int BUGMoveY[8] = -1,-1,0,1,1,1,0,-1 (dir_dy)
+
+# ==== fields: labels inside a table and struct members (not renamable as labels; for later)
+D_game_7620            pl.ncase             ; certain: D_game_760a (scalar) + 0x16; Amiga field from the covert.c debug types
+D_game_7634            pl.object            ; certain: D_game_760a (scalar) + 0x2a; Amiga field from the covert.c debug types
+D_game_765c            pl.object2           ; certain: D_game_760a (scalar) + 0x52; Amiga field from the covert.c debug types
+D_game_760e            pl.clues             ; certain: D_game_760a (scalar) + 0x4; Amiga field from the covert.c debug types
+D_game_7610            pl.BigOrg            ; certain: D_game_760a (scalar) + 0x6; Amiga field from the covert.c debug types
+D_game_7612            pl.BigLoc            ; certain: D_game_760a (scalar) + 0x8; Amiga field from the covert.c debug types
+D_game_7614            pl.BigFace           ; certain: D_game_760a (scalar) + 0xa; Amiga field from the covert.c debug types
+D_game_7622            pl.date              ; certain: D_game_760a (scalar) + 0x18; Amiga field from the covert.c debug types
+D_game_7624            pl.city              ; certain: D_game_760a (scalar) + 0x1a; Amiga field from the covert.c debug types
+D_game_a648            active[1][0]         ; certain: D_game_a628 (counters) + 0x20; Amiga field from the covert.c debug types
+D_tac_98dc             pl.clues             ; certain: D_tac_98d8 (scalar) + 0x4; Amiga field from the covert.c debug types
+D_tac_98de             pl.BigOrg            ; certain: D_tac_98d8 (scalar) + 0x6; Amiga field from the covert.c debug types
+D_tac_98e0             pl.BigLoc            ; certain: D_tac_98d8 (scalar) + 0x8; Amiga field from the covert.c debug types
+D_tac_98e2             pl.BigFace           ; certain: D_tac_98d8 (scalar) + 0xa; Amiga field from the covert.c debug types
+D_tac_98ee             pl.ncase             ; certain: D_tac_98d8 (scalar) + 0x16; Amiga field from the covert.c debug types
+D_tac_98f0             pl.date              ; certain: D_tac_98d8 (scalar) + 0x18; Amiga field from the covert.c debug types
+D_tac_98f2             pl.city              ; certain: D_tac_98d8 (scalar) + 0x1a; Amiga field from the covert.c debug types
+D_tac_9902             pl.object            ; certain: D_tac_98d8 (scalar) + 0x2a; Amiga field from the covert.c debug types
+D_tac_992a             pl.object2           ; certain: D_tac_98d8 (scalar) + 0x52; Amiga field from the covert.c debug types
+D_tac_a8f6             ev[].name            ; certain: D_tac_a8f0 (events) + 0x6; Amiga field from the covert.c debug types
+D_tac_c60a             org[].name           ; certain: D_tac_c604 (orgs) + 0x6; Amiga field from the covert.c debug types
+D_tac_0700             ps[].face            ; certain: D_tac_06fe (persons) + 0x2; Amiga field from the covert.c debug types
+D_tac_0704             ps[].clues           ; certain: D_tac_06fe (persons) + 0x6; Amiga field from the covert.c debug types
+D_tac_a1e8             sn[].time            ; certain: D_tac_a1e6 (messages) + 0x2; Amiga field from the covert.c debug types
+D_tac_a1ea             sn[].data            ; certain: D_tac_a1e6 (messages) + 0x4; Amiga field from the covert.c debug types
+D_tac_cbdc             active[1][0]         ; certain: D_tac_cbbc (counters) + 0x20; Amiga field from the covert.c debug types
+D_bug_7fc6             org[].name           ; certain: D_bug_7fc0 (orgs) + 0x6; Amiga field from the covert.c debug types
+D_bug_605a             sn[].time            ; certain: D_bug_6058 (messages) + 0x2; Amiga field from the covert.c debug types
+D_bug_8c30             active[1][0]         ; certain: D_bug_8c10 (counters) + 0x20; Amiga field from the covert.c debug types
+D_chase_457e           ct[].OrgClues        ; certain: D_chase_4562 (cities) + 0x1c; Amiga field from the covert.c debug types
+D_final_7e08           pl.ncase             ; certain: D_final_7df2 (scalar) + 0x16; Amiga field from the covert.c debug types
+D_final_7e06           pl.VPs               ; certain: D_final_7df2 (scalar) + 0x14; Amiga field from the covert.c debug types
+D_final_7e18           pl.rank              ; certain: D_final_7df2 (scalar) + 0x26; Amiga field from the covert.c debug types
+D_final_807c           pl.bigs              ; certain: D_final_7df2 (scalar) + 0x28a; Amiga field from the covert.c debug types
+D_final_7dfe           pl.BigIndex          ; certain: D_final_7df2 (scalar) + 0xc; Amiga field from the covert.c debug types
+D_final_7df8           pl.BigOrg            ; certain: D_final_7df2 (scalar) + 0x6; Amiga field from the covert.c debug types
+D_final_7dfa           pl.BigLoc            ; certain: D_final_7df2 (scalar) + 0x8; Amiga field from the covert.c debug types
+D_final_7e6c           pl.handle            ; certain: D_final_7df2 (scalar) + 0x7a; Amiga field from the covert.c debug types
+D_final_7e7c           pl.history           ; certain: D_final_7df2 (scalar) + 0x8a; Amiga field from the covert.c debug types
+D_final_7e04           pl.World             ; certain: D_final_7df2 (scalar) + 0x12; Amiga field from the covert.c debug types
+D_final_7df4           pl.done              ; certain: D_final_7df2 (scalar) + 0x2; Amiga field from the covert.c debug types
+D_final_7dfc           pl.BigFace           ; certain: D_final_7df2 (scalar) + 0xa; Amiga field from the covert.c debug types
+D_final_7e00           pl.index             ; certain: D_final_7df2 (scalar) + 0xe; Amiga field from the covert.c debug types
+D_final_7e02           pl.crime             ; certain: D_final_7df2 (scalar) + 0x10; Amiga field from the covert.c debug types
+D_final_7e0c           pl.city              ; certain: D_final_7df2 (scalar) + 0x1a; Amiga field from the covert.c debug types
+D_final_7e1c           pl.object            ; certain: D_final_7df2 (scalar) + 0x2a; Amiga field from the covert.c debug types
+D_final_7e44           pl.object2           ; certain: D_final_7df2 (scalar) + 0x52; Amiga field from the covert.c debug types
+D_final_7df6           pl.clues             ; certain: D_final_7df2 (scalar) + 0x4; Amiga field from the covert.c debug types
+D_final_7e0a           pl.date              ; certain: D_final_7df2 (scalar) + 0x18; Amiga field from the covert.c debug types
+D_final_ae58           active[1][0]         ; certain: D_final_ae38 (counters) + 0x20; Amiga field from the covert.c debug types
+D_game_97a6.person     Activity.who         ; certain: offset 0x00, Amiga type int; struct cast in our headers, same record size
+D_game_97a6.exposure   Activity.cover       ; certain: offset 0x02, Amiga type int; struct cast in our headers, same record size
+D_game_97a6.role       Activity.name        ; certain: offset 0x04, Amiga type char[32]; struct cast in our headers, same record size
+D_game_97a6.key_seed   Activity.key         ; certain: offset 0x24, Amiga type int; struct cast in our headers, same record size
+D_game_97a6.role_flags Activity.status      ; certain: offset 0x26, Amiga type int; struct cast in our headers, same record size
+D_game_97a6.flags      Activity.clued       ; certain: offset 0x28, Amiga type int; struct cast in our headers, same record size
+D_game_97a6.clue_type  Activity.ctype       ; certain: offset 0x2a, Amiga type int; struct cast in our headers, same record size
+D_game_97a6.rank       Activity.rank        ; certain: offset 0x2c, Amiga type int; struct cast in our headers, same record size
+D_game_97a6.u_2e       Activity.dummy       ; certain: offset 0x2e, Amiga type int; struct cast in our headers, same record size
+D_game_a55e.step       Activity2.chron      ; certain: offset 0x00, Amiga type int; struct cast_prog in our headers, same record size
+D_game_a55e.u_02       Activity2.intel      ; certain: offset 0x02, Amiga type int; struct cast_prog in our headers, same record size
+D_game_a55e.u_04       Activity2.firstwho   ; certain: offset 0x04, Amiga type int; struct cast_prog in our headers, same record size
+D_game_83c6.actor      Event.act            ; certain: offset 0x00, Amiga type char; struct event in our headers, same record size
+D_game_83c6.step       Event.chron          ; certain: offset 0x02, Amiga type int; struct event in our headers, same record size
+D_game_83c6.msg_id     Event.synch          ; certain: offset 0x04, Amiga type int; struct event in our headers, same record size
+D_game_83c6.text       Event.name           ; certain: offset 0x06, Amiga type char[32]; struct event in our headers, same record size
+D_game_83c6.target_kind Event.status         ; certain: offset 0x26, Amiga type int; struct event in our headers, same record size
+D_game_83c6.items      Event.macguff        ; certain: offset 0x28, Amiga type int; struct event in our headers, same record size
+D_game_83c6.score      Event.VP             ; certain: offset 0x2a, Amiga type int; struct event in our headers, same record size
+D_game_7a9e.name       City.name            ; certain: offset 0x00, Amiga type char[12]; struct city in our headers, same record size
+D_game_7a9e.country    City.name2           ; certain: offset 0x0c, Amiga type char[12]; struct city in our headers, same record size
+D_game_7a9e.grid       City.climate         ; certain: offset 0x18, Amiga type int; struct city in our headers, same record size
+D_game_7a9e.size       City.police          ; certain: offset 0x1a, Amiga type int; struct city in our headers, same record size
+D_game_7a9e.orgs_seen  City.OrgClues        ; certain: offset 0x1c, Amiga type int; struct city in our headers, same record size
+D_game_7a9e.seen_today City.clued           ; certain: offset 0x1e, Amiga type int; struct city in our headers, same record size
+D_game_7a9e.x          City.geoX            ; certain: offset 0x20, Amiga type uchar; struct city in our headers, same record size
+D_game_7a9e.y          City.geoY            ; certain: offset 0x21, Amiga type uchar; struct city in our headers, same record size
+D_game_9fb4.short_name Org.sname            ; certain: offset 0x00, Amiga type char[6]; struct org in our headers, same record size
+D_game_9fb4.name       Org.name             ; certain: offset 0x06, Amiga type char[20]; struct org in our headers, same record size
+D_game_9fb4.grid       Org.climate          ; certain: offset 0x1a, Amiga type int; struct org in our headers, same record size
+D_game_9fb4.strength   Org.size             ; certain: offset 0x1c, Amiga type int; struct org in our headers, same record size
+D_game_9fb4.divisor    Org.covert           ; certain: offset 0x1e, Amiga type int; struct org in our headers, same record size
+D_game_9fb4.flags      Org.clues            ; certain: offset 0x20, Amiga type int; struct org in our headers, same record size
+D_game_9fb4.ethnic     Org.race             ; certain: offset 0x22, Amiga type char; struct org in our headers, same record size
+D_game_0094.org        Person.org           ; certain: offset 0x00, Amiga type int; struct person in our headers, same record size
+D_game_0094.look       Person.face          ; certain: offset 0x02, Amiga type int; struct person in our headers, same record size
+D_game_0094.city       Person.loc           ; certain: offset 0x04, Amiga type int; struct person in our headers, same record size
+D_game_0094.known      Person.clues         ; certain: offset 0x06, Amiga type int; struct person in our headers, same record size
+D_game_0094.cast_mask  Person.role          ; certain: offset 0x08, Amiga type int; struct person in our headers, same record size
+D_game_0094.seen_by    Person.rknown        ; certain: offset 0x0a, Amiga type int; struct person in our headers, same record size
+D_game_0094.score      Person.intel         ; certain: offset 0x0c, Amiga type int; struct person in our headers, same record size
+D_game_0094.status     Person.alert         ; certain: offset 0x0e, Amiga type int; struct person in our headers, same record size
+D_game_0494.org        Location.org         ; certain: offset 0x00, Amiga type int; struct link in our headers, same record size
+D_game_0494.city       Location.loc         ; certain: offset 0x02, Amiga type int; struct link in our headers, same record size
+D_game_0494.flags      Location.clues       ; certain: offset 0x04, Amiga type int; struct link in our headers, same record size
+D_game_0494.percent    Location.tapped      ; certain: offset 0x06, Amiga type int; struct link in our headers, same record size
+D_game_0494.rooms_seen Location.seen        ; certain: offset 0x08, Amiga type long; struct link in our headers, same record size
+D_game_1094.org        Clue.sorg            ; certain: offset 0x00, Amiga type char; struct activity in our headers, same record size
+D_game_1094.city       Clue.sloc            ; certain: offset 0x01, Amiga type char; struct activity in our headers, same record size
+D_game_1094.cast       Clue.act             ; certain: offset 0x02, Amiga type int; struct activity in our headers, same record size
+D_game_1094.what       Clue.info1           ; certain: offset 0x04, Amiga type int; struct activity in our headers, same record size
+D_game_1094.key        Clue.key1            ; certain: offset 0x06, Amiga type int; struct activity in our headers, same record size
+D_game_1094.u_08       Clue.info2           ; certain: offset 0x08, Amiga type int; struct activity in our headers, same record size
+D_game_1094.u_08       Clue.key2            ; certain: offset 0x0a, Amiga type int; struct activity in our headers, same record size
+D_game_7cc2.kind       Synopsis.type        ; certain: offset 0x00, Amiga type int; struct msg in our headers, same record size
+D_game_7cc2.due        Synopsis.time        ; certain: offset 0x02, Amiga type int; struct msg in our headers, same record size
+D_game_7cc2.event      Synopsis.data        ; certain: offset 0x04, Amiga type int; struct msg in our headers, same record size
+D_game_7cc2.told       Synopsis.clues       ; certain: offset 0x06, Amiga type int; struct msg in our headers, same record size
+D_game_7cc2.strength   Synopsis.alert       ; certain: offset 0x08, Amiga type int; struct msg in our headers, same record size
+D_game_7cc2.person     Synopsis.who         ; certain: offset 0x0a, Amiga type char; struct msg in our headers, same record size
+D_game_7cc2.city       Synopsis.loc         ; certain: offset 0x0b, Amiga type char; struct msg in our headers, same record size
+D_game_7cc2.other      Synopsis.who2        ; certain: offset 0x0c, Amiga type char; struct msg in our headers, same record size
+D_game_7cc2.other_city Synopsis.loc2        ; certain: offset 0x0d, Amiga type char; struct msg in our headers, same record size
+D_game_a414.name       MacGuffins.name      ; certain: offset 0x00, Amiga type char[16]; struct object in our headers, same record size
+D_game_a414.name       MacGuffins.type      ; certain: offset 0x10, Amiga type char; struct object in our headers, same record size
+D_game_a414.holder     MacGuffins.who       ; certain: offset 0x11, Amiga type char; struct object in our headers, same record size
+D_tac_00b2.name        Rooms.name           ; certain: offset 0x00, Amiga type char[16]; struct room_type in our headers, same record size
+D_tac_00b2.value       Rooms.intel          ; certain: offset 0x10, Amiga type int; struct room_type in our headers, same record size
+D_tac_00b2.size_mask   Rooms.size           ; certain: offset 0x12, Amiga type int; struct room_type in our headers, same record size
+D_tac_00b2.building_mask Rooms.where          ; certain: offset 0x14, Amiga type int; struct room_type in our headers, same record size
+D_tac_018e.name        Object.name          ; certain: offset 0x00, Amiga type char[12]; struct tile_type in our headers, same record size
+D_tac_018e.sx          Object.spriteX       ; certain: offset 0x0c, Amiga type int; struct tile_type in our headers, same record size
+D_tac_018e.sy          Object.spriteY       ; certain: offset 0x0e, Amiga type int; struct tile_type in our headers, same record size
+D_tac_018e.flags       Object.bits          ; certain: offset 0x10, Amiga type int; struct tile_type in our headers, same record size
+D_tac_018e.rooms       Object.where         ; certain: offset 0x12, Amiga type int; struct tile_type in our headers, same record size
+D_tac_a05e.x           Room.x               ; certain: offset 0x00, Amiga type char; struct room in our headers, same record size
+D_tac_a05e.y           Room.y               ; certain: offset 0x01, Amiga type char; struct room in our headers, same record size
+D_tac_a05e.w           Room.dx              ; certain: offset 0x02, Amiga type char; struct room in our headers, same record size
+D_tac_a05e.h           Room.dy              ; certain: offset 0x03, Amiga type char; struct room in our headers, same record size
+D_tac_a05e.linked      Room.doors           ; certain: offset 0x04, Amiga type long; struct room in our headers, same record size
+D_tac_a05e.flags       Room.status          ; certain: offset 0x08, Amiga type int; struct room in our headers, same record size
+D_tac_a05e.type        Room.type            ; certain: offset 0x0a, Amiga type int; struct room in our headers, same record size
+D_tac_a05e.alarm_dist  Room.toDist          ; certain: offset 0x0c, Amiga type int; struct room in our headers, same record size
+D_tac_96f8.room_a      Door.room1           ; certain: offset 0x00, Amiga type char; struct door in our headers, same record size
+D_tac_96f8.room_b      Door.room2           ; certain: offset 0x01, Amiga type char; struct door in our headers, same record size
+D_tac_96f8.x           Door.x               ; certain: offset 0x02, Amiga type char; struct door in our headers, same record size
+D_tac_96f8.y           Door.y               ; certain: offset 0x03, Amiga type char; struct door in our headers, same record size
+D_tac_96f8.side        Door.dir             ; certain: offset 0x04, Amiga type char; struct door in our headers, same record size
+D_tac_c870.fl          BadGuy.status        ; certain: offset 0x00, Amiga type int; struct actor in our headers, same record size
+D_tac_c870.x           BadGuy.px            ; certain: offset 0x02, Amiga type int; struct actor in our headers, same record size
+D_tac_c870.y           BadGuy.py            ; certain: offset 0x04, Amiga type int; struct actor in our headers, same record size
+D_tac_c870.tx          BadGuy.destx         ; certain: offset 0x06, Amiga type int; struct actor in our headers, same record size
+D_tac_c870.ty          BadGuy.desty         ; certain: offset 0x08, Amiga type int; struct actor in our headers, same record size
+D_tac_c870.u           BadGuy.pose          ; certain: offset 0x0a, Amiga type int; struct actor in our headers, same record size
+D_tac_c870.dir         BadGuy.dir           ; certain: offset 0x0c, Amiga type int; struct actor in our headers, same record size
+D_tac_c870.state       BadGuy.mode          ; certain: offset 0x0e, Amiga type int; struct actor in our headers, same record size
+D_tac_c870.k           BadGuy.fire          ; certain: offset 0x10, Amiga type int; struct actor in our headers, same record size
+D_tac_c870.id          BadGuy.room          ; certain: offset 0x12, Amiga type int; struct actor in our headers, same record size
+D_tac_c870.wait        BadGuy.pause         ; certain: offset 0x14, Amiga type int; struct actor in our headers, same record size
+D_tac_c870.chase       BadGuy.sighting      ; certain: offset 0x16, Amiga type int; struct actor in our headers, same record size
+D_tac_c870.seen        BadGuy.sighted       ; certain: offset 0x18, Amiga type int; struct actor in our headers, same record size
+D_tac_c870.down        BadGuy.stun          ; certain: offset 0x1a, Amiga type int; struct actor in our headers, same record size
+D_tac_9d78.x           Grenade.px           ; certain: offset 0x00, Amiga type int; struct projectile in our headers, same record size
+D_tac_9d78.y           Grenade.py           ; certain: offset 0x02, Amiga type int; struct projectile in our headers, same record size
+D_tac_9d78.dir         Grenade.dir          ; certain: offset 0x04, Amiga type int; struct projectile in our headers, same record size
+D_tac_9d78.t           Grenade.time         ; certain: offset 0x06, Amiga type int; struct projectile in our headers, same record size
+D_tac_9d78.kind        Grenade.type         ; certain: offset 0x08, Amiga type int; struct projectile in our headers, same record size
+D_code_1250.page       RasterPort.PageNr    ; certain: offset 0x00, Amiga type int; struct gfx_port in our headers, same record size
+D_code_1250.x0         RasterPort.XBgn      ; certain: offset 0x02, Amiga type int; struct gfx_port in our headers, same record size
+D_code_1250.y0         RasterPort.YBgn      ; certain: offset 0x04, Amiga type int; struct gfx_port in our headers, same record size
+D_code_1250.x1         RasterPort.Width1    ; certain: offset 0x06, Amiga type int; struct gfx_port in our headers, same record size
+D_code_1250.y1         RasterPort.Length1   ; certain: offset 0x08, Amiga type int; struct gfx_port in our headers, same record size
+D_code_1250.text_flag  RasterPort.DrawMode  ; certain: offset 0x0a, Amiga type int; struct gfx_port in our headers, same record size
+D_code_1250.text_color RasterPort.APen      ; certain: offset 0x0c, Amiga type int; struct gfx_port in our headers, same record size
+D_code_1250.fill_color RasterPort.BPen      ; certain: offset 0x0e, Amiga type int; struct gfx_port in our headers, same record size
+D_code_1250.font       RasterPort.FontNr    ; certain: offset 0x10, Amiga type int; struct gfx_port in our headers, same record size
+D_game_760a+0x0        Plot.type            ; certain: offset 0x00 of the 0x28e-byte scalar block, Amiga type int (label not yet named in names.txt)
+D_game_760a+0x2        Plot.done            ; certain: offset 0x02 of the 0x28e-byte scalar block, Amiga type int (label not yet named in names.txt)
+D_game_760a+0x4        Plot.clues           ; certain: offset 0x04 of the 0x28e-byte scalar block, Amiga type int (label not yet named in names.txt)
+D_game_760a+0x6        Plot.BigOrg          ; certain: offset 0x06 of the 0x28e-byte scalar block, Amiga type int (label not yet named in names.txt)
+D_game_760a+0x8        Plot.BigLoc          ; certain: offset 0x08 of the 0x28e-byte scalar block, Amiga type int (label not yet named in names.txt)
+D_game_760a+0xa        Plot.BigFace         ; certain: offset 0x0a of the 0x28e-byte scalar block, Amiga type int (label not yet named in names.txt)
+D_game_760a+0xc        Plot.BigIndex        ; certain: offset 0x0c of the 0x28e-byte scalar block, Amiga type int (label not yet named in names.txt)
+D_game_760a+0xe        Plot.index           ; certain: offset 0x0e of the 0x28e-byte scalar block, Amiga type int (label not yet named in names.txt)
+D_game_760a+0x10       Plot.crime           ; certain: offset 0x10 of the 0x28e-byte scalar block, Amiga type int (label not yet named in names.txt)
+D_game_760a+0x12       Plot.World           ; certain: offset 0x12 of the 0x28e-byte scalar block, Amiga type int (label not yet named in names.txt)
+D_game_760a+0x14       Plot.VPs             ; certain: offset 0x14 of the 0x28e-byte scalar block, Amiga type int (label not yet named in names.txt)
+D_game_760a+0x16       Plot.ncase           ; certain: offset 0x16 of the 0x28e-byte scalar block, Amiga type int (label not yet named in names.txt)
+D_game_760a+0x18       Plot.date            ; certain: offset 0x18 of the 0x28e-byte scalar block, Amiga type int (label not yet named in names.txt)
+D_game_760a+0x1a       Plot.city            ; certain: offset 0x1a of the 0x28e-byte scalar block, Amiga type char[12] (label not yet named in names.txt)
+D_game_760a+0x26       Plot.rank            ; certain: offset 0x26 of the 0x28e-byte scalar block, Amiga type int (label not yet named in names.txt)
+D_game_760a+0x28       Plot.dummy           ; certain: offset 0x28 of the 0x28e-byte scalar block, Amiga type int (label not yet named in names.txt)
+D_game_760a+0x2a       Plot.object          ; certain: offset 0x2a of the 0x28e-byte scalar block, Amiga type char[40] (label not yet named in names.txt)
+D_game_760a+0x52       Plot.object2         ; certain: offset 0x52 of the 0x28e-byte scalar block, Amiga type char[40] (label not yet named in names.txt)
+D_game_760a+0x7a       Plot.handle          ; certain: offset 0x7a of the 0x28e-byte scalar block, Amiga type char[16] (label not yet named in names.txt)
+D_game_760a+0x8a       Plot.history         ; certain: offset 0x8a of the 0x28e-byte scalar block, Amiga type uchar[512] (label not yet named in names.txt)
+D_game_760a+0x28a      Plot.bigs            ; certain: offset 0x28a of the 0x28e-byte scalar block, Amiga type long (label not yet named in names.txt)
+
+# ==== C library entry points (our label already has the same name; nothing to apply)
+sub_covert_0000_036a   _exit                ; likely: same C library entry point; the Amiga one is SAS/C lc.lib, ours MSC 5.1 SLIBCR.LIB
+sub_covert_0000_0381   __exit               ; likely: same C library entry point; the Amiga one is SAS/C lc.lib, ours MSC 5.1 SLIBCR.LIB
+sub_covert_0000_075a   _free                ; likely: same C library entry point; the Amiga one is SAS/C lc.lib, ours MSC 5.1 SLIBCR.LIB
+sub_covert_0000_076c   _malloc              ; likely: same C library entry point; the Amiga one is SAS/C lc.lib, ours MSC 5.1 SLIBCR.LIB
+sub_covert_0000_0a66   _strncpy             ; likely: same C library entry point; the Amiga one is SAS/C lc.lib, ours MSC 5.1 SLIBCR.LIB
+sub_intro_0000_0934    _exit                ; likely: same C library entry point; the Amiga one is SAS/C lc.lib, ours MSC 5.1 SLIBCR.LIB
+sub_intro_0000_094b    __exit               ; likely: same C library entry point; the Amiga one is SAS/C lc.lib, ours MSC 5.1 SLIBCR.LIB
+sub_final_0100_c8a4    _exit                ; likely: same C library entry point; the Amiga one is SAS/C lc.lib, ours MSC 5.1 SLIBCR.LIB
+sub_final_0100_c8bb    __exit               ; likely: same C library entry point; the Amiga one is SAS/C lc.lib, ours MSC 5.1 SLIBCR.LIB
+sub_final_0100_cc94    _fclose              ; likely: same C library entry point; the Amiga one is SAS/C lc.lib, ours MSC 5.1 SLIBCR.LIB
+sub_final_0100_cd80    _fopen               ; likely: same C library entry point; the Amiga one is SAS/C lc.lib, ours MSC 5.1 SLIBCR.LIB
+sub_final_0100_cda8    _fscanf              ; likely: same C library entry point; the Amiga one is SAS/C lc.lib, ours MSC 5.1 SLIBCR.LIB
+sub_final_0100_d8dc    _ungetc              ; likely: same C library entry point; the Amiga one is SAS/C lc.lib, ours MSC 5.1 SLIBCR.LIB
+sub_final_0100_d948    _close               ; likely: same C library entry point; the Amiga one is SAS/C lc.lib, ours MSC 5.1 SLIBCR.LIB
+sub_final_0100_d968    _lseek               ; likely: same C library entry point; the Amiga one is SAS/C lc.lib, ours MSC 5.1 SLIBCR.LIB
+sub_final_0100_d9e2    _open                ; likely: same C library entry point; the Amiga one is SAS/C lc.lib, ours MSC 5.1 SLIBCR.LIB
+sub_final_0100_db86    _read                ; likely: same C library entry point; the Amiga one is SAS/C lc.lib, ours MSC 5.1 SLIBCR.LIB
+sub_final_0100_dc64    _write               ; likely: same C library entry point; the Amiga one is SAS/C lc.lib, ours MSC 5.1 SLIBCR.LIB
+sub_final_0100_dd9e    _free                ; likely: same C library entry point; the Amiga one is SAS/C lc.lib, ours MSC 5.1 SLIBCR.LIB
+sub_final_0100_ddb0    _malloc              ; likely: same C library entry point; the Amiga one is SAS/C lc.lib, ours MSC 5.1 SLIBCR.LIB
+sub_final_0100_e08e    _strcmp              ; likely: same C library entry point; the Amiga one is SAS/C lc.lib, ours MSC 5.1 SLIBCR.LIB
+sub_final_0100_e0d6    _strncpy             ; likely: same C library entry point; the Amiga one is SAS/C lc.lib, ours MSC 5.1 SLIBCR.LIB
+sub_final_0100_e42a    _time                ; likely: same C library entry point; the Amiga one is SAS/C lc.lib, ours MSC 5.1 SLIBCR.LIB
+sub_final_0100_e48c    _tzset               ; likely: same C library entry point; the Amiga one is SAS/C lc.lib, ours MSC 5.1 SLIBCR.LIB
+sub_final_0100_e71c    _strnicmp            ; likely: same C library entry point; the Amiga one is SAS/C lc.lib, ours MSC 5.1 SLIBCR.LIB
+sub_final_0100_e824    _memset              ; likely: same C library entry point; the Amiga one is SAS/C lc.lib, ours MSC 5.1 SLIBCR.LIB
+sub_final_0100_e8c8    _srand               ; likely: same C library entry point; the Amiga one is SAS/C lc.lib, ours MSC 5.1 SLIBCR.LIB
+sub_final_0100_e900    _access              ; likely: same C library entry point; the Amiga one is SAS/C lc.lib, ours MSC 5.1 SLIBCR.LIB
+sub_game_00f7_dc26     _exit                ; likely: same C library entry point; the Amiga one is SAS/C lc.lib, ours MSC 5.1 SLIBCR.LIB
+sub_game_00f7_dc3d     __exit               ; likely: same C library entry point; the Amiga one is SAS/C lc.lib, ours MSC 5.1 SLIBCR.LIB
+sub_game_00f7_e016     _fclose              ; likely: same C library entry point; the Amiga one is SAS/C lc.lib, ours MSC 5.1 SLIBCR.LIB
+sub_game_00f7_e102     _fopen               ; likely: same C library entry point; the Amiga one is SAS/C lc.lib, ours MSC 5.1 SLIBCR.LIB
+sub_game_00f7_e12a     _fscanf              ; likely: same C library entry point; the Amiga one is SAS/C lc.lib, ours MSC 5.1 SLIBCR.LIB
+sub_game_00f7_ec5e     _ungetc              ; likely: same C library entry point; the Amiga one is SAS/C lc.lib, ours MSC 5.1 SLIBCR.LIB
+sub_game_00f7_ecca     _close               ; likely: same C library entry point; the Amiga one is SAS/C lc.lib, ours MSC 5.1 SLIBCR.LIB
+sub_game_00f7_ecea     _lseek               ; likely: same C library entry point; the Amiga one is SAS/C lc.lib, ours MSC 5.1 SLIBCR.LIB
+sub_game_00f7_ed64     _open                ; likely: same C library entry point; the Amiga one is SAS/C lc.lib, ours MSC 5.1 SLIBCR.LIB
+sub_game_00f7_ef08     _read                ; likely: same C library entry point; the Amiga one is SAS/C lc.lib, ours MSC 5.1 SLIBCR.LIB
+sub_game_00f7_efe6     _write               ; likely: same C library entry point; the Amiga one is SAS/C lc.lib, ours MSC 5.1 SLIBCR.LIB
+sub_game_00f7_f120     _free                ; likely: same C library entry point; the Amiga one is SAS/C lc.lib, ours MSC 5.1 SLIBCR.LIB
+sub_game_00f7_f132     _malloc              ; likely: same C library entry point; the Amiga one is SAS/C lc.lib, ours MSC 5.1 SLIBCR.LIB
+sub_game_00f7_f410     _strcmp              ; likely: same C library entry point; the Amiga one is SAS/C lc.lib, ours MSC 5.1 SLIBCR.LIB
+sub_game_00f7_f458     _strncpy             ; likely: same C library entry point; the Amiga one is SAS/C lc.lib, ours MSC 5.1 SLIBCR.LIB
+sub_game_00f7_f7bc     _time                ; likely: same C library entry point; the Amiga one is SAS/C lc.lib, ours MSC 5.1 SLIBCR.LIB
+sub_game_00f7_f81e     _tzset               ; likely: same C library entry point; the Amiga one is SAS/C lc.lib, ours MSC 5.1 SLIBCR.LIB
+sub_game_00f7_faae     _strnicmp            ; likely: same C library entry point; the Amiga one is SAS/C lc.lib, ours MSC 5.1 SLIBCR.LIB
+sub_game_00f7_fbb6     _memset              ; likely: same C library entry point; the Amiga one is SAS/C lc.lib, ours MSC 5.1 SLIBCR.LIB
+sub_game_00f7_fc5a     _srand               ; likely: same C library entry point; the Amiga one is SAS/C lc.lib, ours MSC 5.1 SLIBCR.LIB
+sub_code_0000_2c36     _exit                ; likely: same C library entry point; the Amiga one is SAS/C lc.lib, ours MSC 5.1 SLIBCR.LIB
+sub_code_0000_2c4d     __exit               ; likely: same C library entry point; the Amiga one is SAS/C lc.lib, ours MSC 5.1 SLIBCR.LIB
+sub_code_0000_3082     _strcmp              ; likely: same C library entry point; the Amiga one is SAS/C lc.lib, ours MSC 5.1 SLIBCR.LIB
+sub_code_0000_30ca     _strncpy             ; likely: same C library entry point; the Amiga one is SAS/C lc.lib, ours MSC 5.1 SLIBCR.LIB
+sub_code_0000_32b6     _time                ; likely: same C library entry point; the Amiga one is SAS/C lc.lib, ours MSC 5.1 SLIBCR.LIB
+sub_code_0000_3318     _tzset               ; likely: same C library entry point; the Amiga one is SAS/C lc.lib, ours MSC 5.1 SLIBCR.LIB
+sub_code_0000_35a8     _strupr              ; likely: same C library entry point; the Amiga one is SAS/C lc.lib, ours MSC 5.1 SLIBCR.LIB
+sub_code_0000_3640     _srand               ; likely: same C library entry point; the Amiga one is SAS/C lc.lib, ours MSC 5.1 SLIBCR.LIB
+sub_tac_00e8_d93e      _exit                ; likely: same C library entry point; the Amiga one is SAS/C lc.lib, ours MSC 5.1 SLIBCR.LIB
+sub_tac_00e8_d955      __exit               ; likely: same C library entry point; the Amiga one is SAS/C lc.lib, ours MSC 5.1 SLIBCR.LIB
+sub_tac_00e8_dd2e      _fclose              ; likely: same C library entry point; the Amiga one is SAS/C lc.lib, ours MSC 5.1 SLIBCR.LIB
+sub_tac_00e8_de1a      _fopen               ; likely: same C library entry point; the Amiga one is SAS/C lc.lib, ours MSC 5.1 SLIBCR.LIB
+sub_tac_00e8_de42      _fscanf              ; likely: same C library entry point; the Amiga one is SAS/C lc.lib, ours MSC 5.1 SLIBCR.LIB
+sub_tac_00e8_e976      _ungetc              ; likely: same C library entry point; the Amiga one is SAS/C lc.lib, ours MSC 5.1 SLIBCR.LIB
+sub_tac_00e8_e9e2      _close               ; likely: same C library entry point; the Amiga one is SAS/C lc.lib, ours MSC 5.1 SLIBCR.LIB
+sub_tac_00e8_ea02      _lseek               ; likely: same C library entry point; the Amiga one is SAS/C lc.lib, ours MSC 5.1 SLIBCR.LIB
+sub_tac_00e8_ea7c      _open                ; likely: same C library entry point; the Amiga one is SAS/C lc.lib, ours MSC 5.1 SLIBCR.LIB
+sub_tac_00e8_ec20      _read                ; likely: same C library entry point; the Amiga one is SAS/C lc.lib, ours MSC 5.1 SLIBCR.LIB
+sub_tac_00e8_ecfe      _write               ; likely: same C library entry point; the Amiga one is SAS/C lc.lib, ours MSC 5.1 SLIBCR.LIB
+sub_tac_00e8_ee38      _free                ; likely: same C library entry point; the Amiga one is SAS/C lc.lib, ours MSC 5.1 SLIBCR.LIB
+sub_tac_00e8_ee4a      _malloc              ; likely: same C library entry point; the Amiga one is SAS/C lc.lib, ours MSC 5.1 SLIBCR.LIB
+sub_tac_00e8_f128      _strcmp              ; likely: same C library entry point; the Amiga one is SAS/C lc.lib, ours MSC 5.1 SLIBCR.LIB
+sub_tac_00e8_f170      _strncpy             ; likely: same C library entry point; the Amiga one is SAS/C lc.lib, ours MSC 5.1 SLIBCR.LIB
+sub_tac_00e8_f3cc      _fseek               ; likely: same C library entry point; the Amiga one is SAS/C lc.lib, ours MSC 5.1 SLIBCR.LIB
+sub_tac_00e8_f85c      _time                ; likely: same C library entry point; the Amiga one is SAS/C lc.lib, ours MSC 5.1 SLIBCR.LIB
+sub_tac_00e8_f8be      _tzset               ; likely: same C library entry point; the Amiga one is SAS/C lc.lib, ours MSC 5.1 SLIBCR.LIB
+sub_tac_00e8_fb4e      _stricmp             ; likely: same C library entry point; the Amiga one is SAS/C lc.lib, ours MSC 5.1 SLIBCR.LIB
+sub_tac_00e8_fb90      _strnicmp            ; likely: same C library entry point; the Amiga one is SAS/C lc.lib, ours MSC 5.1 SLIBCR.LIB
+sub_tac_00e8_fbe8      _strupr              ; likely: same C library entry point; the Amiga one is SAS/C lc.lib, ours MSC 5.1 SLIBCR.LIB
+sub_tac_00e8_fc92      _memset              ; likely: same C library entry point; the Amiga one is SAS/C lc.lib, ours MSC 5.1 SLIBCR.LIB
+sub_tac_00e8_fd36      _srand               ; likely: same C library entry point; the Amiga one is SAS/C lc.lib, ours MSC 5.1 SLIBCR.LIB
+sub_bug_00e8_770a      _exit                ; likely: same C library entry point; the Amiga one is SAS/C lc.lib, ours MSC 5.1 SLIBCR.LIB
+sub_bug_00e8_7721      __exit               ; likely: same C library entry point; the Amiga one is SAS/C lc.lib, ours MSC 5.1 SLIBCR.LIB
+sub_bug_00e8_7afa      _fclose              ; likely: same C library entry point; the Amiga one is SAS/C lc.lib, ours MSC 5.1 SLIBCR.LIB
+sub_bug_00e8_7be6      _fopen               ; likely: same C library entry point; the Amiga one is SAS/C lc.lib, ours MSC 5.1 SLIBCR.LIB
+sub_bug_00e8_7c0e      _fscanf              ; likely: same C library entry point; the Amiga one is SAS/C lc.lib, ours MSC 5.1 SLIBCR.LIB
+sub_bug_00e8_8742      _ungetc              ; likely: same C library entry point; the Amiga one is SAS/C lc.lib, ours MSC 5.1 SLIBCR.LIB
+sub_bug_00e8_87ae      _close               ; likely: same C library entry point; the Amiga one is SAS/C lc.lib, ours MSC 5.1 SLIBCR.LIB
+sub_bug_00e8_87ce      _open                ; likely: same C library entry point; the Amiga one is SAS/C lc.lib, ours MSC 5.1 SLIBCR.LIB
+sub_bug_00e8_8972      _read                ; likely: same C library entry point; the Amiga one is SAS/C lc.lib, ours MSC 5.1 SLIBCR.LIB
+sub_bug_00e8_8a50      _write               ; likely: same C library entry point; the Amiga one is SAS/C lc.lib, ours MSC 5.1 SLIBCR.LIB
+sub_bug_00e8_8b8a      _free                ; likely: same C library entry point; the Amiga one is SAS/C lc.lib, ours MSC 5.1 SLIBCR.LIB
+sub_bug_00e8_8b9c      _malloc              ; likely: same C library entry point; the Amiga one is SAS/C lc.lib, ours MSC 5.1 SLIBCR.LIB
+sub_bug_00e8_8e7a      _strcmp              ; likely: same C library entry point; the Amiga one is SAS/C lc.lib, ours MSC 5.1 SLIBCR.LIB
+sub_bug_00e8_8ec2      _strncpy             ; likely: same C library entry point; the Amiga one is SAS/C lc.lib, ours MSC 5.1 SLIBCR.LIB
+sub_bug_00e8_9166      _time                ; likely: same C library entry point; the Amiga one is SAS/C lc.lib, ours MSC 5.1 SLIBCR.LIB
+sub_bug_00e8_91c8      _tzset               ; likely: same C library entry point; the Amiga one is SAS/C lc.lib, ours MSC 5.1 SLIBCR.LIB
+sub_bug_00e8_9458      _strnicmp            ; likely: same C library entry point; the Amiga one is SAS/C lc.lib, ours MSC 5.1 SLIBCR.LIB
+sub_bug_00e8_9538      _memset              ; likely: same C library entry point; the Amiga one is SAS/C lc.lib, ours MSC 5.1 SLIBCR.LIB
+sub_bug_00e8_95dc      _srand               ; likely: same C library entry point; the Amiga one is SAS/C lc.lib, ours MSC 5.1 SLIBCR.LIB
+sub_chase_00df_4a12    _exit                ; likely: same C library entry point; the Amiga one is SAS/C lc.lib, ours MSC 5.1 SLIBCR.LIB
+sub_chase_00df_4a29    __exit               ; likely: same C library entry point; the Amiga one is SAS/C lc.lib, ours MSC 5.1 SLIBCR.LIB
+sub_chase_00df_4e02    _read                ; likely: same C library entry point; the Amiga one is SAS/C lc.lib, ours MSC 5.1 SLIBCR.LIB
+sub_chase_00df_4ee0    _write               ; likely: same C library entry point; the Amiga one is SAS/C lc.lib, ours MSC 5.1 SLIBCR.LIB
+sub_chase_00df_508c    _strcmp              ; likely: same C library entry point; the Amiga one is SAS/C lc.lib, ours MSC 5.1 SLIBCR.LIB
+sub_chase_00df_50d4    _strncpy             ; likely: same C library entry point; the Amiga one is SAS/C lc.lib, ours MSC 5.1 SLIBCR.LIB
+sub_chase_00df_5378    _time                ; likely: same C library entry point; the Amiga one is SAS/C lc.lib, ours MSC 5.1 SLIBCR.LIB
+sub_chase_00df_53da    _tzset               ; likely: same C library entry point; the Amiga one is SAS/C lc.lib, ours MSC 5.1 SLIBCR.LIB
+sub_chase_00df_566a    _strnicmp            ; likely: same C library entry point; the Amiga one is SAS/C lc.lib, ours MSC 5.1 SLIBCR.LIB
+sub_chase_00df_5738    _srand               ; likely: same C library entry point; the Amiga one is SAS/C lc.lib, ours MSC 5.1 SLIBCR.LIB

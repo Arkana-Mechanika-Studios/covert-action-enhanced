@@ -1,0 +1,8 @@
+{
+  "part": "FINAL",
+  "start": "campaign-v1",
+  "note": "As FINAL/plain-new-case, with the difficulty level Global Crisis (level 3): animations off, a new character (Maximillian, BOND), Driving and Electronics training, Alt-Q answered No, the briefing without the Chief's animations, a portrait picked by arrows: the case is handed to the campaign.",
+  "handoff": {},
+  "unix_time": 658018800,
+  "keys": " {wait 2}{alt-a}{wait 2}{enter}{wait 3}{enter}{wait 3}BOND{enter}{wait 3}{down}{down}{down}{enter}{wait 3}{down}{enter}{wait 3}{down}{down}{down}{enter}{wait 3}{alt-q}{wait 2}{enter}{wait 20}{enter}{wait 5}{enter}{wait 5}{enter}{wait 5}{enter}{wait 5}{enter}{wait 5}{right}{right}{down}{enter}{wait 20}{enter}{wait 20}"
+}

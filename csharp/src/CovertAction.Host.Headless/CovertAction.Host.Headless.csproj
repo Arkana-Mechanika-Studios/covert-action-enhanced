@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- A host without a window: keys from a script, time that passes at once, the last picture kept for inspection.
+       For tests and scripted runs (its program plays a script and writes the last screen as a picture). -->
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\CovertAction.Platform\CovertAction.Platform.csproj" />
+    <ProjectReference Include="..\CovertAction.Content\CovertAction.Content.csproj" />
+    <ProjectReference Include="..\CovertAction.Launcher\CovertAction.Launcher.csproj" />
+  </ItemGroup>
+</Project>

@@ -1,0 +1,10 @@
+{
+  "part": "COVERT",
+  "note": "The set-up screen with 6) Custom sound driver and the keyboard: the launcher asks for XSOUND.CA, which MicroProse never shipped, prints \"Filename not found\" and the game ends at the DOS prompt (D-18); the rewrite plays nothing and goes on to the menus, where the script ends.",
+  "graphics_key": "2",
+  "unix_time": 671000000,
+  "part_times": [
+    671000000
+  ],
+  "keys": "62{wait 3}"
+}

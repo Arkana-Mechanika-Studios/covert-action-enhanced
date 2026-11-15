@@ -1,0 +1,11 @@
+{
+  "part": "TAC",
+  "start": "tacphoto-v1",
+  "handoff_from": {
+    "recording": "FINAL/practice-breakin-3"
+  },
+  "note": "The practice raid at level 3 (FINAL/practice-breakin-3): the Cipher Room, lunges, ten shots, a trap laid (F9) and fired (F8); the guards' alert and fire: the agent is overcome by his wounds, the hand-off back to the menus part.",
+  "handoff": {},
+  "unix_time": 658094000,
+  "keys": "{wait 3}{esc}{wait 5}{enter}{wait 20}{kp4}{wait 3}{kp4}{wait 3}{kp4}{wait 3}{kp4}{wait 3}{kp4}{wait 3}{kp4}{wait 3}{kp4}{wait 3}{kp4}{wait 3}{kp4}{wait 3}{kp4}{wait 3}{kp8}{wait 3}{kp8}{wait 3}{kp8}{wait 3}{kp8}{wait 3}{kp8}{wait 3}{kp8}{wait 3}{kp8}{wait 3}{kp8}{wait 3}{kp8}{wait 3}{kp8}{wait 3}{right}{wait 10}{right}{wait 10}{right}{wait 10} {wait 3} {wait 3} {wait 3} {wait 3} {wait 3} {wait 3} {wait 3} {wait 3} {wait 3} {wait 3}{f9}{wait 10}{enter}{wait 10}{f8}{wait 10}{wait 900}"
+}

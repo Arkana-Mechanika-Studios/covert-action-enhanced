@@ -1,0 +1,8 @@
+{
+  "part": "TAC",
+  "start": "stasi-v1",
+  "note": "The campaign raid of the start image (the Stasi building in Washington, GAME's hand-off in the captured stasi route), played with the route's 79 raid actions, each after 127 empty polls as in the capture (docs/game-protocol.md \"Arrest, extraction and interrogation\"): the kit, Door #2, lunges through the rooms, doors, F1 at the pieces, the guards' alert and fire, shots, the arrest of Jane Brown (Enter), the way back out: the hand-off to GAME (code 0, result 2: arrested).",
+  "handoff": {},
+  "unix_time": 657835200,
+  "keys": "{wait 127}{right}{wait 127}{enter}{wait 127}{down}{wait 127}{enter}{wait 127}{left}{wait 127}{enter}{wait 127}{down}{wait 127}{enter}{wait 127}{down}{wait 127}{right}{wait 127}{enter}{wait 127}{esc}{wait 127}{down}{wait 127}{enter}{wait 127}{right}{wait 127}{right}{wait 127}{right}{wait 127}{right}{wait 127}{right}{wait 127}{right}{wait 127}{right}{wait 127}{f1}{wait 127}6{wait 127}6{wait 127}{right}{wait 127}{right}{wait 127}{right}{wait 127}{f1}{wait 127}6{wait 127}6{wait 127}{up}{wait 127}{up}{wait 127}{right}{wait 127}{right}{wait 127}6{wait 127}{up}{wait 127}{f1}{wait 127}8{wait 127}8{wait 127}{up}{wait 127}{f1}{wait 127}8{wait 127}{f1}{wait 127}{enter}{wait 127}1{wait 127} {wait 127} {wait 127}{down}{wait 127}5{wait 127}2{wait 127}2{wait 127}2{wait 127}{left}{wait 127}{left}{wait 127}4{wait 127}{down}{wait 127}{down}{wait 127}{left}{wait 127}5{wait 127}4{wait 127}4{wait 127}{left}{wait 127}{left}{wait 127}{left}{wait 127}5{wait 127}4{wait 127}4{wait 127}{f1}{wait 127}4{wait 127}4{wait 127}{left}{wait 127}{left}{wait 127}{left}{wait 127}{left}{wait 127}{left}{wait 127}{left}{wait 127}5{wait 127}4{wait 127}4{wait 60}"
+}

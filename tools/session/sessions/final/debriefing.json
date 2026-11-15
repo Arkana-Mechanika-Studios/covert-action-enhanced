@@ -1,0 +1,11 @@
+{
+  "part": "FINAL",
+  "start": "stasi-v1",
+  "handoff_from": {
+    "recording": "GAME/mastermind-debrief"
+  },
+  "note": "The debriefing after the case GAME/mastermind-debrief ended (its hand-off block, code 9): the Chief, the chronology of the case, the efficiency report card by card, the President's commendation, the Hall of Fame (FAME.DTA written), the career, then the next case's briefing and the hand-off to the campaign (code 1).",
+  "handoff": {},
+  "unix_time": 658200100,
+  "keys": "{wait 5}{enter}{wait 12}{enter}{wait 12}{enter}{wait 12}{enter}{wait 12}{enter}{wait 12}{enter}{wait 12}{enter}{wait 12}{enter}{wait 12}{enter}{wait 12}{enter}{wait 12}{enter}{wait 12}{enter}{wait 12}{enter}{wait 12}{enter}{wait 12}{enter}{wait 12}{enter}{wait 12}{enter}{wait 12}{enter}{wait 12}{enter}{wait 12}{enter}{wait 12}{enter}{wait 12}{enter}{wait 12}{enter}{wait 12}{enter}{wait 12}{enter}{wait 12}{enter}{wait 12}{enter}{wait 12}{enter}{wait 12}{enter}{wait 12}{enter}{wait 12}{enter}{wait 12}{enter}{wait 12}{enter}{wait 12}{enter}{wait 12}{enter}{wait 12}{enter}{wait 12}{enter}{wait 12}{enter}{wait 12}{enter}{wait 12}"
+}

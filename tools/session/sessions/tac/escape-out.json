@@ -1,0 +1,11 @@
+{
+  "part": "TAC",
+  "start": "stasi-v1",
+  "handoff_from": {
+    "recording": "GAME/capture-escape"
+  },
+  "note": "The escape raid of GAME/capture-escape (code 7) played to its end, the way read from the building the raid built (cell_map, room_at_cell): out of the office the agent was held in (room 6) east through its door (F1 opens it), across room 10, north through its door into room 3, west through the outer door (F1) into the street (room 0): \"You quickly slip out of the building.\", the hand-off back to GAME (code 0, person 0: escaped).",
+  "handoff": {},
+  "unix_time": 658020000,
+  "keys": "{wait 3}{enter}{wait 5}{enter}{wait 20}{kp6}{wait 1}{kp6}{wait 1}{kp6}{wait 1}{kp6}{wait 1}{kp6}{wait 1}{kp6}{wait 1}{kp6}{wait 1}{kp6}{wait 1}{kp6}{wait 1}{kp6}{wait 1}{kp6}{wait 1}{kp6}{wait 1}{kp6}{wait 1}{kp6}{wait 1}{kp6}{wait 1}{kp6}{wait 1}{kp6}{wait 1}{kp6}{wait 1}{kp6}{wait 1}{kp6}{wait 1}{f1}{wait 10}{kp6}{wait 1}{kp6}{wait 1}{kp6}{wait 1}{kp6}{wait 1}{kp6}{wait 1}{kp6}{wait 1}{kp6}{wait 1}{kp6}{wait 1}{kp6}{wait 1}{kp6}{wait 1}{kp6}{wait 1}{kp6}{wait 1}{kp8}{wait 1}{kp8}{wait 1}{kp8}{wait 1}{kp8}{wait 1}{kp8}{wait 1}{kp8}{wait 1}{kp8}{wait 1}{kp8}{wait 1}{kp6}{wait 1}{kp6}{wait 1}{kp6}{wait 1}{kp6}{wait 1}{kp6}{wait 1}{kp6}{wait 1}{kp6}{wait 1}{kp6}{wait 1}{kp6}{wait 1}{kp6}{wait 1}{kp6}{wait 1}{kp6}{wait 1}{kp8}{wait 1}{kp8}{wait 1}{kp8}{wait 1}{kp8}{wait 1}{kp8}{wait 1}{kp8}{wait 1}{kp8}{wait 1}{kp8}{wait 1}{kp8}{wait 1}{kp8}{wait 1}{kp8}{wait 1}{kp8}{wait 1}{kp8}{wait 1}{kp8}{wait 1}{f1}{wait 10}{kp8}{wait 1}{kp8}{wait 1}{kp8}{wait 1}{kp8}{wait 1}{kp8}{wait 1}{kp8}{wait 1}{kp8}{wait 1}{kp8}{wait 1}{kp8}{wait 1}{kp8}{wait 1}{kp8}{wait 1}{kp8}{wait 1}{kp8}{wait 1}{kp8}{wait 1}{kp8}{wait 1}{kp8}{wait 1}{kp8}{wait 1}{kp8}{wait 1}{kp8}{wait 1}{kp8}{wait 1}{kp8}{wait 1}{kp8}{wait 1}{kp8}{wait 1}{kp8}{wait 1}{kp4}{wait 1}{kp4}{wait 1}{kp4}{wait 1}{kp4}{wait 1}{kp4}{wait 1}{kp4}{wait 1}{kp4}{wait 1}{kp4}{wait 1}{kp4}{wait 1}{kp4}{wait 1}{kp4}{wait 1}{kp4}{wait 1}{kp4}{wait 1}{kp4}{wait 1}{kp4}{wait 1}{kp4}{wait 1}{kp4}{wait 1}{kp4}{wait 1}{kp4}{wait 1}{kp4}{wait 1}{kp4}{wait 1}{kp4}{wait 1}{f1}{wait 10}{kp4}{wait 1}{kp4}{wait 1}{kp4}{wait 1}{kp4}{wait 1}{kp4}{wait 1}{kp4}{wait 1}{kp4}{wait 1}{kp4}{wait 1}{kp4}{wait 1}{kp4}{wait 1}{kp4}{wait 1}{kp4}{wait 1}{kp4}{wait 1}{kp4}{wait 1}{kp4}{wait 1}{kp4}{wait 1}{wait 200}"
+}

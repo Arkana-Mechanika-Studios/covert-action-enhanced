@@ -1,0 +1,11 @@
+{
+  "part": "TAC",
+  "start": "tacphoto-v1",
+  "handoff_from": {
+    "recording": "GAME/jailbreak-warning"
+  },
+  "note": "The jail-break raid (code 8) from GAME/jailbreak-warning: the fixed kit, the agent in the jail's cafeteria, the Libyan Emb. agents coming in; shots at those in sight (keys chosen by the exploration copy as in TAC/level3-arrest), one of them down, the agent overcome by his wounds: the hand-off to GAME (code 0, person -1: the attempt not foiled).",
+  "handoff": {},
+  "unix_time": 657970000,
+  "keys": "{wait 163}7{wait} {wait} {wait 29} {wait} {wait} {wait 87}4{wait} {wait} {wait} {wait} {wait 27}7{wait 31} {wait} {wait} {wait 15}9{wait}9{wait}6{wait} {wait} {wait} {wait} {wait} {wait} {wait} {wait} {wait} {wait}"
+}

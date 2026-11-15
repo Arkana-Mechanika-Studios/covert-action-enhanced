@@ -1,0 +1,11 @@
+{
+  "part": "GAME",
+  "start": "campaign-v1",
+  "handoff_from": {
+    "recording": "BUG/level1-tap"
+  },
+  "note": "Back from BUG/level1-tap (the alarm, code 0) in the level-1 case: the clock moved on, the Rev. Guards hideout with \"A few guards are peering through the windows.\", Place wiretap again: \"The guards are suspicious. You will have 6 minutes.\", the hand-off to the electronics part (code 4).",
+  "handoff": {},
+  "unix_time": 657950001,
+  "keys": "{wait 5}{enter}{wait 12}{enter}{wait 12}{enter}{wait 12}{enter}{wait 12}"
+}

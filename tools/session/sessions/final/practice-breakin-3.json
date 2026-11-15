@@ -1,0 +1,8 @@
+{
+  "part": "FINAL",
+  "start": "campaign-v1",
+  "note": "Practice, Global Crisis (three Downs), Breaking In: the building raid's practice at level 3 is handed over.",
+  "handoff": {},
+  "unix_time": 658093500,
+  "keys": " {wait 2}{down}{down}{enter}{wait 2}{down}{down}{down}{enter}{wait 2}{enter}{wait 10}"
+}

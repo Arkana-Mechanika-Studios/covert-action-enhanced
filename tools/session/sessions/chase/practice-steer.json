@@ -1,0 +1,8 @@
+{
+  "part": "CHASE",
+  "start": "chase-v1",
+  "note": "Another time of day (another city and quarry): the player steers with the cursor keys, slows down and speeds up while tailing.",
+  "handoff": {},
+  "unix_time": 600000000,
+  "keys": "{wait 3}{enter}{wait 3}{enter}{wait 3}{enter}{wait 40}{left}{wait 30}{right}{wait 30}{down}{wait 20}{up}{up}{wait 60}{right}{wait 40}{left}{wait 100}"
+}

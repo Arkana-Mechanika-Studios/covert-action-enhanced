@@ -1,0 +1,11 @@
+member,reason
+CovertAction.Core.Electronics.CircuitRules.ResetSignals,"the signal reset of build_circuit_board (BUG 00e8:0395), done twice there; split off as a rule"
+CovertAction.Core.Electronics.CircuitRules.LayOutWires,"the wiring loop of build_circuit_board (BUG 00e8:0395), split off as a rule because the function also reads pixels and draws"
+CovertAction.Core.Electronics.CircuitRules.RandomChipType,"the chip type expression clamp(random(diff + 6) + diff, 0, 11) that build_circuit_board (BUG 00e8:0395) uses for the board's chips and the carried chip"
+CovertAction.Core.Electronics.CircuitRules.PlaceRandomChips,"one try of the chip loop of build_circuit_board (BUG 00e8:0395); the function draws between tries"
+CovertAction.Core.Electronics.CircuitRules.PropagateSignals,"the evaluation loop of bug_status_message (BUG 00e8:09cc), split off as a rule; the drawing of changed outputs (power_wire) is the caller's callback"
+CovertAction.Core.Electronics.CircuitRules.AssignTerminals,"the terminal and acceptance test of the chip loop of build_circuit_board (BUG 00e8:0395)"
+CovertAction.Core.Electronics.CircuitRules.RevealChips,"the reveal loop of build_circuit_board (BUG 00e8:0395)"
+CovertAction.Core.Electronics.CircuitRules.LockChips,"the fixing loop of build_circuit_board (BUG 00e8:0395)"
+CovertAction.Core.Electronics.CircuitRules.OutputCell,"the board cell of a chip output, written 4 * column + 7, 4 * row + 1 + line at each use in build_circuit_board and bug_status_message"
+CovertAction.Core.Electronics.CircuitRules.PhoneTarget,"the phone target of bug_status_message (BUG 00e8:09cc), written mode == 0 ? -(diff / 2 - 6) : 5 there; a rule of its own beside the board's acceptance test, which uses the wiretap's half"

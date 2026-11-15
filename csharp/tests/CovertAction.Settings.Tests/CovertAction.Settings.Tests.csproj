@@ -1,0 +1,33 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
+    <PackageReference Include="xunit" Version="2.9.3" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="3.1.4" />
+    <PackageReference Include="Xunit.SkippableFact" Version="1.5.85" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="Xunit" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\CovertAction.Settings\CovertAction.Settings.csproj" />
+    <!-- the launcher as the SDL host gives it its context (the VGA font, the ROM and game-folder checks) -->
+    <ProjectReference Include="..\..\src\CovertAction.Host.Sdl\CovertAction.Host.Sdl.csproj" />
+    <ProjectReference Include="..\..\src\CovertAction.Launcher\CovertAction.Launcher.csproj" />
+    <ProjectReference Include="..\..\src\CovertAction.Content\CovertAction.Content.csproj" />
+    <ProjectReference Include="..\..\src\CovertAction.Platform\CovertAction.Platform.csproj" />
+    <ProjectReference Include="..\..\src\CovertAction.Host.Headless\CovertAction.Host.Headless.csproj" />
+  </ItemGroup>
+
+  <!-- where the repository's folders are (the launcher's pictures go to build/launcher) -->
+  <ItemGroup>
+    <Compile Include="..\Shared\Repository.cs" Link="Shared\Repository.cs" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,8 @@
+{
+  "part": "FINAL",
+  "start": "campaign-v1",
+  "note": "At the main menu: Alt-A (animations off), Alt-S, Alt-J switched, Alt-A back on; the Hall of Fame (the player's empty FAME.DTA opened to read and write) and Esc, the main menu then drawn over it; Up Up Enter takes the first line (a new character): Esc at the gender box (Maximillian), Down Enter in the code-name field, Esc, Local Disturbance; in the training menu Alt-Q, Down to Yes, Enter: the game is left.",
+  "handoff": {},
+  "unix_time": 670000000,
+  "keys": " {wait 3}{alt-a}{wait 2}{alt-s}{wait 2}{alt-j}{wait 2}{alt-a}{wait 2}{down}{down}{down}{enter}{wait 10}{esc}{wait 5}{up}{up}{enter}{wait 4}{esc}{wait 4}{down}{enter}{wait 4}{esc}{wait 4}{alt-q}{wait 3}{down}{enter}{wait 6}"
+}

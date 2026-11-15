@@ -1,0 +1,8 @@
+{
+  "part": "GAME",
+  "start": "stasi-v1",
+  "note": "The loaded Stasi case: the hotel, Save Game (the slot list; the downs are taken by the drive prompt, so the first slot, CV0.SVE), back to the city, the CIA building in a running case (the arrival animation, the Chief's office, her pages), the Crypto Branch (CRYPTO.PAN): the coded messages (none yet) and the crime chronology.",
+  "handoff": {},
+  "unix_time": 658060000,
+  "keys": "{wait 5}{down}{enter}{wait 12}{down}{down}{down}{enter}{wait 12}{enter}{wait 12}{down}{down}{enter}{wait 12}{enter}{wait 12}{enter}{wait 12}{down}{down}{enter}{wait 12}{enter}{wait 12}{enter}{wait 12}{enter}{wait 12}{enter}{wait 12}{down}{down}{enter}{wait 12}{enter}{wait 12}{enter}{wait 12}{enter}{wait 12}"
+}

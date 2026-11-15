@@ -1,0 +1,11 @@
+{
+  "part": "TAC",
+  "start": "tacphoto-v1",
+  "handoff_from": {
+    "recording": "FINAL/practice-breakin"
+  },
+  "note": "The practice raid at level 0 (FINAL/practice-breakin's hand-off, code 0x0d): the kit as offered, the Computer Room entered from the top: walking with the keypad (Num Lock on), lunges (the arrow keys), shots, F10 and grenades thrown (F5, F6), the gas without a mask: the agent lies knocked out while the guards come; the script runs out.",
+  "handoff": {},
+  "unix_time": 657952000,
+  "keys": "{wait 3}{esc}{wait 5}{enter}{wait 20}{kp2}{wait 3}{kp2}{wait 3}{kp2}{wait 3}{kp2}{wait 3}{kp2}{wait 3}{kp2}{wait 3}{kp2}{wait 3}{kp2}{wait 3}{kp2}{wait 3}{kp2}{wait 3}{kp4}{wait 3}{kp4}{wait 3}{kp4}{wait 3}{kp4}{wait 3}{kp4}{wait 3}{kp4}{wait 3}{down}{wait 12}{left}{wait 12}{kp9}{wait 3}{kp9}{wait 3}{kp9}{wait 3}{kp9}{wait 3}{kp9}{wait 3}{kp9}{wait 3} {wait 4} {wait 4} {wait 4} {wait 4}{f10}{wait 4}{f5}{wait 20}{f10}{wait 4}{f6}{wait 20}{kp6}{wait 3}{kp6}{wait 3}{kp6}{wait 3}{kp6}{wait 3}{kp6}{wait 3}{kp6}{wait 3}{kp6}{wait 3}{kp6}{wait 3}{kp6}{wait 3}{kp6}{wait 3}{kp2}{wait 3}{kp2}{wait 3}{kp2}{wait 3}{kp2}{wait 3}{kp2}{wait 3}{kp2}{wait 3}{kp2}{wait 3}{kp2}{wait 3}{kp2}{wait 3}{kp2}{wait 3}{wait 600}"
+}

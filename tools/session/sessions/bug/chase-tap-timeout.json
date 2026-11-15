@@ -1,0 +1,9 @@
+{
+  "part": "BUG",
+  "start": "bug-v1",
+  "handoff_from": {"recording": "GAME/chase-return"},
+  "note": "The campaign wiretap at the building the quarry went into (GAME/chase-return's Place wiretap, code 4): one swap cuts two phones; the intercepted message and the dossiers it updates (Agent K's coded message, Agent S spotted in Washington, Agent K and Agent L identified as Muslim Jihad), each closed with a key; then the ten minutes run out: \"Time expired. 2 phones tapped. No Alarms\", Enter: the hand-off back to the campaign (code 0, 10 per cent tapped).",
+  "handoff": {},
+  "unix_time": 658191600,
+  "keys": "{wait 5}{pgup}{wait 2}{enter}{wait 60}x{wait 10}x{wait 10}{enter}{wait 10}{enter}{wait 10}{enter}{wait 10}{enter}{wait 10}{enter}{wait 10}{enter}{wait 10}{wait 4800}{enter}{wait 5}{enter}{wait 5}"
+}

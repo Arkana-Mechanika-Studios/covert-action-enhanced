@@ -1,0 +1,8 @@
+{
+  "part": "FINAL",
+  "start": "campaign-v1",
+  "note": "A new character: Maxine, code name ANNA, Local Disturbance, the preparation and training menus, the Chief's welcome animation, the briefing pages, the portrait pick, the clearance animation: the case is handed to the campaign.",
+  "handoff": {},
+  "unix_time": 657835200,
+  "keys": " {wait 3}{enter}{wait 3}{down}{enter}{wait 3}ANNA{enter}{wait 3}{enter}{wait 3}{enter}{wait 3}{enter}{wait 3}{enter}{wait 3}{enter}{wait 3}{esc}{wait 300}{enter}{wait 5}{enter}{wait 5}{enter}{wait 5}{enter}{wait 5}{enter}{wait 5}{up}{left}{enter}{wait 300}{enter}{wait 300}"
+}

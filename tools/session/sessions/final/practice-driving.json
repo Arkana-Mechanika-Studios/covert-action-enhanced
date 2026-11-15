@@ -1,0 +1,8 @@
+{
+  "part": "FINAL",
+  "start": "campaign-v1",
+  "note": "Title skipped at once; Practice, Global Crisis (three Downs), Driving: the car chase's practice is handed over.",
+  "handoff": {},
+  "unix_time": 657835200,
+  "keys": " {wait 2}{down}{down}{enter}{wait 3}{down}{wait 1}{down}{wait 1}{down}{enter}{wait 3}{down}{enter}{wait 10}"
+}

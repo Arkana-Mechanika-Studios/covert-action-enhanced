@@ -1,0 +1,16 @@
+{
+  "part": "GAME",
+  "start": "campaign-v1",
+  "handoff_from": {
+    "recording": "FINAL/load-saved-game"
+  },
+  "disk": {
+    "CV0.SVE": {
+      "recording": "GAME/travel-save"
+    }
+  },
+  "note": "The campaign FINAL/load-saved-game loaded from CV0.SVE (the same save still on the disk): Cairo, the hotel's Load Game (drive prompt, the slot list naming the save, slot 1 loaded by GAME's own loader), the city again, the hotel's Save Game over slot 1 (CV0.SVE written again: compared at the checkpoints after its writes and at the end), the travel map.",
+  "handoff": {},
+  "unix_time": 657990100,
+  "keys": "{wait 5}{down}{enter}{wait 12}{down}{down}{down}{down}{enter}{wait 12}{enter}{wait 12}{enter}{wait 12}{enter}{wait 12}{down}{enter}{wait 12}{down}{down}{down}{enter}{wait 12}{enter}{wait 12}{down}{enter}{wait 12}{enter}{wait 12}{enter}{wait 12}{enter}{wait 12}"
+}

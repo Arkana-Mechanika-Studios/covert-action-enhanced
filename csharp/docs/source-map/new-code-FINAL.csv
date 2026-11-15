@@ -1,0 +1,9 @@
+member,reason
+CovertAction.Core.Final.FameEntry.CopyFrom,"an operation of the Hall of Fame entry type (the original moves an entry down a place with memcpy of its 44 bytes)"
+CovertAction.Core.Final.CharTable.Put,"writes a text into a table of characters at a place; the original calls strcpy on the middle of the variable"
+CovertAction.Core.Final.CharTable.TextOf,"the text of a table of characters up to its end mark; the original passes the variable itself as a string"
+CovertAction.Core.Final.CaseSetup.Random,"FINAL's short form of the library's dice on its own generator: forwards to GameLibrary.RandomBelow, which stands for FINAL 0100:c169 random"
+CovertAction.Core.Final.CaseSetup.LayOutCase,"the rules of setup_new_case (FINAL 0100:3f4c) before the briefing, split off so that Headquarters.SetupNewCase reads as the original's steps and the rules can be tested without a screen"
+CovertAction.Core.Final.CaseSetup.LinkOrganisations,"the rules of setup_new_case (FINAL 0100:3f4c) after the briefing that tell the player of the buildings he knows; split off as LayOutCase"
+CovertAction.Core.Final.CaseSetup.AddRedHerrings,"the last rule of setup_new_case (FINAL 0100:3f4c), the Red Herrings of the higher levels; split off as LayOutCase"
+CovertAction.Presentation.Final.Headquarters.AnnounceNewFacts,"the library's announce_new_facts (FINAL 0100:5caa: LibraryDossiers.RevealPersonFacts) given this part's message box, which the debriefing and add_person_knowledge call it through; the oracle tests of FINAL's own vectors of 5caa and 5b3f use it"

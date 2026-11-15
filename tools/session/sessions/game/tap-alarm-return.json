@@ -1,0 +1,11 @@
+{
+  "part": "GAME",
+  "start": "campaign-v1",
+  "handoff_from": {
+    "recording": "BUG/photo-tap-alarm"
+  },
+  "note": "Back from BUG/photo-tap-alarm (the wiretap at the Stasi hideout set off an alarm, code 0): the clock moved on, the hideout \"swarming with guards\", Place wiretap again: \"The guards are very nervous. You will have 2 minutes.\", the hand-off to the electronics part (code 4).",
+  "handoff": {},
+  "unix_time": 657930000,
+  "keys": "{wait 5}{enter}{wait 12}{enter}{wait 12}{enter}{wait 12}{enter}{wait 12}"
+}

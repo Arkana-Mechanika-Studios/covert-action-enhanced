@@ -1,0 +1,11 @@
+{
+  "part": "GAME",
+  "start": "stasi-v1",
+  "handoff_from": {
+    "recording": "TAC/stasi-arrest"
+  },
+  "note": "Back from TAC/stasi-arrest (the block TAC left: Jane Brown arrested): her interrogation, as GAME/stasi-interrogation plays it from the captured block, now from the session's own.",
+  "handoff": {},
+  "unix_time": 658100000,
+  "keys": "{wait 5}{enter}{wait 12}{enter}{wait 12}{enter}{wait 12}{enter}{wait 12}{enter}{wait 12}{enter}{wait 12}{enter}{wait 12}{enter}{wait 12}{enter}{wait 12}{enter}{wait 12}{enter}{wait 12}{enter}{wait 12}{enter}{wait 12}{enter}{wait 12}"
+}

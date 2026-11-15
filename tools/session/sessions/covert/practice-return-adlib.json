@@ -1,0 +1,13 @@
+{
+  "part": "COVERT",
+  "note": "As practice-return-speaker, with 4) AdLib sound board at the set-up screen (ASOUND.CA, the OPL2 at 388h/389h; its music and effects run on INT 8, which the machine delivers, and its device writes are compared at every checkpoint: item 8): FINAL: Practice, Electronics at level 0; BUG: the board solved: back to the menus (code 0x11); FINAL: Practice, the second difficulty, Cryptography; CODE: a hint, two letters, Alt-Q, Yes.",
+  "graphics_key": "2",
+  "unix_time": 657878400,
+  "part_times": [
+    657878400,
+    657879000,
+    660366000,
+    660366100
+  ],
+  "keys": "42 {wait 2}{down}{down}{enter}{wait 2}{enter}{wait 2}{up}{down}{down}{down}{enter}{wait 5}{enter}{wait 2}{up}{wait 2}{enter}{wait 2}{home}{wait 2}{enter}{wait 2}{end}{wait 2}{left}{wait 2}{enter}{wait 2}{down}{wait 2}{down}{wait 2}{down}{wait 2}{enter}{wait 5}{enter}{wait 5}{down}{down}{enter}{wait 2}{down}{enter}{wait 2}{down}{down}{enter}{wait 12}{f1}{wait 2}ux{wait 3}{alt-q}{wait 2}{down}{enter}{wait 2}{enter}{wait 3}"
+}

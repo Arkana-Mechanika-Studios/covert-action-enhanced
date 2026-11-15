@@ -1,0 +1,11 @@
+{
+  "part": "GAME",
+  "start": "stasi-v1",
+  "handoff_from": {
+    "recording": "CODE/campaign-decode"
+  },
+  "note": "Back from the cryptography part (CODE/campaign-decode's hand-off block, message decoded): the decoded message, the CIA building, the Data Section's clue board and clues, out again.",
+  "handoff": {},
+  "unix_time": 658064000,
+  "keys": "{wait 5}{enter}{wait 12}{enter}{wait 12}{enter}{wait 12}{enter}{wait 12}{enter}{wait 12}{enter}{wait 12}{enter}{wait 12}{enter}{wait 12}{esc}{wait 12}{esc}{wait 12}{esc}{wait 12}"
+}

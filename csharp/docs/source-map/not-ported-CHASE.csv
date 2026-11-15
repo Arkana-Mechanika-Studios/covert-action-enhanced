@@ -1,0 +1,64 @@
+module,match,reason
+CHASE,read_shared_or_file,a byte copy of one campaign table from the hand-off block (or a file); the typed hand-off copies the records in import_shared_state (D-400)
+CHASE,0000:0000,not code: zero bytes at the start of the code segment
+CHASE,0000:00ca,driver-call trampoline behind some thunk slots; the thunks are the boundary interfaces
+CHASE,0000:052d,attach_driver_segment: patches the thunk table for a driver the launcher loaded; the rewrite has no driver programs to attach (D-2)
+CHASE,0000:09fe,"part of the picture decoder (an assembly routine behind the thunk table) or of its read hook: the picture file is read to its end and decoded at once by Content (PictureFile), without the row loop and the 512-byte block reader (D-12)"
+CHASE,0000:0a8e,"part of the picture decoder (an assembly routine behind the thunk table) or of its read hook: the picture file is read to its end and decoded at once by Content (PictureFile), without the row loop and the 512-byte block reader (D-12)"
+CHASE,0000:0ad6,"part of the picture decoder (an assembly routine behind the thunk table) or of its read hook: the picture file is read to its end and decoded at once by Content (PictureFile), without the row loop and the 512-byte block reader (D-12)"
+CHASE,0000:0af0,"part of the picture decoder (an assembly routine behind the thunk table) or of its read hook: the picture file is read to its end and decoded at once by Content (PictureFile), without the row loop and the 512-byte block reader (D-12)"
+CHASE,0000:0b0f,"part of the picture decoder (an assembly routine behind the thunk table) or of its read hook: the picture file is read to its end and decoded at once by Content (PictureFile), without the row loop and the 512-byte block reader (D-12)"
+CHASE,0000:0b83,"part of the picture decoder (an assembly routine behind the thunk table) or of its read hook: the picture file is read to its end and decoded at once by Content (PictureFile), without the row loop and the 512-byte block reader (D-12)"
+CHASE,0000:0bff,"part of the picture decoder (an assembly routine behind the thunk table) or of its read hook: the picture file is read to its end and decoded at once by Content (PictureFile), without the row loop and the 512-byte block reader (D-12)"
+CHASE,00df:04a1,no caller in the original (dead code); an empty function
+CHASE,00df:436e,"no caller in the original (dead code); its only caller is save_file, which has none"
+CHASE,00df:43bc,no caller in the original (dead code)
+CHASE,00df:4400,no caller in the original (dead code)
+CHASE,00df:4446,no caller in the original (dead code)
+CHASE,00df:452c,no caller in the original (dead code)
+CHASE,00df:45aa,no caller in the original (dead code)
+CHASE,00df:4606,no caller in the original (dead code)
+CHASE,00df:466a,"the 512-byte block reader behind the picture and animation loaders: the files are read to their end and taken apart at once (D-12, D-13)"
+CHASE,00df:4688,"part of the picture decoder (an assembly routine behind the thunk table) or of its read hook: the picture file is read to its end and decoded at once by Content (PictureFile), without the row loop and the 512-byte block reader (D-12)"
+CHASE,00df:46bc,"the 512-byte block reader behind the picture and animation loaders: the files are read to their end and taken apart at once (D-12, D-13)"
+CHASE,00df:46cc,"the 512-byte block reader behind the picture and animation loaders: the files are read to their end and taken apart at once (D-12, D-13)"
+CHASE,00df:4716,switches the display to text mode (int 10h) for the fatal-error message of a failed file: the rewrite prints the name and ends (D-12)
+CHASE,00df:4aaa,C run-time start-up/exit table walker: no counterpart in a .NET process
+CHASE,00df:57da,gives memory back to DOS (int 21h function 49h): the rewrite lets the objects go (D-14)
+CHASE,lib:__FF_MSGBANNER,"C run-time start-up, exit, error messages and DOS return helpers: no counterpart in a .NET process"
+CHASE,lib:__NMSG_TEXT,"C run-time start-up, exit, error messages and DOS return helpers: no counterpart in a .NET process"
+CHASE,lib:__NMSG_WRITE,"C run-time start-up, exit, error messages and DOS return helpers: no counterpart in a .NET process"
+CHASE,lib:___tzset,internals of the library's time(); time() itself is a boundary call (IGameTimer.Time)
+CHASE,lib:__aNlshr,run-time long shift helper: C# long arithmetic
+CHASE,lib:__amsg_exit,"C run-time start-up, exit, error messages and DOS return helpers: no counterpart in a .NET process"
+CHASE,lib:__astart,"C run-time start-up, exit, error messages and DOS return helpers: no counterpart in a .NET process"
+CHASE,lib:__catox,library number parsing used only by tzset (the TZ variable)
+CHASE,lib:__chkstk,C run-time stack check: a .NET process has no 16-bit stack to check
+CHASE,lib:__cinit,"C run-time start-up, exit, error messages and DOS return helpers: no counterpart in a .NET process"
+CHASE,lib:__cintDIV,"C run-time start-up, exit, error messages and DOS return helpers: no counterpart in a .NET process"
+CHASE,lib:__cltoasub,internal entry of the number-to-text routines
+CHASE,lib:__ctermsub,"C run-time start-up, exit, error messages and DOS return helpers: no counterpart in a .NET process"
+CHASE,lib:__dos_creat,the DOS call under open() that creates a file: the rewrite creates files through IFiles.Open
+CHASE,lib:__dos_creatnew,the DOS call under open() that creates a file: the rewrite creates files through IFiles.Open
+CHASE,lib:__dos_write,the DOS call under write(): the rewrite writes through IFiles.Write
+CHASE,lib:__dosret0,C run-time DOS return helper (carry flag to errno): no counterpart in a .NET process
+CHASE,lib:__dosretax,C run-time DOS return helper (carry flag to errno): no counterpart in a .NET process
+CHASE,lib:__dosreturn,C run-time DOS return helper (carry flag to errno): no counterpart in a .NET process
+CHASE,lib:__dtoxtime,internals of the library's time(); time() itself is a boundary call (IGameTimer.Time)
+CHASE,lib:__exit,ends the program: the C# throws ProgramExitException where the original calls it
+CHASE,lib:__isindst,internals of the library's time(); time() itself is a boundary call (IGameTimer.Time)
+CHASE,lib:__maperror,C run-time: maps a DOS error number to errno; the boundary reports the DOS number itself
+CHASE,lib:__myalloc,C run-time heap: C# objects replace the near heap
+CHASE,lib:__nullcheck,C run-time check of the null segment at exit: no counterpart in a .NET process
+CHASE,lib:__setargv,C run-time start-up: builds argv from the command line; the launcher starts the part itself
+CHASE,lib:__setenvp,C run-time start-up: builds the environment table; the rewrite reads no environment variable
+CHASE,lib:exit,ends the program: the C# throws ProgramExitException where the original calls it
+CHASE,lib:getenv,reads an environment variable (used by tzset): the rewrite reads none
+CHASE,lib:inp,reads a hardware port: the rewrite has no ports; the readings the game takes this way are named services
+CHASE,lib:int86,calls a software interrupt: the rewrite has no interrupts; the services the game uses are the boundary interfaces
+CHASE,lib:intdos,calls DOS through a software interrupt: the rewrite has no interrupts; the services the game uses are IFiles and the boundary interfaces
+CHASE,lib:movedata,"a library copy, compare, fill or search: the ported code does the same with C# arrays, spans and strings"
+CHASE,lib:perror,prints a DOS error text for the fatal-error exit of a failed file: the rewrite prints the file's name and ends (D-12)
+CHASE,lib:stackavail,free space of the 16-bit stack: no counterpart in a .NET process
+CHASE,lib:strnicmp,"a library copy, compare, fill or search: the ported code does the same with C# arrays, spans and strings"
+CHASE,lib:tzset,internals of the library's time(); time() itself is a boundary call (IGameTimer.Time)

@@ -1,0 +1,8 @@
+{
+  "part": "CODE",
+  "start": "decode-v1",
+  "note": "The documented solution of the captured route's cipher (time of day 5 Nov 1990 12:00 PST), typed with pauses, then Enter: the message is decoded and the part hands back to the menus.",
+  "handoff": {},
+  "unix_time": 657835200,
+  "keys": "{wait 2}ua{wait 2}hbrcsdffegdhwinlqmlnzoypirjsktmu{wait 3}{enter}{wait 3}"
+}

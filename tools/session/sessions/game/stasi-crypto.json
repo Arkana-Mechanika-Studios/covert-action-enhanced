@@ -1,0 +1,8 @@
+{
+  "part": "GAME",
+  "start": "stasi-v1",
+  "note": "The loaded Stasi case: the CIA building, the Intelligence Section's local scan with its long run of results (dossiers, photographs, coded messages, a bulletin teletype), Active Wire Taps, then the Crypto Branch: the coded messages, one chosen: the hand-off to the cryptography part (code 2).",
+  "handoff": {},
+  "unix_time": 658060000,
+  "keys": "{wait 5}{down}{down}{enter}{wait 12}{enter}{wait 12}{enter}{wait 12}{enter}{wait 12}{enter}{wait 12}{down}{enter}{wait 12}{enter}{wait 12}{enter}{wait 12}{enter}{wait 12}{enter}{wait 12}{esc}{wait 12}{down}{down}{enter}{wait 12}{enter}{wait 12}{enter}{wait 12}{enter}{wait 12}{enter}{wait 12}{enter}{wait 12}{esc}{wait 12}{esc}{wait 12}{down}{down}{enter}{wait 12}{enter}{wait 12}{enter}{wait 12}{enter}{wait 12}{enter}{wait 12}{enter}{wait 12}{enter}{wait 12}{enter}{wait 12}{enter}{wait 12}{enter}{wait 12}{enter}{wait 12}{enter}{wait 12}{enter}{wait 12}{enter}{wait 12}{enter}{wait 12}{esc}{wait 12}{esc}{wait 12}{esc}{wait 12}{down}{down}{enter}{wait 12}{enter}{wait 12}{enter}{wait 12}{enter}{wait 12}{enter}{wait 12}"
+}

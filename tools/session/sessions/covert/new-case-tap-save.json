@@ -1,0 +1,13 @@
+{
+  "part": "COVERT",
+  "note": "The game from the DOS prompt: COVERT.EXE, the set-up screen (INTRO: MCGA, 1 no sound, 2 keyboard only), FINAL: the title, a new character (Maxine, ANNA), training, the Chief, the briefing, the portrait: a new case handed to GAME; the case's clues, the Chief's office, the Data Section, the Mossad cell's building: Place wiretap; BUG: the tap completed without alarm (FINAL/new-case, GAME/hq-data and BUG/campaign-tap's keys and times); back in GAME at the building: Leave, the city, the hotel: Save Game (drive, slot 1: CV0.SVE written); Alt-Q, Yes, the farewell picture, a key: the game ends and the launcher returns to text mode.",
+  "graphics_key": "2",
+  "unix_time": 657835200,
+  "part_times": [
+    657835200,
+    657835200,
+    658108800,
+    658110000
+  ],
+  "keys": "12 {wait 3}{enter}{wait 3}{down}{enter}{wait 3}ANNA{enter}{wait 3}{enter}{wait 3}{enter}{wait 3}{enter}{wait 3}{enter}{wait 3}{enter}{wait 3}{esc}{wait 300}{enter}{wait 5}{enter}{wait 5}{enter}{wait 5}{enter}{wait 5}{enter}{wait 5}{up}{left}{enter}{wait 300}{enter}{wait 2}{enter}{wait 2}{enter}{wait 2}{enter}{wait 2}{enter}{wait 2}{enter}{wait 2}{enter}{wait 2}{enter}{wait 2}{enter}{wait 2}{enter}{wait 12}{enter}{wait 12}{enter}{wait 12}{enter}{wait 12}{enter}{wait 12}{enter}{wait 12}{enter}{wait 12}{enter}{wait 12}{enter}{wait 6}{esc}{wait 6}{esc}{wait 12}{down}{enter}{wait 12}{enter}{wait 12}{esc}{wait 12}{esc}{wait 12}{down}{down}{enter}{wait 12}{enter}{wait 12}{esc}{wait 12}{esc}{wait 12}{down}{down}{down}{enter}{wait 12}{enter}{wait 12}{esc}{wait 12}{esc}{wait 12}{down}{down}{down}{down}{enter}{wait 12}{enter}{wait 7}{down}{wait 2}{down}{wait 2}{enter}{wait 20}x{wait 5}x{wait 5}{home}{wait 2}{left}{wait 2}{left}{wait 2}{enter}{wait 20}x{wait 5}x{wait 5}{up}{wait 2}{up}{wait 2}{up}{wait 2}{enter}{wait 20}x{wait 5}x{wait 5}x{wait 5}x{wait 5}{enter}{wait 5}{down}{wait 2}{down}{wait 2}{down}{wait 2}{down}{wait 2}{enter}{wait 12}{down}{wait 2}{enter}{wait 12}{down}{wait 2}{down}{wait 2}{down}{wait 2}{enter}{wait 12}{enter}{wait 12}{enter}{wait 12}{enter}{wait 32}{alt-q}{wait 5}{down}{enter}{wait 5}{enter}{wait 5}"
+}

@@ -1,0 +1,11 @@
+{
+  "part": "GAME",
+  "start": "stasi-v1",
+  "handoff_from": {
+    "recording": "BUG/regional-tracer"
+  },
+  "note": "Back from the car tracer that BUG/regional-tracer alarmed (entry mode 0x0c, CityScreens.SettleTheMission): the suspicion the alarm raises, no building found (person below 0x19), the city screen; the airport and the travel map, Stay here, the city screen two hours on.",
+  "handoff": {},
+  "unix_time": 657950000,
+  "keys": "{wait 5}{enter}{wait 12}{enter}{wait 12}"
+}

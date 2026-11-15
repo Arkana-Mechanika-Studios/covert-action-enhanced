@@ -1,0 +1,11 @@
+{
+  "part": "TAC",
+  "start": "tacphoto-v1",
+  "handoff_from": {
+    "recording": "GAME/regional-ambush"
+  },
+  "note": "The ambush raid from GAME/regional-ambush's hand-off (code 0x0a): the street, the attackers' grenades and fire while the agent stands still: \"You slump to the ground, overcome by your wounds.\", the hand-off to GAME (person -1: the ambush lost).",
+  "handoff": {},
+  "unix_time": 657930000,
+  "keys": "{wait 3}{enter}{wait 5}{enter}{wait 20}{wait 200}"
+}

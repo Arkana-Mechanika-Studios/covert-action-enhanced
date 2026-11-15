@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- The one program: what COVERT.EXE is in the original. Builds the game from the player's files and a host, and starts
+       its parts. Hosts reference this project; it references no host. -->
+  <ItemGroup>
+    <ProjectReference Include="..\CovertAction.Msc\CovertAction.Msc.csproj" />
+    <ProjectReference Include="..\CovertAction.Core\CovertAction.Core.csproj" />
+    <ProjectReference Include="..\CovertAction.Platform\CovertAction.Platform.csproj" />
+    <ProjectReference Include="..\CovertAction.Audio\CovertAction.Audio.csproj" />
+    <ProjectReference Include="..\CovertAction.Audio.Mt32\CovertAction.Audio.Mt32.csproj" />
+    <ProjectReference Include="..\CovertAction.Content\CovertAction.Content.csproj" />
+    <ProjectReference Include="..\CovertAction.Persistence\CovertAction.Persistence.csproj" />
+    <ProjectReference Include="..\CovertAction.Presentation\CovertAction.Presentation.csproj" />
+    <ProjectReference Include="..\CovertAction.Drivers\CovertAction.Drivers.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <InternalsVisibleTo Include="CovertAction.Launcher.Tests" />
+  </ItemGroup>
+</Project>

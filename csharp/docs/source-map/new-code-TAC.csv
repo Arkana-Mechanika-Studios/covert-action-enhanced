@@ -1,0 +1,8 @@
+member,reason
+CovertAction.Core.Raid.RaidState.Cell,"the index of a cell in a per-cell table; the original writes table[x][y] (x * 32 + y) in place at each use"
+CovertAction.Core.Raid.BuildingRules.RoomBit,"the bit of a room in a door mask, (long)(1 << room) with a 16-bit shift, which the original writes in place at each use"
+CovertAction.Core.Raid.GuardRules.AwakeGuardCount,"CA-1's switch: where the count of awake guards is read, the city counter (original) or a variable of the raid (fixed)"
+CovertAction.Core.Raid.GuardRules.SetAwakeGuardCount,"CA-1's switch: where the count of awake guards is written, the city counter (original) or a variable of the raid (fixed)"
+CovertAction.Core.Raid.ObjectType.PrintedName,"a tile name as strcat/strcpy read it, the end-mark overrun of CA-31 included; the original copies the name in place at each use"
+CovertAction.Core.Raid.BuildingRules.SetUpThePlotObjectsGuards,"the plot object's presence and its guards at the end of tac_init (TAC 00e8:0018), apart so that a test can hold it: MacHere is only ever set there, as furnish_room may have set it before"
+CovertAction.Core.Raid.RaidState.TileType,"a tile record as the original reads ob[tile] with the low six bits of a cell: types 62 and 63 lie behind the table, on the movement tables (tile 63 is met: TAC/level3-arrest)"

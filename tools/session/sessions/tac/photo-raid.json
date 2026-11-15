@@ -1,0 +1,8 @@
+{
+  "part": "TAC",
+  "start": "tacphoto-v1",
+  "note": "The campaign raid of the start image (the Stasi hideout in Washington, GAME's own hand-off in the captured tacphoto route), played with the route's 23 actions, each after 255 empty polls as in the capture (docs/game-protocol.md \"Photographed evidence\"): the kit (gas mask, vest, camera, bugs, safecracking kit), Door #1, a lunge, F1 at the files (searched), F2: the files photographed, the clue (Swedish Passport #15) and Agent S's coded message; walking out with 2: \"You quickly slip out of the building.\", the hand-off back to GAME (code 0).",
+  "handoff": {},
+  "unix_time": 657835200,
+  "keys": "{wait 255}{right}{wait 255}{enter}{wait 255}{down}{wait 255}{enter}{wait 255}{left}{wait 255}{enter}{wait 255}{down}{wait 255}{enter}{wait 255}{down}{wait 255}{right}{wait 255}{enter}{wait 255}{esc}{wait 255}{enter}{wait 255}{up}{wait 255}{left}{wait 255}{f1}{wait 255}{f2}{wait 255}{enter}{wait 255}{enter}{wait 255}{enter}{wait 255}2{wait 255}2{wait 255}2{wait 60}"
+}

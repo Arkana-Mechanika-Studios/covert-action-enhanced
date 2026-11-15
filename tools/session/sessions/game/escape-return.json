@@ -1,0 +1,11 @@
+{
+  "part": "GAME",
+  "start": "stasi-v1",
+  "handoff_from": {
+    "recording": "TAC/escape-out"
+  },
+  "note": "Back from the escape TAC/escape-out completed (entry mode 7, person 0: no surrender scene, CityScreens.SettleTheMission): the city screen in Washington; the airport, a satellite intercept on the way (the incoming message), the travel map, Stay here, the city screen.",
+  "handoff": {},
+  "unix_time": 658030000,
+  "keys": "{wait 5}{enter}{wait 12}{enter}{wait 12}{enter}{wait 12}{enter}{wait 12}"
+}

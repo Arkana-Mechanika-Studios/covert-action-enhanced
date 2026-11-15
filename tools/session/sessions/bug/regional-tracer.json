@@ -1,0 +1,11 @@
+{
+  "part": "BUG",
+  "start": "bug-v1",
+  "handoff_from": {
+    "recording": "GAME/regional-tracer"
+  },
+  "note": "The car tracer (code 0x0c, ElectronicsMode.CarTracer) GAME/regional-tracer hands over in the level-2 case: the tracer's board (hidden chips, five minutes), three swaps, the third powers an alarm: \"Alarm!!!\", the hand-off back to GAME (code 0, one alarm).",
+  "handoff": {},
+  "unix_time": 657940000,
+  "keys": "{wait 5}{enter}{wait 10}{left}{wait 2}{up}{wait 2}{enter}{wait 20}{down}{wait 2}{down}{wait 2}{down}{wait 2}{enter}{wait 20}{enter}{wait 10}{enter}{wait 10}"
+}

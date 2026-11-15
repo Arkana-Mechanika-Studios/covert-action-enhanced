@@ -1,0 +1,11 @@
+{
+  "part": "TAC",
+  "start": "stasi-v1",
+  "handoff_from": {
+    "recording": "GAME/stasi-city"
+  },
+  "note": "A campaign raid from GAME/stasi-city's hand-off (the Stasi office): the Uzi, the camera and the bugs chosen; the plant bugged with F3 (\"Plant bugged.\"), F3 again in the bugged room; long waits while two guards come in; the agent walks round the chair and runs into a guard: the guard is knocked out, the agent is disguised in his clothes and takes his grenades (one wound: the guard was awake); the other guard sees through the disguise and shoots: \"You slump to the ground, overcome by your wounds.\", the hand-off to GAME (code 0, person -1: captured).",
+  "handoff": {},
+  "unix_time": 658010000,
+  "keys": "{wait 3}{enter}{down}{enter}{down}{enter}{wait 2}{esc}{wait 5}{enter}{wait 20}{kp6}{wait 1}{kp6}{wait 1}{kp8}{wait 1}{kp8}{wait 1}{kp8}{wait 1}{kp8}{wait 1}{kp8}{wait 1}{kp8}{wait 1}{kp8}{wait 1}{kp8}{wait 1}{kp8}{wait 1}{kp8}{wait 1}{kp8}{wait 1}{kp8}{wait 1}{kp6}{wait 1}{kp6}{wait 1}{kp6}{wait 1}{kp6}{wait 1}{kp6}{wait 1}{kp6}{wait 1}{kp6}{wait 1}{kp6}{wait 1}{kp6}{wait 1}{kp6}{wait 1}{kp6}{wait 1}{kp6}{wait 1}{kp6}{wait 1}{kp6}{wait 1}{wait 10}{f3}{wait 30}{f3}{wait 1960}{kp8}{wait 1}{kp8}{wait 1}{kp8}{wait 1}{kp8}{wait 1}{kp6}{wait 1}{kp6}{wait 1}{kp6}{wait 1}{kp6}{wait 1}{kp6}{wait 1}{kp6}{wait 1}{kp6}{wait 1}{kp6}{wait 1}{kp6}{wait 1}{kp6}{wait 1}{kp6}{wait 1}{kp6}{wait 1}{kp6}{wait 1}{kp6}{wait 1}{kp2}{wait 1}{kp2}{wait 1}{kp2}{wait 1}{kp2}{wait 1}{kp2}{wait 1}{kp2}{wait 1}{kp2}{wait 1}{kp2}{wait 1}{kp2}{wait 1}{kp2}{wait 1}{kp2}{wait 1}{kp2}{wait 1}{kp2}{wait 1}{kp2}{wait 1}{kp2}{wait 1}{kp2}{wait 1}{kp2}{wait 1}{kp2}{wait 1}{kp2}{wait 1}{kp2}{wait 1}{kp8}{wait 1}{kp8}{wait 1}{kp8}{wait 1}{kp8}{wait 1}{kp8}{wait 1}{kp8}{wait 1}{kp8}{wait 1}{kp6}{wait 1}{kp6}{wait 1}{kp6}{wait 1}{kp6}{wait 1}{kp6}{wait 1}{kp6}{wait 1}{kp6}{wait 1}{kp6}{wait 1}{kp6}{wait 1}{kp6}{wait 1}{kp2}{wait 1}{kp2}{wait 1}{kp2}{wait 1}{kp2}{wait 1}{kp2}{wait 1}{kp2}{wait 1}{kp3}{wait 1}{kp3}{wait 1}{kp3}{wait 1}{kp3}{wait 1}{wait 100}"
+}

@@ -1,0 +1,9 @@
+{
+  "part": "BUG",
+  "start": "bug-v1",
+  "handoff_from": {"recording": "FINAL/practice-electronics"},
+  "note": "The electronics practice at level 2 (FINAL/practice-electronics's hand-off), another time of day: the cursor moved, Alt-Q, the quit box's second line chosen: the game is left from inside the part (next_module -1).",
+  "handoff": {},
+  "unix_time": 662720400,
+  "keys": "{wait 5}{up}{wait 2}{right}{wait 2}{alt-q}{wait 3}{down}{wait 2}{enter}{wait 3}{enter}{wait 3}"
+}

@@ -1,0 +1,11 @@
+{
+  "part": "GAME",
+  "start": "campaign-v1",
+  "handoff_from": {
+    "recording": "BUG/campaign-tap"
+  },
+  "note": "Back from BUG/campaign-tap (the wiretap completed at the Mossad cell's building, code 0): the clock moved on, the building's menu, Place wiretap again: \"The guards are unsuspecting. You will have 9 minutes.\", the hand-off to the electronics part (code 4).",
+  "handoff": {},
+  "unix_time": 658110000,
+  "keys": "{wait 5}{enter}{wait 12}{enter}{wait 12}{enter}{wait 12}{enter}{wait 12}"
+}

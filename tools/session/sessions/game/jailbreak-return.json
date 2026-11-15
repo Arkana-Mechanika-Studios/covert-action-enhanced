@@ -1,0 +1,11 @@
+{
+  "part": "GAME",
+  "start": "campaign-v1",
+  "handoff_from": {
+    "recording": "TAC/jailbreak"
+  },
+  "note": "Back from TAC/jailbreak in entry mode 8 (CityScreens.EndJailBreak, person -1): the bust-out scene, \"Saadi Hammid escapes!\" (alerted, freed, his organisation's building lost: the Libyan Emb. active cell is gone from the city menu), the city screen, the airport's travel map, Stay here, the city screen again.",
+  "handoff": {},
+  "unix_time": 657980000,
+  "keys": "{wait 5}{enter}{wait 12}{enter}{wait 12}{enter}{wait 12}"
+}

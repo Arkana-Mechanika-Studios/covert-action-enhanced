@@ -1,0 +1,49 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- The program players start: an SDL 3 window, keyboard and sound device behind the Platform interfaces, and the
+       game (CovertAction.Launcher) started in it, with the player's settings and the launcher (CovertAction.Settings).
+       Nothing references this project. -->
+  <PropertyGroup>
+    <!-- a windowed program: no console window opens with the game; started from a command line, its messages go there (Program) -->
+    <OutputType>WinExe</OutputType>
+    <AssemblyName>CovertAction</AssemblyName>
+    <RootNamespace>CovertAction.Host.Sdl</RootNamespace>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <Product>Covert Action (C# rewrite, unofficial fan project)</Product>
+    <AssemblyTitle>Covert Action (C# rewrite)</AssemblyTitle>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\CovertAction.Platform\CovertAction.Platform.csproj" />
+    <ProjectReference Include="..\CovertAction.Content\CovertAction.Content.csproj" />
+    <ProjectReference Include="..\CovertAction.Launcher\CovertAction.Launcher.csproj" />
+    <ProjectReference Include="..\CovertAction.Settings\CovertAction.Settings.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <InternalsVisibleTo Include="CovertAction.Settings.Tests" />
+  </ItemGroup>
+  <ItemGroup>
+    <!-- the VGA's 8x16 text font (provenance: THIRD_PARTY_NOTICES.md) -->
+    <EmbeddedResource Include="Resources/vga-8x16.b64" LogicalName="CovertAction.Host.Sdl.vga-8x16.b64" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(RuntimeIdentifier)' == '' or $(RuntimeIdentifier.StartsWith('win'))">
+    <!-- SDL 3.4.20, the official Windows x64 release (zlib licence, see THIRD_PARTY_NOTICES.md), next to the program -->
+    <None Include="Native/win-x64/SDL3.dll" Link="SDL3.dll" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+  </ItemGroup>
+  <!-- this version's release notes (csharp/releases/<version>/release-notes.md, when there) next to the program, for the
+       launcher's "What's new" -->
+  <PropertyGroup>
+    <ReleaseNotesFile>$(MSBuildThisFileDirectory)..\..\releases\$(Version.Replace('-dev',''))\release-notes.md</ReleaseNotesFile>
+  </PropertyGroup>
+  <ItemGroup>
+    <None Include="$(ReleaseNotesFile)" Link="RELEASE_NOTES.md" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" Condition="Exists('$(ReleaseNotesFile)')" />
+  </ItemGroup>
+  <!-- a release carries an empty MT32_ROMS folder beside the program, where the player puts MT-32 / CM-32L ROM files
+       for the Roland choice of the set-up (none is included; THIRD_PARTY_NOTICES.md); as the Darklands Restoration Project's -->
+  <Target Name="CreateMt32RomFolder" AfterTargets="Publish">
+    <MakeDir Directories="$(PublishDir)MT32_ROMS" />
+  </Target>
+  <!-- the launcher as a program of its own beside CovertAction.exe (CovertAction.Host.Launcher): "CovertAction Launcher.exe",
+       which starts CovertAction.exe with its setup switch; as the Darklands Restoration Project's -->
+  <Target Name="PublishLauncherProgram" AfterTargets="Publish" Condition="'$(RuntimeIdentifier)' == '' or $(RuntimeIdentifier.StartsWith('win'))">
+    <Exec Command="dotnet build &quot;$(MSBuildThisFileDirectory)..\CovertAction.Host.Launcher\CovertAction.Host.Launcher.csproj&quot; -c Release -nologo -v q -p:Version=$(Version) -o &quot;$(PublishDir).&quot;" />
+  </Target>
+</Project>

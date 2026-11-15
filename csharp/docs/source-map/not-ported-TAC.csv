@@ -1,0 +1,95 @@
+module,match,reason
+TAC,0000:05b9,attach_driver_segment: patches the thunk table for a driver the launcher loaded; the rewrite has no driver programs to attach (D-2)
+TAC,0000:0000,not code: zero bytes at the start of the code segment
+TAC,0000:00ca,the palette loader of the display modes: it forwards to the graphics driver's palette routine for MCGA (IGraphicsDriver.SetPalette) and programs the EGA or Tandy palette registers through the ports for the other modes; the rewrite has the 256-colour MCGA display only (DECISIONS.md)
+TAC,0000:0156,driver-call trampoline behind some thunk slots; the thunks are the boundary interfaces
+TAC,0000:0a8a,"part of the picture decoder (an assembly routine behind the thunk table) or of its read hook: the picture file is read to its end and decoded at once by Content (PictureFile), without the row loop and the 512-byte block reader (D-12)"
+TAC,0000:0b1a,"part of the picture decoder (an assembly routine behind the thunk table) or of its read hook: the picture file is read to its end and decoded at once by Content (PictureFile), without the row loop and the 512-byte block reader (D-12)"
+TAC,0000:0b62,"part of the picture decoder (an assembly routine behind the thunk table) or of its read hook: the picture file is read to its end and decoded at once by Content (PictureFile), without the row loop and the 512-byte block reader (D-12)"
+TAC,0000:0b7c,"part of the picture decoder (an assembly routine behind the thunk table) or of its read hook: the picture file is read to its end and decoded at once by Content (PictureFile), without the row loop and the 512-byte block reader (D-12)"
+TAC,00e8:06a0,no caller in the original (dead code)
+TAC,00e8:a522,"no caller in the original (dead code); the text builder of an intercepted message; no program calls its copy (FINAL 7668, BUG 3c9e)"
+TAC,00e8:d29a,"no caller in the original (dead code); its only caller is write_file, which has none"
+TAC,00e8:d2e8,no caller in the original (dead code)
+TAC,00e8:d32c,no caller in the original (dead code)
+TAC,00e8:d372,no caller in the original (dead code)
+TAC,00e8:d458,no caller in the original (dead code)
+TAC,00e8:d4d6,no caller in the original (dead code)
+TAC,00e8:d532,no caller in the original (dead code)
+TAC,00e8:d596,"the 512-byte block reader behind the picture and animation loaders: the files are read to their end and taken apart at once (D-12, D-13)"
+TAC,00e8:d5b4,"part of the picture decoder (an assembly routine behind the thunk table) or of its read hook: the picture file is read to its end and decoded at once by Content (PictureFile), without the row loop and the 512-byte block reader (D-12)"
+TAC,00e8:d5e8,"the 512-byte block reader behind the picture and animation loaders: the files are read to their end and taken apart at once (D-12, D-13)"
+TAC,00e8:d5f8,"the 512-byte block reader behind the picture and animation loaders: the files are read to their end and taken apart at once (D-12, D-13)"
+TAC,00e8:d642,switches the display to text mode (int 10h) for the fatal-error message of a failed file: the rewrite prints the name and ends (D-12)
+TAC,00e8:d9d6,C run-time start-up/exit table walker: no counterpart in a .NET process
+TAC,00e8:fd6e,"MSC library DOS wrapper (int 21h function 41h, delete a file): nothing in the game's own code calls it"
+TAC,00e8:ff84,run-time long shift-assign helper: C# long arithmetic
+TAC,lib:__FF_MSGBANNER,"C run-time start-up, exit, error messages and DOS return helpers: no counterpart in a .NET process"
+TAC,lib:__NMSG_TEXT,"C run-time start-up, exit, error messages and DOS return helpers: no counterpart in a .NET process"
+TAC,lib:__NMSG_WRITE,"C run-time start-up, exit, error messages and DOS return helpers: no counterpart in a .NET process"
+TAC,lib:___tzset,internals of the library's time(); time() itself is a boundary call (IGameTimer.Time)
+TAC,lib:__aNlshr,run-time long shift helper: C# long arithmetic
+TAC,lib:__amalloc,C run-time heap: C# objects replace the near heap
+TAC,lib:__amallocbrk,C run-time heap: C# objects replace the near heap
+TAC,lib:__amexpand,C run-time heap: C# objects replace the near heap
+TAC,lib:__amlink,C run-time heap: C# objects replace the near heap
+TAC,lib:__amsg_exit,"C run-time start-up, exit, error messages and DOS return helpers: no counterpart in a .NET process"
+TAC,lib:__astart,"C run-time start-up, exit, error messages and DOS return helpers: no counterpart in a .NET process"
+TAC,lib:__cXENIXtoDOSmode,C run-time: translates the file mode of open() for the DOS call; the rewrite opens files through IFiles
+TAC,lib:__catox,library number parsing used only by tzset (the TZ variable)
+TAC,lib:__chkstk,C run-time stack check: a .NET process has no 16-bit stack to check
+TAC,lib:__cinit,"C run-time start-up, exit, error messages and DOS return helpers: no counterpart in a .NET process"
+TAC,lib:__cintDIV,"C run-time start-up, exit, error messages and DOS return helpers: no counterpart in a .NET process"
+TAC,lib:__cltoasub,internal entry of the number-to-text routines
+TAC,lib:__copensub,"internals of the C library's stream reading (fopen, fscanf, fclose): the rewrite reads the text file through IFiles in one piece (D-16)"
+TAC,lib:__ctermsub,"C run-time start-up, exit, error messages and DOS return helpers: no counterpart in a .NET process"
+TAC,lib:__dos_creat,the DOS call under open() that creates a file: the rewrite creates files through IFiles.Open
+TAC,lib:__dos_creatnew,the DOS call under open() that creates a file: the rewrite creates files through IFiles.Open
+TAC,lib:__dos_write,the DOS call under write(): the rewrite writes through IFiles.Write
+TAC,lib:__dosret0,C run-time DOS return helper (carry flag to errno): no counterpart in a .NET process
+TAC,lib:__dosretax,C run-time DOS return helper (carry flag to errno): no counterpart in a .NET process
+TAC,lib:__dosreturn,C run-time DOS return helper (carry flag to errno): no counterpart in a .NET process
+TAC,lib:__dtoxtime,internals of the library's time(); time() itself is a boundary call (IGameTimer.Time)
+TAC,lib:__exit,ends the program: the C# throws ProgramExitException where the original calls it
+TAC,lib:__filbuf,"internals of the C library's stream reading (fopen, fscanf, fclose): the rewrite reads the text file through IFiles in one piece (D-16)"
+TAC,lib:__freebuf,"internals of the C library's stream reading (fopen, fscanf, fclose): the rewrite reads the text file through IFiles in one piece (D-16)"
+TAC,lib:__getbuf,"internals of the C library's stream reading (fopen, fscanf, fclose): the rewrite reads the text file through IFiles in one piece (D-16)"
+TAC,lib:__getstream,"internals of the C library's stream reading (fopen, fscanf, fclose): the rewrite reads the text file through IFiles in one piece (D-16)"
+TAC,lib:__input,"the scanf engine of the C library (fscanf behind the ""security clearance"" text reader): LibraryText.ReadClearedText reads the text itself (D-16)"
+TAC,lib:__isindst,internals of the library's time(); time() itself is a boundary call (IGameTimer.Time)
+TAC,lib:__maperror,C run-time: maps a DOS error number to errno; the boundary reports the DOS number itself
+TAC,lib:__myalloc,C run-time heap: C# objects replace the near heap
+TAC,lib:__nfree,C run-time heap: C# objects replace the near heap
+TAC,lib:__nullcheck,C run-time check of the null segment at exit: no counterpart in a .NET process
+TAC,lib:__openfile,"internals of the C library's stream reading (fopen, fscanf, fclose): the rewrite reads the text file through IFiles in one piece (D-16)"
+TAC,lib:__setargv,C run-time start-up: builds argv from the command line; the launcher starts the part itself
+TAC,lib:__setenvp,C run-time start-up: builds the environment table; the rewrite reads no environment variable
+TAC,lib:brkctl,C run-time heap: C# objects replace the near heap
+TAC,lib:burn,"internals of the scanf engine (fscanf behind the ""security clearance"" text reader): LibraryText.ReadClearedText reads the text itself (D-16)"
+TAC,lib:ch_ok,"internals of the scanf engine (fscanf behind the ""security clearance"" text reader): LibraryText.ReadClearedText reads the text itself (D-16)"
+TAC,lib:exit,ends the program: the C# throws ProgramExitException where the original calls it
+TAC,lib:f_in,"internals of the scanf engine (fscanf behind the ""security clearance"" text reader): LibraryText.ReadClearedText reads the text itself (D-16)"
+TAC,lib:fflush,"internals of the C library's stream reading (fopen, fscanf, fclose): the rewrite reads the text file through IFiles in one piece (D-16)"
+TAC,lib:flushall,"internals of the C library's stream reading (fopen, fscanf, fclose): the rewrite reads the text file through IFiles in one piece (D-16)"
+TAC,lib:ftell,"internals of the C library's stream reading (fopen, fscanf, fclose): the rewrite reads the text file through IFiles in one piece (D-16)"
+TAC,lib:getche,console key read of the C library: keys come from the input driver (IInputDriver)
+TAC,lib:getenv,reads an environment variable (used by tzset): the rewrite reads none
+TAC,lib:i_in,"internals of the scanf engine (fscanf behind the ""security clearance"" text reader): LibraryText.ReadClearedText reads the text itself (D-16)"
+TAC,lib:inc,"internals of the scanf engine (fscanf behind the ""security clearance"" text reader): LibraryText.ReadClearedText reads the text itself (D-16)"
+TAC,lib:inp,reads a hardware port: the rewrite has no ports; the readings the game takes this way are named services
+TAC,lib:int86,calls a software interrupt: the rewrite has no interrupts; the services the game uses are the boundary interfaces
+TAC,lib:intdos,calls DOS through a software interrupt: the rewrite has no interrupts; the services the game uses are IFiles and the boundary interfaces
+TAC,lib:malloc,C run-time heap: C# objects replace the near heap
+TAC,lib:memcpy,"a library copy, compare, fill or search: the ported code does the same with C# arrays, spans and strings"
+TAC,lib:memset,"a library copy, compare, fill or search: the ported code does the same with C# arrays, spans and strings"
+TAC,lib:movedata,"a library copy, compare, fill or search: the ported code does the same with C# arrays, spans and strings"
+TAC,lib:perror,prints a DOS error text for the fatal-error exit of a failed file: the rewrite prints the file's name and ends (D-12)
+TAC,lib:s_in,"internals of the scanf engine (fscanf behind the ""security clearance"" text reader): LibraryText.ReadClearedText reads the text itself (D-16)"
+TAC,lib:stackavail,free space of the 16-bit stack: no counterpart in a .NET process
+TAC,lib:stricmp,"a library copy, compare, fill or search: the ported code does the same with C# arrays, spans and strings"
+TAC,lib:strnicmp,"a library copy, compare, fill or search: the ported code does the same with C# arrays, spans and strings"
+TAC,lib:strstr,"a library copy, compare, fill or search: the ported code does the same with C# arrays, spans and strings"
+TAC,lib:tzset,internals of the library's time(); time() itself is a boundary call (IGameTimer.Time)
+TAC,lib:ungetc,"internals of the C library's stream reading (fopen, fscanf, fclose): the rewrite reads the text file through IFiles in one piece (D-16)"
+TAC,lib:wgood,"internals of the scanf engine (fscanf behind the ""security clearance"" text reader): LibraryText.ReadClearedText reads the text itself (D-16)"
+TAC,lib:whiteout,"internals of the scanf engine (fscanf behind the ""security clearance"" text reader): LibraryText.ReadClearedText reads the text itself (D-16)"

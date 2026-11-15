@@ -1,0 +1,11 @@
+{
+  "part": "TAC",
+  "start": "tacphoto-v1",
+  "handoff_from": {
+    "recording": "FINAL/practice-breakin-1"
+  },
+  "note": "The practice raid at level 1 (FINAL/practice-breakin-1): the Uzi, the camera and the bugs chosen; the Lounge, walking with the keypad, F2 (\"Nothing to photograph.\"), F4, the boxes answered with Enter; the script runs out.",
+  "handoff": {},
+  "unix_time": 657953000,
+  "keys": "{wait 3}{enter}{down}{enter}{down}{enter}{esc}{wait 5}{enter}{wait 20}{kp4}{wait 3}{kp4}{wait 3}{kp4}{wait 3}{kp4}{wait 3}{kp4}{wait 3}{kp4}{wait 3}{kp4}{wait 3}{kp4}{wait 3}{kp4}{wait 3}{kp4}{wait 3}{kp4}{wait 3}{kp4}{wait 3}{kp8}{wait 3}{kp8}{wait 3}{kp8}{wait 3}{kp8}{wait 3}{kp8}{wait 3}{kp8}{wait 3}{kp8}{wait 3}{kp8}{wait 3}{kp8}{wait 3}{kp8}{wait 3}{kp8}{wait 3}{kp8}{wait 3}{f2}{wait 10}{enter}{wait 10}{enter}{wait 6}{f4}{wait 10}{enter}{wait 10}{enter}{wait 6}{kp7}{wait 3}{kp7}{wait 3}{kp7}{wait 3}{kp7}{wait 3}{kp7}{wait 3}{kp7}{wait 3}{kp7}{wait 3}{kp7}{wait 3}{kp1}{wait 3}{kp1}{wait 3}{kp1}{wait 3}{kp1}{wait 3}{kp1}{wait 3}{kp1}{wait 3}{kp1}{wait 3}{kp1}{wait 3}{wait 600}"
+}

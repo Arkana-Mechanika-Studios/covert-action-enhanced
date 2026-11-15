@@ -1,0 +1,8 @@
+{
+  "part": "GAME",
+  "start": "stasi-v1",
+  "note": "The loaded Stasi case: the flight to Rome, its city screen, a building and its animation, Watch the building: four stakeouts (the first two with the binoculars; the memory of the second is never given back, so the third and fourth do not load: D-11), Wait.",
+  "handoff": {},
+  "unix_time": 658030000,
+  "keys": "{wait 5}{enter}{wait 12}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{enter}{wait 40}{enter}{wait 12}{enter}{wait 12}{down}{down}{down}{down}{down}{enter}{wait 12}{down}{down}{enter}{wait 30}{enter}{wait 30}{enter}{wait 30}{enter}{wait 12}{enter}{wait 12}{enter}{wait 12}{enter}{wait 12}"
+}

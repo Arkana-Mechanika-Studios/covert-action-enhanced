@@ -1,0 +1,11 @@
+{
+  "part": "GAME",
+  "start": "campaign-v1",
+  "handoff_from": {
+    "recording": "BUG/level3-tap"
+  },
+  "note": "Back from BUG/level3-tap (the alarm, code 0) in the level-3 case: the clock moved on, the Mercenaries agent's building with \"It appears extra guards have been posted.\", Place wiretap again: \"The guards are nervous. You will have 2 minutes.\", the hand-off to the electronics part (code 4).",
+  "handoff": {},
+  "unix_time": 657950003,
+  "keys": "{wait 5}{enter}{wait 12}{enter}{wait 12}{enter}{wait 12}{enter}{wait 12}"
+}

@@ -1,0 +1,7 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- The only layer that knows the original's byte layouts: the hand-off block, saved campaigns, the modules' data segments. -->
+  <ItemGroup>
+    <ProjectReference Include="..\CovertAction.Core\CovertAction.Core.csproj" />
+    <ProjectReference Include="..\CovertAction.Msc\CovertAction.Msc.csproj" />
+  </ItemGroup>
+</Project>

@@ -1,0 +1,11 @@
+{
+  "part": "GAME",
+  "start": "campaign-v1",
+  "handoff_from": {
+    "recording": "FINAL/level3-new-case"
+  },
+  "note": "The level-3 case of FINAL/level3-new-case (Global Crisis): two clues, the CIA building, Leave building, the airport, the flight to Tehran, a satellite intercept, the hotel: Sleep through case, hour by hour, until the Paymaster (Saadi Hammid, Libyan Emb.) has withdrawn the money (the plot object Payoff is his: the bulletin teletype, two keys), awake, Leave hotel, the Libyan Emb. active cell: Break into building (code 1).",
+  "handoff": {},
+  "unix_time": 657900003,
+  "keys": "{wait 5}{enter}{wait 12}{enter}{wait 12}{enter}{wait 12}{wait 10}{down}{down}{down}{enter}{wait 30}{enter}{wait 30}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{enter}{wait 40}{enter}{wait 20}{down}{enter}{wait 30}{down}{down}{enter}{wait 21}{enter}{wait 14}{enter}{wait}{enter}{wait 10}{enter}{wait 20}{down}{down}{down}{down}{down}{down}{enter}{wait 30}{down}{enter}{wait 30}"
+}

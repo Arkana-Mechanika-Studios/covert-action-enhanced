@@ -1,0 +1,11 @@
+{
+  "part": "GAME",
+  "start": "campaign-v1",
+  "handoff_from": {
+    "recording": "CHASE/campaign-tail"
+  },
+  "note": "Back from the car chase (CHASE/campaign-tail's hand-off block: the quarry followed home): the building he went into, Place wiretap: the hand-off to the electronics part (code 4).",
+  "handoff": {},
+  "unix_time": 657952000,
+  "keys": "{wait 5}{enter}{wait 12}"
+}

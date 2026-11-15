@@ -1,0 +1,8 @@
+{
+  "part": "GAME",
+  "start": "campaign-v1",
+  "note": "A new case (08:00): the CIA building's Intelligence Section: the local scan (a clue, a coded message, a photograph, a positive identification, recruiting), the international scan's results, the clue records; the city screen; the MI6 office's building: Break into building, the hand-off to the raid (code 1).",
+  "handoff": {},
+  "unix_time": 657878400,
+  "keys": "{wait 2}{enter}{wait 2}{enter}{wait 2}{enter}{wait 2}{enter}{wait 2}{enter}{wait 2}{enter}{wait 2}{enter}{wait 2}{enter}{wait 2}{enter}{wait 12}{enter}{wait 12}{enter}{wait 12}{enter}{wait 12}{enter}{wait 12}{enter}{wait 12}{down}{enter}{wait 12}{enter}{wait 12}{enter}{wait 12}{enter}{wait 12}{enter}{wait 12}{enter}{wait 12}{down}{enter}{wait 12}{enter}{wait 12}{enter}{wait 12}{enter}{wait 12}{down}{down}{enter}{wait 12}{enter}{wait 12}{esc}{wait 12}{down}{down}{down}{down}{enter}{wait 12}{enter}{wait 12}{enter}{wait 12}{esc}{wait 12}{esc}{wait 12}{down}{down}{down}{enter}{wait 12}{down}{enter}{wait 12}{down}{enter}{wait 12}{enter}{wait 12}{enter}{wait 12}{down}{enter}{wait 12}{down}{down}{down}{enter}{wait 12}{enter}{wait 12}{down}{enter}{wait 12}{enter}{wait 12}"
+}

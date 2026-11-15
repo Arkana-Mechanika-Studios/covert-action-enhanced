@@ -1,0 +1,11 @@
+{
+  "part": "GAME",
+  "start": "campaign-v1",
+  "handoff_from": {
+    "recording": "TAC/photo-raid"
+  },
+  "note": "Back from TAC/photo-raid (the block TAC left: the files photographed, the agent out of the building): the Stasi hideout again with extra guards posted, Place wiretap: the hand-off to the electronics part (code 4).",
+  "handoff": {},
+  "unix_time": 657838000,
+  "keys": "{wait 5}{enter}{wait 12}{enter}{wait 12}"
+}

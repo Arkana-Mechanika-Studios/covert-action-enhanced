@@ -1,0 +1,14 @@
+{
+  "part": "GAME",
+  "start": "stasi-v1",
+  "handoff_from": {
+    "memory": "build/game-oracle/mastermind-arrest-15/phase-094/stop.memory.bin",
+    "sha256": "cd59003d3ac361cb7da5a5cf9cfafc29ceadfb39364ac29b0aae0b432498f240"
+  },
+  "note": "The end of a case reached in play: the block TAC.EXE handed back to GAME after the played raid in Damascus in which the MasterMind Yazid Nidal was arrested (191 ordinary actions, docs/game-protocol.md \"Mastermind arrest prompt\"), from the earlier full-chain capture (next_module set back to the 0 TAC left). The interrogation, the MasterMind breaking down and the dossiers of the participants, the jail, the Chief's congratulations, the incoming Surveillance Team and bulletin teletypes, then the case is over: the hand-off to the debriefing (code 9).",
+  "handoff": {
+    "next_module": 0
+  },
+  "unix_time": 658200000,
+  "keys": "{wait 5}{enter}{wait 12}{enter}{wait 12}{enter}{wait 12}{enter}{wait 12}{enter}{wait 12}{enter}{wait 12}{enter}{wait 12}{enter}{wait 12}{enter}{wait 12}{enter}{wait 12}{enter}{wait 12}{enter}{wait 12}{enter}{wait 12}"
+}

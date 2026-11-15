@@ -1,0 +1,11 @@
+{
+  "part": "GAME",
+  "start": "stasi-v1",
+  "handoff_from": {
+    "recording": "TAC/stasi-capture"
+  },
+  "note": "Back from TAC/stasi-capture (the agent captured in the raid): the capture scene, the captors' offer agreed (\"Agree to exchange.\"): with no suspect arrested the agent is exchanged for two double agents; the city screen, the travel map; the script runs out.",
+  "handoff": {},
+  "unix_time": 658014000,
+  "keys": "{wait 5}{down}{enter}{wait 12}{enter}{wait 12}{enter}{wait 12}{enter}{wait 12}{enter}{wait 12}"
+}

@@ -1,0 +1,274 @@
+// Adapted from the Darklands Restoration Project, src/Darklands.Launcher/LauncherModel.cs; same author.
+// Adapted: Covert Action's settings (the sound cards and the controls the set-up screen asked for, the picture's scaling, the saves
+// folder, the keyboard's repeat); window sizes of the 4:3 picture; no packs, filters or start-up switches.
+using System.Text.Json.Nodes;
+
+namespace CovertAction.Settings;
+
+/// <summary>The settings being edited on the launcher, what each shows, and what changed.</summary>
+internal sealed class LauncherModel
+{
+    /// <summary>The sound choices offered, with their labels, in the order ←/→ go through them.</summary>
+    public static readonly IReadOnlyList<(string Value, string Label)> SoundCards =
+    [
+        ("none", "No sound"),
+        ("speaker", "PC speaker"),
+        ("adlib", "AdLib"),
+        ("mt32", "Roland MT-32"),
+        ("tandy", "Tandy"),
+    ];
+
+    /// <summary>The picture's scalings, with their labels.</summary>
+    public static readonly IReadOnlyList<(string Value, string Label)> Scalings =
+    [
+        ("pixelart", "Pixel art (even pixels)"),
+        ("nearest", "Nearest (hard pixels)"),
+        ("smooth", "Smooth"),
+    ];
+
+    /// <summary>The controls, with their labels (the set-up screen's controls question of the original).</summary>
+    public static readonly IReadOnlyList<(string Value, string Label)> ControlChoices =
+    [
+        ("joystick", "Keyboard and joystick"),
+        ("keyboard", "Keyboard only"),
+    ];
+
+    /// <summary>The key repeats, with their labels.</summary>
+    public static readonly IReadOnlyList<(string Value, string Label)> KeyRepeats =
+    [
+        ("pc", "PC keyboard (10.9 a second)"),
+        ("windows", "Windows' own rate"),
+    ];
+
+    private static readonly int[] WindowScales = [2, 3, 4, 5, 6];
+
+    private readonly LauncherContext _context;
+    private readonly (string? GameFolder, (int W, int H) Window, bool Fullscreen, string Scaling, string SoundCard, string Controls, string? Roms, string? Saves, string KeyRepeat) _initial;
+
+    /// <summary>The folder shown at the start without the player choosing it (given at the start or found), or null.</summary>
+    private readonly string? _automatic;
+
+    private string? _mt32Roms;
+    private RomStatus? _roms;
+
+    public LauncherModel(LauncherContext context, (int Width, int Height)? display)
+    {
+        _context = context;
+        var s = context.Settings;
+        var start = context.Start;
+        // what the run would start with: the command line and the environment shown where they set a row
+        var window = (start.Width, start.Height);
+        Windows = WindowChoices(display, window);
+        WindowIndex = Windows.IndexOf(window);
+        Fullscreen = start.Fullscreen;
+        Scaling = start.Scaling;
+        SoundCard = start.SoundCard;
+        Controls = start.Controls;
+        _mt32Roms = IsFixed("sound.mt32Roms", out _) ? start.Mt32Roms : Blank(s.Mt32Roms);
+        SavesFolder = IsFixed("savesFolder", out _) ? start.SavesFolder : Blank(s.SavesFolder);
+        KeyRepeat = start.SystemKeyRepeat ? "windows" : "pc";
+        Found = context.FoundGameFolders();
+        var fileFolder = Blank(s.GameFolder);
+        // the folder the command line (or COVERT_GAME_DIR) gives is the one the game would start with: shown first
+        var given = IsFixed("gameFolder", out var by) ? Blank(start.GameFolder) : null;
+        SetGameFolder(given ?? fileFolder, given is null ? null : "set by " + by);
+        if (GameFolderChecked is null && Found.Count > 0)
+        {
+            SetGameFolder(Found[0].Folder, Found[0].Source);
+        }
+        _initial = (fileFolder, Windows[WindowIndex], Fullscreen, Scaling, SoundCard, Controls, _mt32Roms, SavesFolder, KeyRepeat);
+        _automatic = GameFolder;
+    }
+
+    private static string? Blank(string? text) => string.IsNullOrWhiteSpace(text) ? null : text;
+
+    public IReadOnlyList<(string Folder, string Source)> Found { get; }
+
+    /// <summary>The game folder as the player named it (or as it was found), null: none.</summary>
+    public string? GameFolder { get; private set; }
+
+    /// <summary>The folder with the game in <see cref="GameFolder"/>, null when it holds none.</summary>
+    public string? GameFolderChecked { get; private set; }
+
+    /// <summary>Where the game folder came from ("the program's folder"), or null.</summary>
+    public string? GameFolderSource { get; private set; }
+
+    public List<(int Width, int Height)> Windows { get; }
+
+    public int WindowIndex { get; set; }
+
+    public bool Fullscreen { get; set; }
+
+    /// <summary>One of <see cref="Scalings"/>' values.</summary>
+    public string Scaling { get; set; }
+
+    /// <summary>One of <see cref="SoundCards"/>' values.</summary>
+    public string SoundCard { get; set; }
+
+    /// <summary>One of <see cref="ControlChoices"/>' values.</summary>
+    public string Controls { get; set; }
+
+    /// <summary>The saves folder chosen; null: the default (<see cref="LauncherContext.DefaultSavesFolder"/>).</summary>
+    public string? SavesFolder { get; set; }
+
+    /// <summary>One of <see cref="KeyRepeats"/>' values.</summary>
+    public string KeyRepeat { get; set; }
+
+    /// <summary>The MT-32 ROM folder chosen; null: the default (MT32_ROMS next to the program, else where the ROMs are found).</summary>
+    public string? Mt32Roms
+    {
+        get => _mt32Roms;
+        set
+        {
+            _mt32Roms = value;
+            _roms = null;
+        }
+    }
+
+    /// <summary>What the ROM folder holds; looked at once for each folder (it reads the disk).</summary>
+    public RomStatus Roms => _roms ??= Mt32Roms is null && _context.AutomaticRoms is { } automatic
+        ? automatic(GameFolderChecked)
+        : _context.DescribeRoms(Mt32Roms);
+
+    public bool CanPlay => GameFolderChecked is not null;
+
+    public bool IsFixed(string key, out string by) => _context.Start.FixedKeys.TryGetValue(key, out by!);
+
+    public void SetGameFolder(string? folder, string? source = null)
+    {
+        GameFolder = folder;
+        GameFolderChecked = folder is null ? null : _context.CheckGameFolder(folder);
+        GameFolderSource = GameFolderChecked is null ? null : source;
+        _roms = null; // the ROMs looked for around the game when no folder is chosen depend on the game folder
+    }
+
+    /// <summary>The next (or previous) of the folders found, after the current one.</summary>
+    public void CycleFoundFolder(int step)
+    {
+        if (Found.Count == 0)
+        {
+            return;
+        }
+        var i = Found.ToList().FindIndex(f => f.Folder == GameFolder);
+        i = i < 0 ? 0 : (i + step + Found.Count) % Found.Count;
+        SetGameFolder(Found[i].Folder, Found[i].Source);
+    }
+
+    public void CycleWindow(int step) => WindowIndex = (WindowIndex + step + Windows.Count) % Windows.Count;
+
+    public void CycleSoundCard(int step) => SoundCard = Step(SoundCards, SoundCard, step);
+
+    public void CycleControls(int step) => Controls = Step(ControlChoices, Controls, step);
+
+    public void CycleScaling(int step) => Scaling = Step(Scalings, Scaling, step);
+
+    public void CycleKeyRepeat(int step) => KeyRepeat = Step(KeyRepeats, KeyRepeat, step);
+
+    private static string Step(IReadOnlyList<(string Value, string Label)> choices, string current, int step)
+    {
+        var i = Math.Max(0, choices.ToList().FindIndex(c => c.Value == current));
+        return choices[((i + step) % choices.Count + choices.Count) % choices.Count].Value;
+    }
+
+    public static string Label(IReadOnlyList<(string Value, string Label)> choices, string value) =>
+        choices.FirstOrDefault(c => c.Value == value).Label ?? choices[0].Label;
+
+    public static string SizeLabel((int Width, int Height) size) => $"{size.Width} x {size.Height}";
+
+    /// <summary>The settings-file keys that changed, with their new values.</summary>
+    /// <param name="playing">The player pressed Play: a folder they did not choose themselves (given at the start or found) is
+    /// written only then; else (the launcher closed) it is left to the next start.</param>
+    public IReadOnlyDictionary<string, JsonNode?> Changes(bool playing = true)
+    {
+        var changes = new Dictionary<string, JsonNode?>(StringComparer.Ordinal);
+        // a folder fixed by the command line goes into the file only when the file names none (the next start then finds it)
+        if (GameFolder != _initial.GameFolder && GameFolderChecked is not null && (_initial.GameFolder is null || !IsFixed("gameFolder", out _))
+            && (playing || GameFolder != _automatic))
+        {
+            changes["gameFolder"] = Written(GameFolder);
+        }
+        var window = Windows[WindowIndex];
+        if (window != _initial.Window)
+        {
+            if (window.Width % StartSettings.BaseWidth == 0 && window.Height == window.Width / StartSettings.BaseWidth * StartSettings.BaseHeight)
+            {
+                changes["display.scale"] = window.Width / StartSettings.BaseWidth;
+                changes["display.resolution"] = "";
+            }
+            else
+            {
+                changes["display.resolution"] = $"{window.Width}x{window.Height}";
+            }
+        }
+        if (Fullscreen != _initial.Fullscreen)
+        {
+            changes["display.fullscreen"] = Fullscreen;
+        }
+        if (Scaling != _initial.Scaling)
+        {
+            changes["display.scaling"] = Scaling;
+        }
+        if (SoundCard != _initial.SoundCard)
+        {
+            changes["sound.card"] = SoundCard;
+        }
+        if (Controls != _initial.Controls)
+        {
+            changes["input.controls"] = Controls;
+        }
+        if (Mt32Roms != _initial.Roms)
+        {
+            changes["sound.mt32Roms"] = Written(Mt32Roms);
+        }
+        if (SavesFolder != _initial.Saves)
+        {
+            changes["savesFolder"] = Written(SavesFolder);
+        }
+        if (KeyRepeat != _initial.KeyRepeat)
+        {
+            changes["input.keyRepeat"] = KeyRepeat;
+        }
+        return changes;
+    }
+
+    /// <summary>A folder as the file names it: forward slashes (JSON needs no escapes then); "" for none.</summary>
+    private static string Written(string? folder) => folder?.Replace('\\', '/') ?? "";
+
+    /// <summary>The settings file's values with the launcher's rows over them.</summary>
+    public GameSettings Settings()
+    {
+        var s = _context.Settings.Copy();
+        var window = Windows[WindowIndex];
+        var exact = window.Width % StartSettings.BaseWidth == 0 && window.Height == window.Width / StartSettings.BaseWidth * StartSettings.BaseHeight;
+        s.GameFolder = GameFolderChecked is not null ? GameFolder : s.GameFolder;
+        s.Scale = exact ? window.Width / StartSettings.BaseWidth : null;
+        s.Resolution = exact ? null : $"{window.Width}x{window.Height}";
+        s.Fullscreen = Fullscreen;
+        s.Scaling = Scaling;
+        s.SoundCard = SoundCard;
+        s.Controls = Controls;
+        s.Mt32Roms = Mt32Roms;
+        s.SavesFolder = SavesFolder;
+        s.KeyRepeat = KeyRepeat;
+        return s;
+    }
+
+    /// <summary>The 4:3 sizes that fit the screen (all of them when its size is unknown), and the current one.</summary>
+    private static List<(int Width, int Height)> WindowChoices((int Width, int Height)? display, (int Width, int Height) current)
+    {
+        var sizes = WindowScales
+            .Select(f => (StartSettings.BaseWidth * f, StartSettings.BaseHeight * f))
+            .Where(size => display is not { } d || (size.Item1 <= d.Width && size.Item2 <= d.Height))
+            .ToList();
+        if (sizes.Count == 0)
+        {
+            sizes.Add((StartSettings.BaseWidth * 2, StartSettings.BaseHeight * 2));
+        }
+        if (!sizes.Contains(current))
+        {
+            sizes.Add(current);
+            sizes.Sort((a, b) => a.Item1.CompareTo(b.Item1));
+        }
+        return sizes;
+    }
+}

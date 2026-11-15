@@ -1,0 +1,6 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- The game's state and its rules: no I/O, no clock, no device. References only the C semantics. -->
+  <ItemGroup>
+    <ProjectReference Include="..\CovertAction.Msc\CovertAction.Msc.csproj" />
+  </ItemGroup>
+</Project>

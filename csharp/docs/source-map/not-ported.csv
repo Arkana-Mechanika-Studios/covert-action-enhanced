@@ -1,0 +1,27 @@
+module,match,reason
+CODE,0000:0000,not code: zero bytes at the start of the code segment
+CODE,0000:00ca,driver-call trampoline behind some thunk slots; the thunks are the boundary interfaces
+CODE,attach_driver_segment,driver loading: patches the thunk table for a driver the launcher loaded; the rewrite has no driver programs to attach (D-2)
+CODE,0000:0cf3,an empty function without a name and without a caller
+CODE,0000:2cce,C run-time: walks the start-up and exit tables
+CODE,lib:___tzset,internals of the library's time(); time() itself is a boundary call (IMachine.Time)
+CODE,lib:tzset,internals of the library's time(); time() itself is a boundary call (IMachine.Time)
+CODE,lib:__isindst,internals of the library's time(); time() itself is a boundary call (IMachine.Time)
+CODE,lib:__dtoxtime,internals of the library's time(); time() itself is a boundary call (IMachine.Time)
+CODE,lib:__catox,library number parsing used only by tzset (the TZ variable)
+CODE,lib:getenv,used only by tzset (the TZ variable)
+CODE,lib:getch,linked with kbhit; the module never calls it (keys come from the input driver)
+CODE,lib:getche,linked with kbhit; the module never calls it (keys come from the input driver)
+CODE,lib:__cltoasub,internal entry of the number-to-text routines; itoa is CStr.Itoa
+CODE,lib:inp,reads a hardware port: the rewrite has no ports; the two readings the game takes this way are named services (IGameTimer.WaitForFrame and IInputDriver.ReadJoystickButtons)
+CODE,lib:int86,calls a software interrupt: the rewrite has no interrupts; the mouse driver's services are IMouseDriver and the video BIOS's one is IGraphicsDriver.SelectDisplayPage
+CODE,lib:exit,ends the program: the C# throws ProgramExitException where the original calls it
+CODE,lib,"C run-time start-up, exit, error messages and DOS return helpers: no counterpart in a .NET process"
+FINAL,0100:b9af,"the animation player's border colour from a 256-colour palette block: nothing in the program calls it, and it ends in a video BIOS call, which the rewrite has none of"
+FINAL,0100:b9ec,"loads 256 colours through the video BIOS: nothing in the program calls it (the player sets its palette through the graphics driver, apply_pan_palette)"
+FINAL,0100:ba2c,"sets the border colour through the video BIOS: its only caller is set_border_from_palette, which nothing calls"
+FINAL,0100:ba53,"sets the display mode through the video BIOS: nothing in the program calls it (the graphics driver owns the display)"
+GAME,00f7:c18d,"the animation player's border colour from a 256-colour palette block: nothing in the program calls it, and it ends in a video BIOS call, which the rewrite has none of"
+GAME,00f7:c1ca,"loads 256 colours through the video BIOS: nothing in the program calls it (the player sets its palette through the graphics driver, apply_pan_palette)"
+GAME,00f7:c20a,"sets the border colour through the video BIOS: its only caller is set_border_from_palette, which nothing calls"
+GAME,00f7:c231,"sets the display mode through the video BIOS: nothing in the program calls it (the graphics driver owns the display)"

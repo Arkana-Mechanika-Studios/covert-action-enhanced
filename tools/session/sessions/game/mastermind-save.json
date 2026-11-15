@@ -1,0 +1,14 @@
+{
+  "part": "GAME",
+  "start": "stasi-v1",
+  "handoff_from": {
+    "memory": "build/game-oracle/wiretap-checkpoint-reload/phase-000/stop.memory.bin",
+    "sha256": "71ddc1a74af4055be33e53a5fab3f5b30977aa14c7931753200675fbf6527010"
+  },
+  "note": "The case with its MasterMind identified and located, as the original loaded it (the earlier full-chain capture wiretap-checkpoint-reload: FINAL's Load of the played save 25ac3aa0..., GAME at its first key wait in Damascus; next_module set back to the 0 FINAL handed over, docs/game-protocol.md \"PFO wiretap and identified-mastermind checkpoint\"). The hotel, Save Game in slot 1: CV0.SVE, byte for byte the played save; back to the city. Its save is the disk of the whole session COVERT/mastermind-debrief.",
+  "handoff": {
+    "next_module": 0
+  },
+  "unix_time": 657835200,
+  "keys": "{wait 5}{down}{enter}{wait 12}{down}{down}{down}{enter}{wait 12}{enter}{wait 12}{down}{down}{enter}{wait 12}{enter}{wait 12}{enter}{wait 12}"
+}

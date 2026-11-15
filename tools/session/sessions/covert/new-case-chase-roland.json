@@ -1,0 +1,13 @@
+{
+  "part": "COVERT",
+  "note": "As new-case-chase, with 5) Roland MT-32 MIDI board (RSOUND.CA) at the set-up screen, its device writes and timer ticks compared at every checkpoint (item 8): the new case's music in FINAL, GAME's stakeouts, CHASE/campaign-tail's 6013 frames with both cars' engines (commands 26 and 27 with their gears), back in GAME, Alt-Q, Yes.",
+  "graphics_key": "2",
+  "unix_time": 657835200,
+  "part_times": [
+    657835200,
+    657950400,
+    657951000,
+    657952000
+  ],
+  "keys": "52 {wait 3}{enter}{wait 3}{down}{enter}{wait 3}ANNA{enter}{wait 3}{enter}{wait 3}{enter}{wait 3}{enter}{wait 3}{enter}{wait 3}{enter}{wait 3}{esc}{wait 300}{enter}{wait 5}{enter}{wait 5}{enter}{wait 5}{enter}{wait 5}{enter}{wait 5}{up}{left}{enter}{wait 300}{enter}{wait 2}{enter}{wait 2}{enter}{wait 2}{enter}{wait 2}{enter}{wait 2}{enter}{wait 2}{enter}{wait 2}{enter}{wait 2}{enter}{wait 2}{enter}{wait 12}{enter}{wait 12}{enter}{wait 12}{enter}{wait 12}{enter}{wait 12}{enter}{wait 12}{down}{down}{down}{enter}{wait 12}{down}{down}{down}{down}{enter}{wait 12}{down}{down}{enter}{wait 30}{enter}{wait 30}{enter}{wait 12}{down}{enter}{wait 5}{enter}{wait 3}{enter}{wait 3}{enter}{wait 6000}{enter}{wait 5}{alt-q}{wait 5}{down}{enter}{wait 5}{enter}{wait 5}"
+}

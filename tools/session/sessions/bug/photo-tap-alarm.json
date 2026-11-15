@@ -1,0 +1,9 @@
+{
+  "part": "BUG",
+  "start": "bug-v1",
+  "handoff_from": {"recording": "GAME/raid-photo-return"},
+  "note": "The campaign wiretap at the Stasi hideout after the photo raid (GAME/raid-photo-return's Place wiretap, code 4): the cursor walked round, a chip swapped that powers an alarm (planned from the board the part built): \"Alarm!!!\", Enter: the hand-off back to the campaign (code 0, no phone, one alarm).",
+  "handoff": {},
+  "unix_time": 657928800,
+  "keys": "{wait 5}{left}{wait 2}{left}{wait 2}{pgdn}{wait 2}{pgdn}{wait 2}{right}{wait 2}{right}{wait 2}{up}{wait 2}{enter}{wait 20}{enter}{wait 5}{enter}{wait 5}"
+}

@@ -1,0 +1,10 @@
+{
+  "part": "COVERT",
+  "note": "The set-up screen with the IBM sound and the joystick (1: joystick and keyboard); FINAL calibrates the joystick (no joystick: the port reads FFh; a key answers each corner), the title, Space, the main menu: Alt-Q, Yes: the game is left from the menus.",
+  "graphics_key": "2",
+  "unix_time": 670000000,
+  "part_times": [
+    670000000
+  ],
+  "keys": "21{wait 2}{enter}{wait 2}{enter}{wait 3} {wait 4}{alt-q}{wait 3}{down}{enter}{wait 6}"
+}

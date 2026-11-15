@@ -1,0 +1,11 @@
+/game/
+/amiga/
+/reference/
+/build/
+/local/
+__pycache__/
+*.pyc
+.venv/
+**/bin/
+**/obj/
+/dos/

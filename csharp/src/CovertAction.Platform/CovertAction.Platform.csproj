@@ -1,0 +1,7 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- The boundary: everything the original reaches outside its own C code, as interfaces. No logic.
+       References Core only for the records the driver calls take (RasterPort). -->
+  <ItemGroup>
+    <ProjectReference Include="..\CovertAction.Core\CovertAction.Core.csproj" />
+  </ItemGroup>
+</Project>

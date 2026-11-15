@@ -1,0 +1,11 @@
+{
+  "part": "GAME",
+  "start": "campaign-v1",
+  "handoff_from": {
+    "recording": "FINAL/level3-new-case"
+  },
+  "note": "The level-3 case of FINAL/level3-new-case (Global Crisis): two clues, the CIA building, Leave building, the city, the Mercenaries agent's building: Place wiretap, \"The guards are unsuspecting. You will have 9 minutes.\": the hand-off to the electronics part (code 4) at level 3.",
+  "handoff": {},
+  "unix_time": 657900003,
+  "keys": "{wait 5}{enter}{wait 12}{enter}{wait 12}{enter}{wait 12}{wait 10}{down}{down}{down}{enter}{wait 30}{down}{down}{down}{down}{down}{down}{enter}{wait 30}{enter}{wait 30}{enter}{wait 30}"
+}

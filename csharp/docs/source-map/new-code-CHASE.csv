@@ -1,0 +1,2 @@
+member,reason
+CovertAction.Core.Chase.ChaseState.CellIndex,"the index of a tile in the map table; the original writes x * 24 + y in place at each use"

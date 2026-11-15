@@ -1,0 +1,11 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- The original's functions that reach a boundary (draw, play a sound, read the player, a file or the clock): the screens
+       and the module loops. They see the outside world only through the interfaces of CovertAction.Platform. -->
+  <ItemGroup>
+    <ProjectReference Include="..\CovertAction.Core\CovertAction.Core.csproj" />
+    <ProjectReference Include="..\CovertAction.Msc\CovertAction.Msc.csproj" />
+    <ProjectReference Include="..\CovertAction.Platform\CovertAction.Platform.csproj" />
+    <ProjectReference Include="..\CovertAction.Content\CovertAction.Content.csproj" />
+    <ProjectReference Include="..\CovertAction.Persistence\CovertAction.Persistence.csproj" />
+  </ItemGroup>
+</Project>

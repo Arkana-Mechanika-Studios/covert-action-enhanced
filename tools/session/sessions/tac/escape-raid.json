@@ -1,0 +1,11 @@
+{
+  "part": "TAC",
+  "start": "stasi-v1",
+  "handoff_from": {
+    "recording": "GAME/capture-escape"
+  },
+  "note": "The escape raid from GAME/capture-escape's hand-off (code 7): the escape's own kit (the pistol, the vest), the agent in the middle of the office he was held in, the alarm; walking to the wall, F4, ten shots, 600 polls while the guards patrol elsewhere; the script runs out (the room's only door leads further into the building).",
+  "handoff": {},
+  "unix_time": 658020000,
+  "keys": "{wait 3}{enter}{wait 5}{enter}{wait 20}{kp6}{wait 1}{kp6}{wait 1}{kp6}{wait 1}{kp6}{wait 1}{kp6}{wait 1}{kp6}{wait 1}{kp6}{wait 1}{kp6}{wait 1}{kp6}{wait 1}{kp6}{wait 1}{kp6}{wait 1}{kp6}{wait 1}{kp6}{wait 1}{kp6}{wait 1}{kp6}{wait 1}{kp6}{wait 1}{kp6}{wait 1}{kp6}{wait 1}{kp6}{wait 1}{kp6}{wait 1}{kp6}{wait 1}{kp6}{wait 1}{kp6}{wait 1}{kp6}{wait 1}{kp6}{wait 1}{kp6}{wait 1}{kp6}{wait 1}{kp6}{wait 1}{kp6}{wait 1}{kp6}{wait 1}{f4}{wait 10} {wait 4} {wait 4} {wait 4} {wait 4} {wait 4} {wait 4} {wait 4} {wait 4} {wait 4} {wait 4}{wait 600}"
+}

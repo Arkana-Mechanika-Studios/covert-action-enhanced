@@ -1,0 +1,14 @@
+{
+  "part": "GAME",
+  "start": "stasi-v1",
+  "handoff_from": {
+    "memory": "build/game-oracle/stasi-arrest-return-127/phase-001/stop.memory.bin",
+    "sha256": "bf06fa24b8359c419f302278a606ab0436b497b190b1273bfb6912676c66ccd9"
+  },
+  "note": "An interrogation reached in play: the block TAC.EXE handed back to GAME after the played raid on the Stasi building in Washington in which Jane Brown (Organizer) was arrested (93 ordinary actions from the investigation-code-return save, docs/game-protocol.md \"Arrest, extraction and interrogation\"), taken from the earlier full-chain capture of the original (GAME stopped at its first key wait; GAME writes nothing into the block before it but next_module, set back here to the 0 TAC left, as the capture records TAC's exit). The accusation, the evidence, the messages put to her (two decoded on the spot), the jail, the Chief's comment, the CIA building and its Data Section.",
+  "handoff": {
+    "next_module": 0
+  },
+  "unix_time": 658100000,
+  "keys": "{wait 5}{enter}{wait 12}{enter}{wait 12}{enter}{wait 12}{enter}{wait 12}{enter}{wait 12}{enter}{wait 12}{enter}{wait 12}{enter}{wait 12}{enter}{wait 12}{enter}{wait 12}{enter}{wait 12}{enter}{wait 12}{enter}{wait 12}{enter}{wait 12}"
+}

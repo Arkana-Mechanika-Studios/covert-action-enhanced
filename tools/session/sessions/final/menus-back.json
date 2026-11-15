@@ -1,0 +1,8 @@
+{
+  "part": "FINAL",
+  "start": "campaign-v1",
+  "note": "Load a Saved Game: the drive prompt, Enter: the saved-game list (no CV?.SVE: four empty slots), Esc; the main menu is drawn over the list. Practice a skill, Esc at the difficulty: the level becomes -1 and the practice menu still follows (FINAL 0100:0c40); Cryptography: the decode practice is handed over at level -1. Early morning.",
+  "handoff": {},
+  "unix_time": 657781200,
+  "keys": "{wait 2} {wait 2}{down}{enter}{wait 3}{enter}{wait 5}{esc}{wait 4}{down}{down}{enter}{wait 3}{esc}{wait 3}{down}{down}{enter}{wait 6}"
+}

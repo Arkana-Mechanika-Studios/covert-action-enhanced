@@ -1,0 +1,9 @@
+{
+  "part": "BUG",
+  "start": "bug-v1",
+  "handoff_from": {"recording": "FINAL/practice-electronics-3"},
+  "note": "The electronics practice at level 3 (FINAL/practice-electronics-3's hand-off: hidden chips, fixed chips): Alt-P (the board blanked, PAUSED) and a key, Alt-S twice, a hidden chip taken (shown for ten ticks), a fixed chip tried, Alt-Q answered No, then Esc: the player gives up, the hand-off back to the menus (code 0x11).",
+  "handoff": {},
+  "unix_time": 664978200,
+  "keys": "{wait 5}{alt-p}{wait 3} {wait 3}{alt-s}{wait 2}{alt-s}{wait 2}{pgdn}{wait 2}{down}{wait 2}{enter}{wait 15}{left}{wait 2}{enter}{wait 3}{alt-q}{wait 3}{enter}{wait 3}{esc}{wait 3}{enter}{wait 3}"
+}

@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- The original's sound drivers' logic as C# (the PC speaker's, the AdLib card's) behind ISoundDriver, and the
+       chips they play on (a PC-speaker voice, the OPL2/OPL3 of the AdLib card).
+       No emulated PC, no driver programs: ARCHITECTURE.md "No emulator". -->
+  <ItemGroup>
+    <ProjectReference Include="..\CovertAction.Platform\CovertAction.Platform.csproj" />
+    <ProjectReference Include="..\CovertAction.Content\CovertAction.Content.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <InternalsVisibleTo Include="CovertAction.Audio.Tests" />
+  </ItemGroup>
+</Project>

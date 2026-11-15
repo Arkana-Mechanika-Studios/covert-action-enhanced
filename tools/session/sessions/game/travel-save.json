@@ -1,0 +1,8 @@
+{
+  "part": "GAME",
+  "start": "campaign-v1",
+  "note": "A new case (14:00): out of the CIA building, the airport and the travel map, the flight to Cairo, its hotel: Save Game into the first slot (the drive prompt, the slot list; CV0.SVE compared at the checkpoints after its creation and its writes, and at the end), the lounge; the travel map again; the hotel: Sleep through case; the city screen; Alt-Q, Yes, the closing advertisement (AD.PIC), a key: the game ends (code -1).",
+  "handoff": {},
+  "unix_time": 657900000,
+  "keys": "{wait 2}{enter}{wait 2}{enter}{wait 2}{enter}{wait 2}{enter}{wait 2}{enter}{wait 2}{enter}{wait 2}{enter}{wait 2}{enter}{wait 2}{enter}{wait 12}{enter}{wait 12}{enter}{wait 12}{enter}{wait 12}{enter}{wait 12}{enter}{wait 12}{down}{down}{down}{enter}{wait 12}{enter}{wait 12}{down}{down}{down}{down}{down}{down}{enter}{wait 40}{enter}{wait 12}{enter}{wait 12}{down}{enter}{wait 12}{down}{down}{down}{enter}{wait 12}{enter}{wait 12}{enter}{wait 12}{enter}{wait 12}{down}{enter}{wait 12}{down}{down}{down}{down}{enter}{wait 12}{enter}{wait 12}{esc}{wait 12}{esc}{wait 12}{down}{enter}{wait 12}{down}{down}{enter}{wait 12}{enter}{wait 12}{enter}{wait 12}{enter}{wait 12}{enter}{wait 30}{alt-q}{wait 5}{down}{enter}{wait 5}{enter}{wait 5}"
+}

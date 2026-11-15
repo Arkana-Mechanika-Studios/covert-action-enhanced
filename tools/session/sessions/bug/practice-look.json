@@ -1,0 +1,9 @@
+{
+  "part": "BUG",
+  "start": "bug-v1",
+  "handoff_from": {"recording": "FINAL/practice-electronics"},
+  "note": "The electronics practice handed over by FINAL/practice-electronics (level 2): the board built and the current run along it, then Enter at the first chip under the cursor: the swap powers an alarm, \"Alarm!!!\", Enter: the part ends with no phone counted and hands back to the menus (code 0x11).",
+  "handoff": {},
+  "unix_time": 662690000,
+  "keys": "{wait 5}{enter}{wait 5}{enter}{wait 5}"
+}

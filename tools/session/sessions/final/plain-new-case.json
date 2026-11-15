@@ -1,0 +1,8 @@
+{
+  "part": "FINAL",
+  "start": "campaign-v1",
+  "note": "Animations off (Alt-A) at the main menu: the menus without their pictures. A new character, Maximillian, code name BOND, Regional Conflict, Driving and Electronics training, then Alt-Q answered No (as Esc: the points left are spent), the briefing without the Chief's animations, a portrait picked by arrows: the case is handed to the campaign. Evening.",
+  "handoff": {},
+  "unix_time": 657932400,
+  "keys": " {wait 2}{alt-a}{wait 2}{enter}{wait 3}{enter}{wait 3}BOND{enter}{wait 3}{down}{down}{enter}{wait 3}{down}{enter}{wait 3}{down}{down}{down}{enter}{wait 3}{alt-q}{wait 2}{enter}{wait 20}{enter}{wait 5}{enter}{wait 5}{enter}{wait 5}{enter}{wait 5}{enter}{wait 5}{right}{right}{down}{enter}{wait 20}{enter}{wait 20}"
+}

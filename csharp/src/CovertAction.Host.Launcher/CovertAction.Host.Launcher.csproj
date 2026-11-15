@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- "CovertAction Launcher.exe": a small Windows program beside CovertAction.exe in the release that opens the launcher
+       (the settings screen); its Play starts the game. It only starts CovertAction.exe with the setup switch, so it is built
+       for the .NET Framework every Windows 10 and 11 has (a few kilobytes, instead of a second copy of the .NET runtime), as
+       the Darklands Restoration Project's "DarklandsRP Launcher.exe". The SDL host's publish puts it beside the program. -->
+  <PropertyGroup>
+    <TargetFramework>net462</TargetFramework>
+    <OutputType>WinExe</OutputType>
+    <AssemblyName>CovertAction Launcher</AssemblyName>
+    <RootNamespace>CovertAction.Host.Launcher</RootNamespace>
+    <Product>Covert Action (C# rewrite, unofficial fan project)</Product>
+    <AssemblyTitle>Covert Action launcher</AssemblyTitle>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <Nullable>disable</Nullable>
+    <DebugType>none</DebugType>
+    <GenerateDocumentationFile>false</GenerateDocumentationFile>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System.Windows.Forms" />
+  </ItemGroup>
+</Project>

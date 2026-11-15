@@ -1,0 +1,8 @@
+{
+  "part": "CHASE",
+  "start": "chase-v1",
+  "note": "The practice car chase of the captured route's hand-off block: the first cars offered are taken, then the chase runs for 400 polls without a key.",
+  "handoff": {},
+  "unix_time": 657835200,
+  "keys": "{wait 3}{enter}{wait 3}{enter}{wait 3}{enter}{wait 400}"
+}
