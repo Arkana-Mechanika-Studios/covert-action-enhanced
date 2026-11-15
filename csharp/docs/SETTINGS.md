@@ -148,7 +148,7 @@ panel, in every state drawn); its pictures are written to `build/launcher` for t
 
 ## The release
 
-`python -B csharp/tools/publish_release.py [--version 1.0.0] [--out folder]` publishes the SDL host self-contained for
+`python -B csharp/tools/publish_release.py [--version 1.1.0] [--out folder]` publishes the SDL host self-contained for
 win-x64 into `build/release/<version>/CovertAction-<version>-win-x64` and zips that folder beside it. The folder holds
 `CovertAction.exe` (and the .NET runtime), `CovertAction Launcher.exe` (built for .NET Framework 4.6.2, which Windows 10
 and 11 have, so it is a few kilobytes; as Darklands' `DarklandsRP Launcher.exe`), `SDL3.dll`, `libmt32emu.dll`, an

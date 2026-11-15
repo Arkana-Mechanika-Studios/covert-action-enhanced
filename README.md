@@ -4,11 +4,12 @@ A rewrite of *Sid Meier's Covert Action* (MicroProse, 1990, DOS) as a native Win
 original's own code, part by part, so that it plays as the original did. You need your own copy of the game: none of its
 files come with this project, and your copy is never changed.
 
-**Status: version 1.0, the faithful version.** The whole game runs, from the set-up screen to the end of a career:
-the menus, the briefings, the campaign, the building raids, the electronics workbench, the car chase, the cryptography
-workstation, saving and loading, the joystick and all four of the original's sound cards. 1.0 has nothing the original
-does not have, and stays the reference; options beyond the original come after it. Its limits are in
-[Known limits of 1.0](#known-limits-of-10); what 1.0 had to meet is in [release 1.0](csharp/docs/RELEASE-1.0.md).
+**Status: version 1.1.** The whole game runs, from the set-up screen to the end of a career: the menus, the
+briefings, the campaign, the building raids, the electronics workbench, the car chase, the cryptography workstation,
+saving and loading, the joystick and all four of the original's sound cards. Version 1.0 is the faithful version and
+stays the reference (its `release/1.0` branch and the tag `v1.0`; what it had to meet is in
+[release 1.0](csharp/docs/RELEASE-1.0.md)). 1.1 adds [player options](#player-options), all off by default: with them off,
+it plays as 1.0 and the original. Its limits are in [Known limits](#known-limits).
 
 <table>
 <tr>
@@ -76,6 +77,17 @@ folder and the keyboard's repeat. They are kept in `covertaction.settings.json`;
   game) with the stick at rest; "Keyboard only" leaves it out. The left stick
   (or the directional pad) is the stick, the bottom face button the first button, the right one the second.
 
+## Player options
+
+Not in the original, each off by default, on the launcher's Advanced tab ([the settings](csharp/docs/SETTINGS.md)):
+
+* **The mouse in the menus, lists and on the flight map** ([D-630](csharp/docs/faithfulness/DIVERGENCES.md)): pointing
+  at a choice highlights it, a left click takes it, a right click is Esc.
+* **Arrow keys that walk in a building raid** ([D-610](csharp/docs/faithfulness/DIVERGENCES-INTRO.md)): the grey arrow keys
+  walk the agent as the keypad does, and Shift with an arrow lunges.
+* **Music and sound effects on different sound cards** ([D-620](csharp/docs/faithfulness/DIVERGENCES-INTRO.md)), for example
+  the music on the MT-32 and the effects on the AdLib.
+
 ## How it is made faithful
 
 The rewrite is checked against the original program at every level, not by eye:
@@ -102,12 +114,12 @@ Where the rewrite does differ, the difference is written down: [divergences](csh
 (what the rewrite does differently, and why), [the original's bugs](docs/original-bugs.md) (kept, unless they damage
 data), and [cut content](docs/cut-content.md) found in the original's code and data.
 
-## Known limits of 1.0
+## Known limits
 
 * Only the MCGA picture. In this game the EGA, VGA and Tandy choices show the same 16 colours as the MCGA; the CGA's
   four-colour picture is not offered ([D-600](csharp/docs/faithfulness/DIVERGENCES-INTRO.md)).
-* Player options beyond the original (the mouse, arrow keys that walk in raids, music and effects on different sound
-  cards) come after 1.0, which stays faithful to the original.
+* The mouse works in the menus, lists and on the flight map, not in the action parts (the raid, the car chase, the
+  workbench and the workstation).
 * A few outcomes are proven function by function but not yet in a recorded session: a jailbreak foiled (the agent
   winning the jailbreak raid) and a campaign wiretap solved above level 0.
 * The joystick is not yet tried with a real controller; how a real stick's position turns into the game's readings is

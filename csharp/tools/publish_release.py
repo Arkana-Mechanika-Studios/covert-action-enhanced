@@ -1,6 +1,6 @@
 """Make the Windows release of the C# rewrite: one folder and its zip.
 
-    python -B csharp/tools/publish_release.py                    version 1.0.0, into build/release/1.0.0
+    python -B csharp/tools/publish_release.py                    version 1.1.0, into build/release/1.1.0
     python -B csharp/tools/publish_release.py --version 0.2.0 --out D:/somewhere
 
 The folder (build/release/<version>/CovertAction-<version>-win-x64) holds:
@@ -56,7 +56,7 @@ def sdl_licence():
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    parser.add_argument("--version", default="1.0.0")
+    parser.add_argument("--version", default="1.1.0")
     parser.add_argument("--out", default=str(ROOT / "build" / "release"), help="the folder the version's folder is made in")
     args = parser.parse_args()
     version = args.version
