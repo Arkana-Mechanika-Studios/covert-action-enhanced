@@ -38,4 +38,27 @@ public static class SoundCheck
         sound.Choose(letter);
         sound.PlaySound(ThemeTune);
     }
+
+    /// <summary>Effects the mix test plays in turn over the theme: a shot, the Uzi's burst, a door (TAC's commands 3, 6, 13).</summary>
+    public static IReadOnlyList<int> TestEffects { get; } = [3, 6, 13];
+
+    /// <summary>
+    /// Starts the theme tune on the music card and returns the game's sound driver with the music and the effects on two
+    /// cards (D-620): the caller plays <see cref="TestEffects"/> on it now and then, which the effects card plays.
+    /// </summary>
+    /// <param name="folder">The player's game folder (its driver files).</param>
+    /// <param name="host">The host whose sound device and clock the two drivers play on.</param>
+    /// <param name="musicLetter">The music card's driver letter (N, I, T, A, R).</param>
+    /// <param name="effectsLetter">The effects card's driver letter.</param>
+    /// <param name="romFolder">The MT-32 ROMs' folder; null: the default.</param>
+    /// <param name="report">Told why a Roland plays the AdLib driver instead, when it does (D-20).</param>
+    /// <exception cref="FileNotFoundException">A driver file is not in the game folder.</exception>
+    /// <exception cref="InvalidDataException">A driver file is not the driver.</exception>
+    public static ISoundDriver PlayMix(GameFolder folder, IHost host, char musicLetter, char effectsLetter, string? romFolder, Action<string> report)
+    {
+        var sound = new SoundDriverChoice(folder, host, report, romFolder ?? DefaultRomFolder, musicLetter, effectsLetter);
+        sound.Choose(musicLetter);
+        sound.PlaySound(ThemeTune);
+        return sound;
+    }
 }

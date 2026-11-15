@@ -57,7 +57,11 @@ internal static class SdlKeyMap
         }
         if (Special.TryGetValue(scancode, out var special))
         {
-            return special;
+            // the grey cursor keys carry marks the keyboard driver reads for the player option "arrow keys walk" (D-610);
+            // it takes them off again, so without the option the key is the plain code
+            return scancode is 82 or 81 or 80 or 79 or 74 or 77 or 75 or 78
+                ? special | HostKeys.GreyArrow | ((mod & ModShift) != 0 ? HostKeys.ShiftHeld : 0)
+                : special;
         }
         if (sym is < 32 or > 126)
         {

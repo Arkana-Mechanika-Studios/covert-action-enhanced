@@ -1,5 +1,6 @@
 using CovertAction.Core.Raid;
 using CovertAction.Core.Shared;
+using CovertAction.Presentation.Library;
 
 namespace CovertAction.Presentation.Raid;
 
@@ -97,16 +98,21 @@ public sealed partial class BuildingRaid
         state.Equip = 1;
         var cursor = FirstItem;
         DrawStatusPanel();
+        Input.BeginPointer();
         do
         {
             var area = state.EquipAreas[cursor];
             world.Graphics.RecolorRect(state.Rp1, area.X1, area.Y1, area.Width, area.Height, CursorFrom, CursorTo);
             Output.WaitVsync(CursorWait);
-            var key = WaitForKitKey();
+            var key = WaitForKitKey(out var pointedItem);
             var previous = cursor;
             foreach (var step in StepsOf(key))
             {
                 cursor = Neighbour(cursor, step);
+            }
+            if (pointedItem >= 0)
+            {
+                cursor = pointedItem;
             }
             if (key is Keys.Return or Keys.Space)
             {
@@ -136,10 +142,15 @@ public sealed partial class BuildingRaid
         }
     }
 
-    /// <summary>Waits for a key of the keyboard, or of the joystick when it is on and no key is waiting (button A is Space, button B Esc).</summary>
-    private int WaitForKitKey()
+    /// <summary>
+    /// Waits for a key of the keyboard, or of the joystick when it is on and no key is waiting (button A is Space, button B
+    /// Esc); with the mouse option, or for a mouse action (<see cref="KitPointerKey"/>).
+    /// </summary>
+    /// <param name="pointedItem">The item the mouse pointed at or clicked, -1 for none.</param>
+    private int WaitForKitKey(out int pointedItem)
     {
         int key;
+        pointedItem = -1;
         do
         {
             key = -1;
@@ -156,13 +167,50 @@ public sealed partial class BuildingRaid
                     key = Keys.Esc;
                 }
             }
-            else
+            else if (!Input.PointerOn || world.Input.Kbhit())
             {
                 key = ReadKey();
+            }
+            // DIVERGENCE: D-632 with the mouse option on, the pointer on an item moves the cursor there; a click takes or gives it back (Space), a right click leaves (Esc).
+            if (key == -1)
+            {
+                key = KitPointerKey(out pointedItem);
             }
         }
         while (key == -1);
         return key;
+    }
+
+    /// <summary>What a mouse action on the equipment screen stands for, in place of a key.</summary>
+    /// <param name="pointedItem">The item pointed at or clicked, -1 for none.</param>
+    /// <returns><see cref="KitPointed"/> for a move onto an item, Space for a click on one, Esc for a right click, -1 for nothing.</returns>
+    private int KitPointerKey(out int pointedItem)
+    {
+        var pointed = Input.ReadPointer(KitItemAt);
+        pointedItem = pointed.Choice;
+        return pointed.Action switch
+        {
+            PointerAction.Point => KitPointed,
+            PointerAction.Accept when pointed.Choice >= 0 => Keys.Space,
+            PointerAction.Cancel => Keys.Esc,
+            _ => -1,
+        };
+    }
+
+    /// <summary>The "key" of a mouse move onto an item: no key of the game has this code, so it only moves the cursor.</summary>
+    private const int KitPointed = 0;
+
+    /// <summary>The equipment screen's mouse hit test: the item (1..11) whose cursor area holds a pixel, -1 for none.</summary>
+    private int KitItemAt(int x, int y)
+    {
+        var areas = new List<HitArea>();
+        for (var item = FirstItem; item < RaidState.EquipNeighbourCount; item++)
+        {
+            var area = state.EquipAreas[item];
+            areas.Add(new HitArea(area.X1, area.Y1, area.Width, area.Height));
+        }
+        var hit = PointerHit.Area(x, y, areas);
+        return hit < 0 ? -1 : hit + FirstItem;
     }
 
     /// <summary>

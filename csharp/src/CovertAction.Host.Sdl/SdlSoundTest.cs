@@ -19,6 +19,15 @@ internal sealed class SdlSoundTest : ISoundTest, IDisposable
 
     public string? Status { get; private set; }
 
+    /// <summary>The mix test's driver (the music and the effects on two cards, D-620), which plays an effect now and then; null for the one card's test.</summary>
+    private ISoundDriver? _mix;
+
+    /// <summary>How many of the mix test's effects have played.</summary>
+    private int _effectsPlayed;
+
+    /// <summary>The time between two of the mix test's effects.</summary>
+    private static readonly TimeSpan EffectInterval = TimeSpan.FromSeconds(2);
+
     public bool Playing
     {
         get
@@ -28,6 +37,11 @@ internal sealed class SdlSoundTest : ISoundTest, IDisposable
                 Stop();
                 Status = null;
             }
+            // the launcher asks now and then while the test plays: the mix test's next effect when its time has come
+            if (_mix is { } mix && _playing is { } playing && playing.Elapsed > EffectInterval * (_effectsPlayed + 1))
+            {
+                mix.PlaySound(SoundCheck.TestEffects[_effectsPlayed++ % SoundCheck.TestEffects.Count]);
+            }
             return _output is not null;
         }
     }
@@ -35,6 +49,11 @@ internal sealed class SdlSoundTest : ISoundTest, IDisposable
     public void Play(SoundTestRequest request)
     {
         Stop();
+        if (request.EffectsCard is not null)
+        {
+            PlayMix(request);
+            return;
+        }
         var letter = GameSettings.SoundLetter(request.Card);
         if (letter == 'N')
         {
@@ -64,10 +83,44 @@ internal sealed class SdlSoundTest : ISoundTest, IDisposable
         Status = warning is null ? $"Playing the theme on the {card}…" : "No MT-32 ROMs: playing the theme on the AdLib instead (D-20)…";
     }
 
+    /// <summary>The theme on the music's card and an effect every two seconds on the effects' card (D-620).</summary>
+    private void PlayMix(SoundTestRequest request)
+    {
+        var (music, effects) = (GameSettings.SoundLetter(request.Card), GameSettings.SoundLetter(request.EffectsCard));
+        if (music == 'N' && effects == 'N')
+        {
+            Status = "Nothing to play: choose a card for the music or for the effects.";
+            return;
+        }
+        var output = SdlAudioOutput.TryOpen(out var error);
+        if (output is null)
+        {
+            Status = "No sound device: " + (error ?? "SDL could not open one") + ".";
+            return;
+        }
+        string? warning = null;
+        try
+        {
+            _mix = SoundCheck.PlayMix(new GameFolder(request.GameFolder), new TestHost(output), music, effects, request.RomFolder, message => warning = message);
+        }
+        catch (Exception e) when (e is FileNotFoundException or InvalidDataException or IOException)
+        {
+            output.Dispose();
+            Status = "Could not play: " + e.Message;
+            return;
+        }
+        _output = output;
+        _effectsPlayed = 0;
+        _playing = System.Diagnostics.Stopwatch.StartNew();
+        var (musicCard, effectsCard) = (LauncherModel.Label(LauncherModel.PartCards, request.Card), LauncherModel.Label(LauncherModel.PartCards, request.EffectsCard!));
+        Status = $"Playing: the theme on {musicCard}, effects on {effectsCard}…" + (warning is null ? "" : " (no MT-32 ROMs: AdLib for it, D-20)");
+    }
+
     public void Stop()
     {
         _output?.Dispose();
         _output = null;
+        _mix = null;
         _playing = null;
         Status = null;
     }

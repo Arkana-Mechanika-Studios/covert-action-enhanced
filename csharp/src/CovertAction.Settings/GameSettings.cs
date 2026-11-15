@@ -60,6 +60,21 @@ internal sealed class GameSettings
     /// <summary>One of <see cref="KeyRepeats"/>.</summary>
     public string? KeyRepeat { get; set; }
 
+    /// <summary>In a building raid the grey arrow keys walk like the keypad's digits and Shift with them lunges (D-610; off: the original's keys).</summary>
+    public bool? ArrowKeysWalk { get; set; }
+
+    /// <summary>The cards the music or the effects can play on: "card" (the sound card plays both, as the original), else a card of its own (D-620).</summary>
+    public static readonly IReadOnlyList<string> PartCards = ["card", "none", "speaker", "tandy", "adlib", "mt32"];
+
+    /// <summary>One of <see cref="PartCards"/>: the card the tunes play on.</summary>
+    public string? MusicCard { get; set; }
+
+    /// <summary>One of <see cref="PartCards"/>: the card the sound effects play on.</summary>
+    public string? EffectsCard { get; set; }
+
+    /// <summary>The mouse in the menus, lists and maps (input.mouse; not in the original, off by default).</summary>
+    public bool? Mouse { get; set; }
+
     /// <summary>A copy (a change to it leaves this one as it is).</summary>
     public GameSettings Copy() => (GameSettings)MemberwiseClone();
 
@@ -72,4 +87,10 @@ internal sealed class GameSettings
         "mt32" => 'R',
         _ => 'A',
     };
+
+    /// <summary>
+    /// The driver's letter of the music's or the effects' card (D-620): null for "card" (or none set), which plays on the
+    /// sound card as the original; else the letter of the card of its own.
+    /// </summary>
+    public static char? PartLetter(string? part) => part is null || part == "card" ? null : SoundLetter(part);
 }

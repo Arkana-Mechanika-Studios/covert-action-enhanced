@@ -38,6 +38,7 @@ public sealed class LayerTests
     [
         "HostKeys",         // the key codes hosts deliver: constants and the table from a character to its key
         "SilentPcmOutput",  // the sound device of a host without sound, shared by the hosts
+        "PointerLatch",     // the mouse a host keeps for the game's mouse driver (the latched presses), shared by the hosts
         "TextScreen",      // the 80x25 text page of characters and attributes that IVideo.PresentText hands a host (video mode 3)
     ];
 

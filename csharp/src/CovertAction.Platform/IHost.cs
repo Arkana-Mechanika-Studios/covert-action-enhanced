@@ -2,6 +2,7 @@
 // Adapted: cut down to what Covert Action's drivers use so far (a picture, key presses, the time); the picture is handed
 // over as pixels and colours instead of a Screen object; the clock also tells the time of day; sound is a PCM output (Pcm.cs);
 // the system clock is with the hosts. Added: the text screen (TextScreen.cs) shown through IVideo.PresentText, as in Darklands;
+// the mouse over the picture (IInput.Pointer, IPointer.cs), a player option;
 // the joystick as the game port shows it (IInput.ReadJoystick, JoystickReading.cs).
 namespace CovertAction.Platform;
 
@@ -51,6 +52,12 @@ public interface IInput
 
     /// <summary>Takes the next key press, as a key code (<see cref="HostKeys"/>).</summary>
     bool TryReadKey(out int key);
+
+    /// <summary>
+    /// The mouse over the picture, when the player turned it on (the settings' input.mouse); null: no mouse, as on the
+    /// original's PC without one. New code (csharp/docs/MOUSE-SUPPORT.md; D-630).
+    /// </summary>
+    IPointer? Pointer => null;
 
     /// <summary>
     /// The joystick as the game port shows it right now: its buttons and its two timers' counts. The game reads it

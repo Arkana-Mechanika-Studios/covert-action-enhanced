@@ -1,7 +1,8 @@
 // Adapted from the Darklands Restoration Project, src/Darklands.Host.Sdl/SdlHost.cs; same author.
 // A short version of that host: one window that shows the game's picture, and the keyboard. Left out: the picture
-// filters, the high-resolution renderer, the mouse, the developer console, Darklands's keyboard timing. Added
+// filters, the high-resolution renderer, the developer console, Darklands's keyboard timing. Added
 // (csharp/docs/PERFORMANCE.md): the PC keyboard's own repeat and the BIOS's 15-key buffer, precise frame waits, a timing trace;
+// the mouse as a player option (csharp/docs/MOUSE-SUPPORT.md: the system's pointer, mapped through PictureLayout);
 // a controller as the PC's joystick (SdlJoystick).
 using CovertAction.Platform;
 
@@ -47,6 +48,12 @@ internal sealed class SdlHost : IHost, IVideo, IInput, IClock, IDisposable
     private const double TypematicDelay = 500, TypematicInterval = 1000 / 10.9;
 
     private readonly bool _systemRepeat;
+
+    /// <summary>The mouse over the picture, with the player's mouse option on; null without it (the original's PC has no mouse).</summary>
+    private readonly PointerLatch? _pointer;
+
+    /// <summary>SDL's software renderer draws (its stretching rounds differently: PictureLayout.UnderSoftware).</summary>
+    private readonly bool _software;
     private int _heldScancode = -1;
     private int _heldKey;
     private double _nextRepeat;
@@ -65,6 +72,7 @@ internal sealed class SdlHost : IHost, IVideo, IInput, IClock, IDisposable
     public SdlHost(string title, SdlWindowOptions options)
     {
         _systemRepeat = options.SystemKeyRepeat;
+        _pointer = options.Mouse ? new PointerLatch() : null;
         if (!SdlNative.SDL_Init(SdlNative.InitVideo | SdlNative.InitEvents))
         {
             throw new SdlHostException("SDL_Init failed: " + SdlNative.GetErrorText());
@@ -86,6 +94,17 @@ internal sealed class SdlHost : IHost, IVideo, IInput, IClock, IDisposable
         if (_renderer == IntPtr.Zero)
         {
             throw new SdlHostException("SDL_CreateRenderer failed: " + SdlNative.GetErrorText());
+        }
+        _software = SdlNative.Text(SdlNative.SDL_GetRendererName(_renderer)) == "software";
+        // the system's pointer is shown over the window only with the mouse option on: the game without it has no mouse
+        // (D-630; nothing is drawn into the picture either way)
+        if (_pointer is null)
+        {
+            SdlNative.SDL_HideCursor();
+        }
+        else
+        {
+            SdlNative.SDL_ShowCursor();
         }
         _texture = SdlNative.SDL_CreateTexture(_renderer, SdlNative.PixelFormatArgb8888, SdlNative.TextureAccessStreaming, ScreenWidth, ScreenHeight);
         Scale(_texture, options.Scaling, SdlNative.ScaleModeNearest);
@@ -124,6 +143,9 @@ internal sealed class SdlHost : IHost, IVideo, IInput, IClock, IDisposable
     public IClock Clock => this;
 
     public bool QuitRequested { get; private set; }
+
+    /// <summary>The mouse over the picture (with the mouse option on), else null.</summary>
+    public IPointer? Pointer => _pointer;
 
     public long Milliseconds => _watch.ElapsedMilliseconds;
 
@@ -223,6 +245,23 @@ internal sealed class SdlHost : IHost, IVideo, IInput, IClock, IDisposable
                         _heldScancode = -1;
                     }
                     break;
+                case SdlNative.EventMouseMotion when _pointer is not null:
+                    MovePointer(e.Motion.X, e.Motion.Y);
+                    break;
+                case SdlNative.EventMouseButtonDown or SdlNative.EventMouseButtonUp when _pointer is not null && GameButton(e.Button.Button) is { } button:
+                    MovePointer(e.Button.X, e.Button.Y);
+                    if (e.Type == SdlNative.EventMouseButtonDown)
+                    {
+                        _pointer.Press(button);
+                    }
+                    else
+                    {
+                        _pointer.Release(button);
+                    }
+                    break;
+                case SdlNative.EventWindowMouseLeave when _pointer is not null:
+                    _pointer.MoveTo(0, 0, inside: false);
+                    break;
                 case var type when SdlJoystick.IsDeviceEvent(type):
                     _joystick?.Refresh();
                     _trace?.Mark($"joystick {_joystick?.Description ?? "none"}");
@@ -241,6 +280,23 @@ internal sealed class SdlHost : IHost, IVideo, IInput, IClock, IDisposable
             Type(_heldKey, 0);
         }
     }
+
+    /// <summary>The mouse moved to a window position: the game pixel under it (PictureLayout), or off the picture.</summary>
+    private void MovePointer(float x, float y)
+    {
+        SdlNative.SDL_GetRenderOutputSize(_renderer, out var width, out var height);
+        SdlNative.SDL_GetWindowSize(_window, out var windowWidth, out var windowHeight);
+        var (gx, gy, inside) = PictureLayout.ToGame(PictureLayout.Place(width, height), (width, height), (windowWidth, windowHeight), x, y, _software);
+        _pointer!.MoveTo(gx, gy, inside);
+    }
+
+    /// <summary>The game's number of an SDL mouse button: 0 the left, 1 the right; null for the others.</summary>
+    private static int? GameButton(byte button) => button switch
+    {
+        SdlNative.MouseButtonLeft => 0,
+        SdlNative.MouseButtonRight => 1,
+        _ => null,
+    };
 
     /// <summary>A key into the BIOS's buffer, unless it is full (<see cref="BiosBufferKeys"/>); none while a script plays.</summary>
     private void Type(int key, ulong timestamp)
@@ -323,9 +379,8 @@ internal sealed class SdlHost : IHost, IVideo, IInput, IClock, IDisposable
     private SdlNative.SdlRect PicturePlace()
     {
         SdlNative.SDL_GetRenderOutputSize(_renderer, out var width, out var height);
-        var pictureWidth = Math.Min(width, height * 4 / 3);
-        var pictureHeight = pictureWidth * 3 / 4;
-        return new SdlNative.SdlRect { X = (width - pictureWidth) / 2, Y = (height - pictureHeight) / 2, Width = pictureWidth, Height = pictureHeight };
+        var (x, y, pictureWidth, pictureHeight) = PictureLayout.Place(width, height);
+        return new SdlNative.SdlRect { X = x, Y = y, Width = pictureWidth, Height = pictureHeight };
     }
 }
 
@@ -348,4 +403,5 @@ internal enum PictureScaling
 /// <param name="Fullscreen">The window fills the screen.</param>
 /// <param name="Scaling">How the picture is enlarged.</param>
 /// <param name="SystemKeyRepeat">A held key repeats at the system's rate (else the PC keyboard's).</param>
-internal sealed record SdlWindowOptions(int Width, int Height, bool Fullscreen = false, PictureScaling Scaling = PictureScaling.PixelArt, bool SystemKeyRepeat = false);
+/// <param name="Mouse">The mouse in the menus (input.mouse): the system's pointer over the window, read by the game.</param>
+internal sealed record SdlWindowOptions(int Width, int Height, bool Fullscreen = false, PictureScaling Scaling = PictureScaling.PixelArt, bool SystemKeyRepeat = false, bool Mouse = false);

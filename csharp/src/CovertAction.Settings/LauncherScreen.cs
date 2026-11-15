@@ -100,11 +100,16 @@ internal sealed class LauncherScreen
         Sound,
         Test,
         Controls,
+        Music,
+        MixTest,
+        Effects,
         Saves,
         SavesChange,
         Roms,
         RomsChange,
         KeyRepeat,
+        ArrowKeysWalk,
+        Mouse,
         TabGeneral,
         TabAdvanced,
         Save,
@@ -152,13 +157,13 @@ internal sealed class LauncherScreen
     /// <summary>A sound test is playing: the launcher draws again now and then to show its status.</summary>
     public bool Animating => _context.SoundTest is { Playing: true };
 
-    private bool OnAdvanced(Item item) => item is Item.Roms or Item.RomsChange or Item.KeyRepeat;
+    private bool OnAdvanced(Item item) => item is Item.Roms or Item.RomsChange or Item.KeyRepeat or Item.ArrowKeysWalk or Item.Music or Item.MixTest or Item.Effects or Item.Mouse;
 
     // Tab and the arrows go through General's rows, then Advanced's (its tab opens), then the buttons
     private IEnumerable<Item> Order =>
         new[] { Item.GameFolder, Item.GameChange, Item.Window, Item.Fullscreen, Item.Scaling, Item.Sound, Item.Test, Item.Controls, Item.Saves, Item.SavesChange,
-            Item.Roms, Item.RomsChange, Item.KeyRepeat, Item.Save, Item.Play }
-            .Where(i => i != Item.Test || _context.SoundTest is not null);
+            Item.Roms, Item.RomsChange, Item.KeyRepeat, Item.ArrowKeysWalk, Item.Music, Item.MixTest, Item.Effects, Item.Mouse, Item.Save, Item.Play }
+            .Where(i => i is not (Item.Test or Item.MixTest) || _context.SoundTest is not null);
 
     /// <summary>Handles one input; returns the player's choice when the launcher should end.</summary>
     public LauncherChoice? Handle(LauncherInput input)
@@ -211,9 +216,9 @@ internal sealed class LauncherScreen
 
     private (Rect Area, Item Item, Part Part) HotspotAt(int x, int y) => _hotspots.LastOrDefault(h => h.Area.Contains(x, y));
 
-    private static bool IsButton(Item item) => item is Item.GameChange or Item.SavesChange or Item.RomsChange or Item.Test or Item.Save or Item.Play;
+    private static bool IsButton(Item item) => item is Item.GameChange or Item.SavesChange or Item.RomsChange or Item.Test or Item.MixTest or Item.Save or Item.Play;
 
-    private static bool IsSelect(Item item) => item is Item.Window or Item.Fullscreen or Item.Scaling or Item.Sound or Item.Controls or Item.KeyRepeat;
+    private static bool IsSelect(Item item) => item is Item.Window or Item.Fullscreen or Item.Scaling or Item.Sound or Item.Controls or Item.KeyRepeat or Item.ArrowKeysWalk or Item.Music or Item.Effects or Item.Mouse;
 
     private LauncherChoice? Key(KeyPressed key)
     {
@@ -283,6 +288,10 @@ internal sealed class LauncherScreen
         Item.Saves or Item.SavesChange => "savesFolder",
         Item.Roms or Item.RomsChange => "sound.mt32Roms",
         Item.KeyRepeat => "input.keyRepeat",
+        Item.ArrowKeysWalk => "input.arrowKeysWalk",
+        Item.Music => "sound.music",
+        Item.Effects => "sound.effects",
+        Item.Mouse => "input.mouse",
         _ => null,
     };
 
@@ -352,6 +361,23 @@ internal sealed class LauncherScreen
             case Item.KeyRepeat:
                 _model.CycleKeyRepeat(step);
                 break;
+            case Item.ArrowKeysWalk:
+                _model.ArrowKeysWalk = !_model.ArrowKeysWalk;
+                break;
+            case Item.Music:
+                _context.SoundTest?.Stop();
+                _model.CycleMusicCard(step);
+                break;
+            case Item.Effects:
+                _context.SoundTest?.Stop();
+                _model.CycleEffectsCard(step);
+                break;
+            case Item.MixTest:
+                TestMix();
+                break;
+            case Item.Mouse:
+                _model.Mouse = !_model.Mouse;
+                break;
             case Item.Test when _context.SoundTest is { Playing: true } playing:
                 playing.Stop();
                 break;
@@ -367,6 +393,29 @@ internal sealed class LauncherScreen
                 break;
         }
         return null;
+    }
+
+    /// <summary>The mix's Test: the theme on the music's card, effects on the effects' card (D-620); Stop while it plays.</summary>
+    private void TestMix()
+    {
+        var (music, effects) = (_model.CardOf(_model.MusicCard), _model.CardOf(_model.EffectsCard));
+        if (_context.SoundTest is { Playing: true } playing)
+        {
+            playing.Stop();
+        }
+        else if (_model.GameFolderChecked is null)
+        {
+            _message = "Choose the game folder first: the sound drivers are in it.";
+        }
+        else if (music == "none" && effects == "none")
+        {
+            _message = "Nothing to test: neither the music nor the effects play on a card.";
+            _messageColour = Note;
+        }
+        else
+        {
+            _context.SoundTest?.Play(new SoundTestRequest(music, _model.GameFolderChecked, _model.Mt32Roms, effects));
+        }
     }
 
     /// <summary>The system's folder dialog for a folder row; without one, the folder is dropped or pasted instead.</summary>
@@ -783,8 +832,15 @@ internal sealed class LauncherScreen
             y = Section("Keyboard", y);
             y = Select(y, "Key repeat", LauncherModel.Label(LauncherModel.KeyRepeats, _model.KeyRepeat), Item.KeyRepeat);
             y = Section("Player options", y);
+            y = Select(y, "Arrow keys walk", _model.ArrowKeysWalk ? "Yes" : "No", Item.ArrowKeysWalk);
+            var mixTest = _context.SoundTest is { } mixSound ? (mixSound.Playing ? "Stop" : "Test mix") : null;
+            y = Select(y, "Music on", LauncherModel.Label(LauncherModel.PartCards, _model.MusicCard), Item.Music, mixTest, Item.MixTest);
+            y = Select(y, "Effects on", LauncherModel.Label(LauncherModel.PartCards, _model.EffectsCard), Item.Effects);
+            y = Status(y, MixStatus());
+            y = Select(y, "Mouse in the menus", _model.Mouse ? "Yes" : "No", Item.Mouse);
+            y = Status(y, ("Not in the original: point and click to choose, right click is Esc.", Note));
             // room for the options the original never had, planned for later versions (not offered yet)
-            foreach (var line in new[] { "Planned for a later version, not in this one:", "· the arrow keys walk the agent in a building", "· the mouse in the menus and the workstations", "· mixing the sound drivers (music on one card, effects on another)" })
+            foreach (var line in new[] { "Planned for a later version, not in this one:", "· the mouse at the workstations, in the raid and the chase" })
             {
                 _font.Draw(canvas, line, label, y + 1, TextDim);
                 Leaf(new Rect(label, y + 1, BitmapFont.Measure(line), 16), "planned " + line);
@@ -908,6 +964,23 @@ internal sealed class LauncherScreen
         };
     }
 
+    /// <summary>The line under the mix's rows: off, or what plays where (D-620), or the mix test's status.</summary>
+    private (string Text, uint Colour) MixStatus()
+    {
+        if (_context.SoundTest is { Status: { } status } test && (_focus is Item.Music or Item.MixTest or Item.Effects))
+        {
+            return (status, test.Playing ? Good : Bad);
+        }
+        if (!_model.Mixing)
+        {
+            return ("Off: the sound card plays the music and the effects, as the original.", Note);
+        }
+        string Card(string part) => part == "card"
+            ? LauncherModel.Label(LauncherModel.SoundCards, _model.SoundCard)
+            : LauncherModel.Label(LauncherModel.PartCards, part);
+        return ($"Music: {Card(_model.MusicCard)}; effects: {Card(_model.EffectsCard)}; mixed (D-620).", Note);
+    }
+
     private (string Text, uint Colour) RomStatusLine()
     {
         var roms = _model.Roms;
@@ -939,7 +1012,12 @@ internal sealed class LauncherScreen
             Item.Saves or Item.SavesChange => $"Where your saved games (CV0.SVE to CV3.SVE) and the Hall of Fame are written and read back; a save this folder does not hold is read from your game folder, so the saves you made with the original can be loaded. Default: {_context.DefaultSavesFolder} (Saves beside the program, or in your account when the program's folder cannot be written to)." + fixedNote,
             Item.Roms or Item.RomsChange => "The folder with your Roland MT-32 (or CM-32L) ROM files, for the Roland MT-32 sound card. None come with the program. Without them the AdLib driver plays instead (divergence D-20). Default: MT32_ROMS beside the program, else where they are found (next to the game, DOSBox's folders)." + fixedNote,
             Item.KeyRepeat => "PC keyboard: a held key repeats as on the PC of 1990 (after half a second, 10.9 times a second), so the agent stops when you let go. Windows: your Windows keyboard's delay and rate (faster: keys can pile up in a building)." + fixedNote,
-            Item.TabGeneral or Item.TabAdvanced => "General: the game, the display, the sound card, the controls and the saves. Advanced: the MT-32 ROMs and the keyboard. Ctrl+Tab goes to the other tab.",
+            Item.ArrowKeysWalk => "Yes: in a building raid the grey arrow keys (and Home, End, PgUp, PgDn) walk the agent like the number keypad, and Shift with an arrow lunges. No (the default, as the original): the keypad walks and the grey arrows lunge. Divergence D-610; no other part of the game is changed." + fixedNote,
+            Item.Music => "The card the tunes play on: the theme, the selection screens' tune, the vacations. The sound card (the default): one card plays the music and the effects, as the original. A card here plays the tunes while the effects play on the card below, both at once, mixed into your sound output (divergence D-620). The MT-32 needs your ROMs; without them the AdLib plays." + fixedNote,
+            Item.Effects => "The card the sound effects play on: the aeroplane, the cars, doors, shots, the gunfire, the workbench, the teleprinter. The sound card (the default) plays them, or the card here does while the music plays on the card above (divergence D-620). None: the effects are not played." + fixedNote,
+            Item.MixTest => "Plays the theme on the music's card and a shot, the Uzi and a door on the effects' card, for a few seconds, through your game's own sound drivers.",
+            Item.Mouse => "Not in the original. Yes: the mouse works in the menus, the lists and on the flight map: point at a choice to highlight it, left click to take it, right click for Esc; a click also answers \"press a key\". The keys work as before. No: no mouse, as the original (the default)." + fixedNote,
+            Item.TabGeneral or Item.TabAdvanced => "General: the game, the display, the sound card, the controls and the saves. Advanced: the MT-32 ROMs, the keyboard and the player options (not in the original, all off by default). Ctrl+Tab goes to the other tab.",
             Item.Save => _context.SettingsPath is { } path ? $"Saves the settings into {path} and closes. Esc and the window's close button save too." : "Closes (no settings file can be written here: the changes are lost).",
             Item.Play => _model.CanPlay ? "Saves the settings and starts the game." : "Choose the folder of your copy of the game first.",
             _ => "",

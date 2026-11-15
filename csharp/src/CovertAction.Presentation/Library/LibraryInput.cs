@@ -197,6 +197,88 @@ public sealed class LibraryInput(ILibraryState state, Boundaries world)
         world.Mouse.SetVerticalRange(ymin, ymax);
     }
 
+    /// <summary>The driver's units across for one game pixel (int 33h counts 640 across in the 320-pixel modes).</summary>
+    private const int MouseUnitsPerPixel = 2;
+
+    /// <summary>The pointer's last position a menu saw (pixels of the screen), to tell a move from a pointer at rest.</summary>
+    private (int X, int Y) _pointerSeen;
+
+    /// <summary>
+    /// Whether the player's mouse works in the menus and lists: the mouse option is on (a mouse driver with a mouse).
+    /// Without it no menu asks the mouse driver anything, so the game makes exactly the original's calls.
+    /// </summary>
+    /// <remarks>New code (csharp/docs/MOUSE-SUPPORT.md; D-630).</remarks>
+    public bool PointerOn => world.Mouse.Installed;
+
+    /// <summary>
+    /// A menu or list starts waiting: the presses made before it are forgotten (as <see cref="FlushInput"/> forgets the
+    /// keys) and the pointer's place now counts as at rest, so the highlight stays where the menu puts it until the
+    /// mouse moves.
+    /// </summary>
+    /// <remarks>New code (D-630). Does nothing without the mouse option.</remarks>
+    // DIVERGENCE: D-630 the mouse in the menus and lists is a player option; the original's menus never read the mouse.
+    public void BeginPointer()
+    {
+        if (!PointerOn)
+        {
+            return;
+        }
+        world.Mouse.ButtonPresses(0);
+        world.Mouse.ButtonPresses(1);
+        _pointerSeen = PointerPixel(world.Mouse.GetStatus());
+    }
+
+    /// <summary>
+    /// What the mouse did since the menu last asked: a right click (Esc), a left click on a choice or beside every choice
+    /// (Return), or a move onto a choice (the highlight follows). A pointer at rest does nothing, so the cursor keys keep
+    /// working beside it.
+    /// </summary>
+    /// <param name="choiceAt">The menu's hit test: the choice under a pixel of the screen, -1 for none.</param>
+    /// <remarks>New code (D-630). Without the mouse option: always nothing, and no call of the mouse driver.</remarks>
+    public PointerEvent ReadPointer(Func<int, int, int> choiceAt)
+    {
+        if (!PointerOn)
+        {
+            return PointerEvent.Nothing;
+        }
+        if (world.Mouse.ButtonPresses(1).Count > 0)
+        {
+            world.Mouse.ButtonPresses(0);
+            return new PointerEvent(PointerAction.Cancel, -1);
+        }
+        var left = world.Mouse.ButtonPresses(0);
+        if (left.Count > 0)
+        {
+            var (x, y) = (left.X / MouseUnitsPerPixel, left.Y);
+            _pointerSeen = (x, y);
+            return new PointerEvent(PointerAction.Accept, choiceAt(x, y));
+        }
+        var place = PointerPixel(world.Mouse.GetStatus());
+        if (place == _pointerSeen)
+        {
+            return PointerEvent.Nothing;
+        }
+        _pointerSeen = place;
+        var choice = choiceAt(place.X, place.Y);
+        return choice < 0 ? PointerEvent.Nothing : new PointerEvent(PointerAction.Point, choice);
+    }
+
+    /// <summary>
+    /// A "press a key" wait's reading of the mouse: a left click stands for Space, a right click for Esc; a move is
+    /// nothing.
+    /// </summary>
+    /// <returns>The key a click stands for, or -1.</returns>
+    /// <remarks>New code (D-630). Without the mouse option: -1, and no call of the mouse driver.</remarks>
+    public int ReadPointerKey() => ReadPointer(static (_, _) => -1).Action switch
+    {
+        PointerAction.Accept => Keys.Space,
+        PointerAction.Cancel => Keys.Esc,
+        _ => -1,
+    };
+
+    /// <summary>The screen pixel of the mouse driver's position.</summary>
+    private static (int X, int Y) PointerPixel(Platform.MouseStatus status) => (status.X / MouseUnitsPerPixel, status.Y);
+
     /// <summary>Stores the answer to a button query in the mouse variables.</summary>
     private int Keep(Platform.MouseButtonEvents events)
     {

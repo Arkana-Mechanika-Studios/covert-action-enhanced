@@ -80,8 +80,11 @@ internal interface ISoundTest
     string? Status { get; }
 }
 
-/// <summary>What the sound test plays on: the sound card ("adlib", "mt32" ...), the game folder (its drivers) and the ROM folder.</summary>
-internal sealed record SoundTestRequest(string Card, string GameFolder, string? RomFolder);
+/// <summary>
+/// What the sound test plays on: the sound card ("adlib", "mt32" ...), the game folder (its drivers) and the ROM folder;
+/// for the test of the mix (D-620) also the effects' card, the music then playing on <paramref name="Card"/>.
+/// </summary>
+internal sealed record SoundTestRequest(string Card, string GameFolder, string? RomFolder, string? EffectsCard = null);
 
 /// <summary>The Roland ROMs in a folder.</summary>
 /// <param name="Folder">The folder looked in (the default one when none is set).</param>

@@ -47,6 +47,18 @@ internal sealed record StartSettings
     /// <summary>A held key repeats at Windows' rate (else the PC keyboard's).</summary>
     public bool SystemKeyRepeat { get; init; }
 
+    /// <summary>In a building raid the grey arrow keys walk (D-610).</summary>
+    public bool ArrowKeysWalk { get; init; }
+
+    /// <summary>The card the tunes play on: "card" (the sound card, as the original) or a card of its own (D-620).</summary>
+    public string MusicCard { get; init; } = "card";
+
+    /// <summary>The card the sound effects play on: "card" (the sound card, as the original) or a card of its own (D-620).</summary>
+    public string EffectsCard { get; init; } = "card";
+
+    /// <summary>The mouse in the menus, lists and maps (input.mouse; off by default, as the original has none).</summary>
+    public bool Mouse { get; init; }
+
     /// <summary>
     /// The settings-file keys the command line or the environment sets for this run, with what sets them ("the command
     /// line (--scale)"): the launcher shows them but cannot change them.
@@ -93,6 +105,8 @@ internal sealed record StartSettings
             return fromFile ?? false;
         }
         var fullscreen = Switch("display.fullscreen", cli.Fullscreen, "--fullscreen", file.Fullscreen);
+        var arrowsWalk = Switch("input.arrowKeysWalk", cli.ArrowKeysWalk, "--arrow-keys-walk", file.ArrowKeysWalk);
+        var mouse = Switch("input.mouse", cli.Mouse, cli.Mouse == false ? "--no-mouse" : "--mouse", file.Mouse);
 
         // the window: a size on the command line (--window or --scale) replaces both keys of the file
         (int Width, int Height) size;
@@ -119,6 +133,10 @@ internal sealed record StartSettings
             Controls = controls,
             Mt32Roms = roms,
             SystemKeyRepeat = keyRepeat == "windows",
+            ArrowKeysWalk = arrowsWalk,
+            MusicCard = file.MusicCard ?? "card",
+            EffectsCard = file.EffectsCard ?? "card",
+            Mouse = mouse,
             FixedKeys = fixedKeys,
         };
     }

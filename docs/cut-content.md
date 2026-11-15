@@ -425,6 +425,8 @@ copies of CODE and CHASE; none is called.
 only"; README.DOC lists no mouse.
 
 **Status.** Explained as library code. Whether a mouse option was planned for the game is not shown by anything.
+Since 15 November 2026 the C# rewrite has an optional mouse in the menus, lists and maps (a player option, off by
+default; csharp/docs/MOUSE-SUPPORT.md, divergence D-630): an addition, not a restoration of this cut content.
 
 **Related.** CC-9 (the library's design notes mention nothing about mice).
 

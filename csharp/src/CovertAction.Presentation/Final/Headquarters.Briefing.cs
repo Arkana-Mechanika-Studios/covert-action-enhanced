@@ -2,6 +2,7 @@ using CovertAction.Core.Final;
 using CovertAction.Core.Records;
 using CovertAction.Core.Shared;
 using CovertAction.Msc;
+using CovertAction.Presentation.Library;
 
 namespace CovertAction.Presentation.Final;
 
@@ -342,6 +343,7 @@ public sealed partial class Headquarters
         var row = 1;
         var chosen = FaceColumns * row + column;
         var picked = false;
+        Input.BeginPointer();
         do
         {
             ShowFaceCursor(chosen, false);
@@ -358,6 +360,17 @@ public sealed partial class Headquarters
             if (key == -1 && !_world.Input.NoKeyWaiting())
             {
                 key = Input.ReadKey();
+            }
+            // DIVERGENCE: D-632 with the mouse option on, the pointer on a face moves the frame there; a click picks it (as Return; a right click as Esc, which picks too).
+            var pointed = key == -1 ? Input.ReadPointer(FaceCellAt) : PointerEvent.Nothing;
+            if (pointed.Choice >= 0)
+            {
+                (column, row) = (pointed.Choice % FaceColumns, pointed.Choice / FaceColumns);
+                chosen = pointed.Choice;
+            }
+            if (pointed.Action == PointerAction.Cancel || (pointed.Action == PointerAction.Accept && pointed.Choice >= 0))
+            {
+                key = Keys.Return;
             }
             if (key != -1)
             {
@@ -413,15 +426,24 @@ public sealed partial class Headquarters
     /// <summary>Draws the frame around a face of the faces screen, or takes it away: an outline on the four-colour screen, else the frame's colour exchanged.</summary>
     private void ShowFaceCursor(int cell, bool on)
     {
+        var frame = FaceFrame(cell);
         if (_state.CGA)
         {
-            Output.DrawRectOutline(FaceCellLeft(cell) + 1, FaceCellTop(cell) + 0x15, 0x37, 0x39, on ? CgaFrameWhite : CgaFrameOff);
+            Output.DrawRectOutline(frame.X, frame.Y, frame.Width, frame.Height, on ? CgaFrameWhite : CgaFrameOff);
         }
         else
         {
-            _world.Graphics.RecolorRect(_state.Rp1, FaceCellLeft(cell) + 3, FaceCellTop(cell) + 0x17, 0x36, 0x38, on ? FrameWhite : FrameOff, on ? FrameOff : FrameWhite);
+            _world.Graphics.RecolorRect(_state.Rp1, frame.X, frame.Y, frame.Width, frame.Height, on ? FrameWhite : FrameOff, on ? FrameOff : FrameWhite);
         }
     }
+
+    /// <summary>The frame around a face: an outline on the four-colour screen, the recoloured area on the others; what the mouse points at.</summary>
+    private HitArea FaceFrame(int cell) => _state.CGA
+        ? new HitArea(FaceCellLeft(cell) + 1, FaceCellTop(cell) + 0x15, 0x37, 0x39)
+        : new HitArea(FaceCellLeft(cell) + 3, FaceCellTop(cell) + 0x17, 0x36, 0x38);
+
+    /// <summary>The faces screen's mouse hit test: the cell whose frame holds a pixel, -1 for none.</summary>
+    private int FaceCellAt(int x, int y) => PointerHit.Area(x, y, [.. Enumerable.Range(0, FaceCells).Select(FaceFrame)]);
 
     /// <summary>The left edge of a cell of the faces screen.</summary>
     private static int FaceCellLeft(int cell) => cell % FaceColumns * FaceCellWidth;

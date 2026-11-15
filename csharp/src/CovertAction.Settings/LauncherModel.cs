@@ -40,13 +40,29 @@ internal sealed class LauncherModel
         ("windows", "Windows' own rate"),
     ];
 
+    /// <summary>The cards the music or the effects can play on (D-620), with their labels; "card": the sound card plays both.</summary>
+    public static readonly IReadOnlyList<(string Value, string Label)> PartCards =
+    [
+        ("card", "The sound card"),
+        ("none", "None"),
+        ("speaker", "PC speaker"),
+        ("adlib", "AdLib"),
+        ("mt32", "Roland MT-32"),
+        ("tandy", "Tandy"),
+    ];
+
     private static readonly int[] WindowScales = [2, 3, 4, 5, 6];
 
     private readonly LauncherContext _context;
-    private readonly (string? GameFolder, (int W, int H) Window, bool Fullscreen, string Scaling, string SoundCard, string Controls, string? Roms, string? Saves, string KeyRepeat) _initial;
+    private readonly (string? GameFolder, (int W, int H) Window, bool Fullscreen, string Scaling, string SoundCard, string Controls, string? Roms, string? Saves, string KeyRepeat, bool ArrowKeysWalk) _initial;
+
+    /// <summary>The mouse option as the launcher opened.</summary>
+    private readonly bool _initialMouse;
 
     /// <summary>The folder shown at the start without the player choosing it (given at the start or found), or null.</summary>
     private readonly string? _automatic;
+
+    private readonly (string Music, string Effects) _initialParts;
 
     private string? _mt32Roms;
     private RomStatus? _roms;
@@ -67,6 +83,8 @@ internal sealed class LauncherModel
         _mt32Roms = IsFixed("sound.mt32Roms", out _) ? start.Mt32Roms : Blank(s.Mt32Roms);
         SavesFolder = IsFixed("savesFolder", out _) ? start.SavesFolder : Blank(s.SavesFolder);
         KeyRepeat = start.SystemKeyRepeat ? "windows" : "pc";
+        ArrowKeysWalk = IsFixed("input.arrowKeysWalk", out _) ? start.ArrowKeysWalk : s.ArrowKeysWalk ?? false;
+        Mouse = _initialMouse = start.Mouse;
         Found = context.FoundGameFolders();
         var fileFolder = Blank(s.GameFolder);
         // the folder the command line (or COVERT_GAME_DIR) gives is the one the game would start with: shown first
@@ -76,8 +94,9 @@ internal sealed class LauncherModel
         {
             SetGameFolder(Found[0].Folder, Found[0].Source);
         }
-        _initial = (fileFolder, Windows[WindowIndex], Fullscreen, Scaling, SoundCard, Controls, _mt32Roms, SavesFolder, KeyRepeat);
+        _initial = (fileFolder, Windows[WindowIndex], Fullscreen, Scaling, SoundCard, Controls, _mt32Roms, SavesFolder, KeyRepeat, ArrowKeysWalk);
         _automatic = GameFolder;
+        (MusicCard, EffectsCard) = _initialParts = (start.MusicCard, start.EffectsCard);
     }
 
     private static string? Blank(string? text) => string.IsNullOrWhiteSpace(text) ? null : text;
@@ -113,6 +132,24 @@ internal sealed class LauncherModel
 
     /// <summary>One of <see cref="KeyRepeats"/>' values.</summary>
     public string KeyRepeat { get; set; }
+
+    /// <summary>In a building raid the grey arrow keys walk (D-610).</summary>
+    public bool ArrowKeysWalk { get; set; }
+
+    /// <summary>One of <see cref="PartCards"/>' values: the card the tunes play on.</summary>
+    public string MusicCard { get; set; }
+
+    /// <summary>One of <see cref="PartCards"/>' values: the card the sound effects play on.</summary>
+    public string EffectsCard { get; set; }
+
+    /// <summary>Whether the music and the effects play on two cards (either is set to a card of its own, D-620).</summary>
+    public bool Mixing => MusicCard != "card" || EffectsCard != "card";
+
+    /// <summary>The card a part plays on: its own, else the sound card.</summary>
+    public string CardOf(string part) => part == "card" ? SoundCard : part;
+
+    /// <summary>The mouse in the menus, lists and maps (input.mouse).</summary>
+    public bool Mouse { get; set; }
 
     /// <summary>The MT-32 ROM folder chosen; null: the default (MT32_ROMS next to the program, else where the ROMs are found).</summary>
     public string? Mt32Roms
@@ -163,6 +200,10 @@ internal sealed class LauncherModel
     public void CycleScaling(int step) => Scaling = Step(Scalings, Scaling, step);
 
     public void CycleKeyRepeat(int step) => KeyRepeat = Step(KeyRepeats, KeyRepeat, step);
+
+    public void CycleMusicCard(int step) => MusicCard = Step(PartCards, MusicCard, step);
+
+    public void CycleEffectsCard(int step) => EffectsCard = Step(PartCards, EffectsCard, step);
 
     private static string Step(IReadOnlyList<(string Value, string Label)> choices, string current, int step)
     {
@@ -228,6 +269,22 @@ internal sealed class LauncherModel
         {
             changes["input.keyRepeat"] = KeyRepeat;
         }
+        if (ArrowKeysWalk != _initial.ArrowKeysWalk)
+        {
+            changes["input.arrowKeysWalk"] = ArrowKeysWalk;
+        }
+        if (MusicCard != _initialParts.Music)
+        {
+            changes["sound.music"] = MusicCard;
+        }
+        if (EffectsCard != _initialParts.Effects)
+        {
+            changes["sound.effects"] = EffectsCard;
+        }
+        if (Mouse != _initialMouse)
+        {
+            changes["input.mouse"] = Mouse;
+        }
         return changes;
     }
 
@@ -250,6 +307,10 @@ internal sealed class LauncherModel
         s.Mt32Roms = Mt32Roms;
         s.SavesFolder = SavesFolder;
         s.KeyRepeat = KeyRepeat;
+        s.ArrowKeysWalk = ArrowKeysWalk;
+        s.MusicCard = MusicCard;
+        s.EffectsCard = EffectsCard;
+        s.Mouse = Mouse;
         return s;
     }
 

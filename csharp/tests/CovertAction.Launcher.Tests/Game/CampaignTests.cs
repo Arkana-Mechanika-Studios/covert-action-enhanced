@@ -45,7 +45,7 @@ public sealed class CampaignTests
     /// played: the agent in the first city of the European world (WORLD0.DTA) at eight in the morning of the first
     /// day, on the easiest level, with a cast of no one and no events yet.
     /// </summary>
-    private static SharedState CampaignUnderWay(GameFolder folder, params int[] buildingsKnown)
+    internal static SharedState CampaignUnderWay(GameFolder folder, params int[] buildingsKnown)
     {
         const int counts = 4, eightInTheMorning = 8 * 60;
         var shared = new SharedState

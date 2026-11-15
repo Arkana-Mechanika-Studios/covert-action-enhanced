@@ -304,6 +304,7 @@ public sealed class LibraryScreens(ILibraryState state, ILibraryScreenState scre
     {
         const int noKey = -1;
         var key = noKey;
+        input.BeginPointer();
         while (world.Input.NoKeyWaiting())
         {
             if (key != noKey)
@@ -313,6 +314,11 @@ public sealed class LibraryScreens(ILibraryState state, ILibraryScreenState scre
             if (state.Status.HasFlag(Options.Joystick) && (input.JoystickButtonDown(0) || input.JoystickButtonDown(1)))
             {
                 key = JoystickButton;
+            }
+            // DIVERGENCE: D-633 with the mouse option on, a click answers a "press a key" wait (left: Space, right: Esc).
+            if (key == noKey)
+            {
+                key = input.ReadPointerKey();
             }
         }
         if (key == noKey)

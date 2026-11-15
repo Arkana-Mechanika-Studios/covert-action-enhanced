@@ -45,8 +45,12 @@ launcher but cannot be changed there (its details say what sets it); the launche
 | `display.scaling` | `"pixelart"` | `--scaling <name>` | how the 320x200 picture (and the set-up's text page) is enlarged: `pixelart` (every game pixel the same size, only the edges between them blended; SDL 3.4), `nearest` (hard pixels, some a window pixel wider than others), `smooth` (linear) |
 | `sound.card` | `"adlib"` | `--sound <card>` | the card the game plays on, the set-up screen's sound answer (D-603): `none`, `speaker`, `tandy`, `adlib`, `mt32`. An earlier file's `"setup"` (the set-up screen asked) reads as the default, without a message |
 | `sound.mt32Roms` | `MT32_ROMS` next to the program | `--mt32-roms`; `COVERT_MT32_ROMS` | your MT-32 (or CM-32L) ROM files (found by themselves in the usual places, below); without them the AdLib driver plays instead (D-20) |
+| `sound.music` | `"card"` | none | the card the tunes play on (the theme, the selection screens' tune, the vacations): `card` (the sound card plays both, as the original), or `none`, `speaker`, `tandy`, `adlib`, `mt32`: the music on that card's driver while the effects play on `sound.effects`', the two mixed (D-620, SOUND-MIXING.md) |
+| `sound.effects` | `"card"` | none | the card the sound effects play on: `card` (the sound card), or a card as for `sound.music`. Either key other than `card` turns the mix on; an `mt32` without ROMs plays the AdLib driver (D-20) |
 | `input.controls` | `"joystick"` | `--controls <joystick\|keyboard>` | the set-up screen's controls answer (D-603): `joystick` ("1. Joystick and Keyboard" when a joystick or gamepad is plugged in at the start: the menus part then calibrates it; with none, "keyboard only") or `keyboard` ("2. Keyboard only") |
 | `input.keyRepeat` | `"pc"` | `--key-repeat <pc\|windows>`; `COVERT_KEY_REPEAT=system` | how a held key repeats: as the PC keyboard did (after half a second, 10.9 a second; PERFORMANCE.md) or at Windows' own rate |
+| `input.arrowKeysWalk` | false | `--arrow-keys-walk` | in a building raid only, the grey arrow keys (and Home, End, PgUp, PgDn) walk the agent like the keypad's digits 8/2/4/6 (and the diagonals), and Shift with an arrow lunges, which the grey arrows do in the original. Off: the original's keys (the keypad walks, the grey arrows lunge). A player option, divergence D-610 |
+| `input.mouse` | false | `--mouse`, `--no-mouse` | the mouse in the menus, lists and on the flight map (not in the original, D-630; MOUSE-SUPPORT.md): pointing at a choice highlights it, a left click takes it, a right click is Esc, a click answers "press a key"; the keys work as before. The system's pointer shows over the window only while it is on |
 
 An earlier file's `startup.skipSetup` is ignored without a message: there is nothing left to skip.
 
@@ -114,8 +118,10 @@ project, not affiliated with or endorsed by MicroProse or the game's rights hold
   (window size, fullscreen, picture scaling), Sound and controls (the sound card with **Test sound**, a line about the
   card or the ROMs; the controls: Keyboard and joystick, or Keyboard only), Saved games (the folder, **Change…**).
 * **Advanced**: Roland MT-32 (the ROM folder, **Change…**, found or missing with the D-20 note), Keyboard (key
-  repeat), and room for the player options planned for later (the arrow keys walking in a building, the mouse, mixing
-  the sound drivers), shown as planned and not offered.
+  repeat), and the player options: **Arrow keys walk** (D-610), **Music on** with **Test mix** and **Effects on**
+  (each "The sound card" or a card of its own, a line saying what plays where, D-620), **Mouse in the menus**
+  (`input.mouse`, with a line saying it is not in the original, D-630), and room for those planned for later (the mouse
+  at the workstations, in the raid and the chase), shown as planned and not offered.
 
 Rows show `‹ value ›`: a click on ‹ or › (or ←/→) steps through the values, a click on the row or Enter/Space steps on.
 Folders: **Change…** (or Enter on the field) opens Windows' folder dialog; a folder can also be dropped on the window
@@ -124,7 +130,8 @@ or pasted (Ctrl+V); ←/→ on the game folder go through the folders found. Tab
 of both tabs and the buttons; Ctrl+Tab changes the tab. The **details box** above the buttons shows the last message
 (why the launcher came up, what an action did, why it could not), then what the row under the pointer, or chosen, does.
 **Test sound** plays the theme tune for twelve seconds on the chosen card through the game's own driver (the player's
-?SOUND.CA; the MT-32 with the ROMs, else the AdLib). **Play** saves the changes and starts the game; **Save and quit**,
+?SOUND.CA; the MT-32 with the ROMs, else the AdLib); **Test mix** plays it on the music's card with a shot, the Uzi
+and a door every two seconds on the effects' card. **Play** saves the changes and starts the game; **Save and quit**,
 Esc and the window's close button save and leave.
 
 Nothing of the game's art is in the repository or the release: the launcher is drawn in code, in the VGA 8x16 text

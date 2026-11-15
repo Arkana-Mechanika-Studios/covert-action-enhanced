@@ -11,4 +11,13 @@ namespace CovertAction.Launcher;
 /// For the proof and the tests: the set-up screen asks the original's questions and its answers count (<paramref name="SoundLetter"/>
 /// and <paramref name="Joystick"/> are not used). Default false: the set-up screen shows its title only, as the player's game does.
 /// </param>
-public sealed record GameOptions(char SoundLetter = 'A', bool Joystick = true, string? Mt32RomFolder = null, bool AskSetUpQuestions = false);
+/// <param name="ArrowKeysWalk">In a building raid the grey arrow keys walk like the keypad's digits and Shift with them lunges (D-610); off: the original's keys.</param>
+/// <param name="MusicLetter">The driver the tunes play on (N, I, T, A, R) when the music and the effects play on two cards (D-620); null: the sound card's.</param>
+/// <param name="EffectsLetter">The driver the sound effects play on (D-620); null: the sound card's. Both null (the default): one card plays all, as the original.</param>
+/// <param name="Mouse">
+/// The mouse in the menus, lists and maps (the settings' input.mouse, off by default): the game gets a mouse driver on
+/// the host's pointer, when the host has one; off (or without a pointer), the PC has no mouse, as the original assumes
+/// (docs/faithfulness/DIVERGENCES.md D-630).
+/// </param>
+public sealed record GameOptions(char SoundLetter = 'A', bool Joystick = true, string? Mt32RomFolder = null, bool AskSetUpQuestions = false,
+    bool ArrowKeysWalk = false, char? MusicLetter = null, char? EffectsLetter = null, bool Mouse = false);

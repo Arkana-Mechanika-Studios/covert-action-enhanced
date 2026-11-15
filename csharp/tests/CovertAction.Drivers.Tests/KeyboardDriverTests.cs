@@ -53,6 +53,45 @@ public sealed class KeyboardDriverTests
         Assert.Equal(HostKeys.Up, keyboard.ReadKeyRaw());
     }
 
+    // the grey arrows as the SDL host gives them: the cursor code with the GreyArrow mark (and ShiftHeld with Shift)
+    private const int GreyUp = HostKeys.Up | HostKeys.GreyArrow, GreyEnd = HostKeys.End | HostKeys.GreyArrow;
+
+    [Fact]
+    public void WithoutTheOptionAGreyArrowGivesItsCursorCodeWhateverNumLockSaysAndShiftChangesNothing()
+    {
+        var (keyboard, _, _) = Setup(GreyUp, GreyUp | HostKeys.ShiftHeld, GreyEnd, GreyUp, HostKeys.Up | HostKeys.Keypad);
+        Assert.False(keyboard.ArrowKeysWalk);
+        Assert.Equal(HostKeys.Up, keyboard.ReadKeyRaw());
+        Assert.Equal(HostKeys.Up, keyboard.ReadKeyRaw());
+        Assert.Equal(HostKeys.End, keyboard.ReadKeyRaw());
+        keyboard.SetNumLock(false);
+        Assert.Equal(HostKeys.Up, keyboard.ReadKeyRaw());
+        Assert.Equal(HostKeys.Up, keyboard.ReadKeyRaw());       // the keypad with Num Lock off
+    }
+
+    [Fact]
+    public void WithTheOptionAGreyArrowWalksLikeTheKeypadAndShiftWithItLunges()
+    {
+        // Num Lock on, as in the raid: up and End give the keypad's 8 and 1; with Shift the cursor codes, which lunge
+        var (keyboard, _, _) = Setup(GreyUp, GreyEnd, GreyUp | HostKeys.ShiftHeld, GreyEnd | HostKeys.ShiftHeld, HostKeys.Up | HostKeys.Keypad);
+        keyboard.ArrowKeysWalk = true;
+        Assert.Equal(0x4838, keyboard.ReadKeyRaw());
+        Assert.Equal(0x4f31, keyboard.ReadKeyRaw());
+        Assert.Equal(HostKeys.Up, keyboard.ReadKeyRaw());
+        Assert.Equal(HostKeys.End, keyboard.ReadKeyRaw());
+        Assert.Equal(0x4838, keyboard.ReadKeyRaw());            // the keypad is as before
+    }
+
+    [Fact]
+    public void KeysWithoutMarksAreUntouchedByTheOption()
+    {
+        var (keyboard, _, _) = Setup(HostKeys.Up, HostKeys.Enter, HostKeys.F1);
+        keyboard.ArrowKeysWalk = true;
+        Assert.Equal(HostKeys.Up, keyboard.ReadKeyRaw());
+        Assert.Equal(HostKeys.Enter, keyboard.ReadKeyRaw());
+        Assert.Equal(HostKeys.F1, keyboard.ReadKeyRaw());
+    }
+
     [Fact]
     public void WithoutAKeyTheBufferIsEmpty()
     {

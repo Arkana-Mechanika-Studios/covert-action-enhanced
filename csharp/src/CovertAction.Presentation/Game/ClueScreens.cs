@@ -1,5 +1,6 @@
 using CovertAction.Core.Campaign;
 using CovertAction.Core.Shared;
+using CovertAction.Presentation.Library;
 
 namespace CovertAction.Presentation.Game;
 
@@ -83,21 +84,40 @@ public sealed class ClueScreens(CampaignState state, Boundaries world, CampaignS
     {
         const int down = 0x5000, up = 0x4800, enter = 0xd, space = 0x20, escape = 0x1b, noKey = -1;
         int answer = 0;
+        screens.Input.BeginPointer();
         do
         {
-            var x = (state.ClueListSelection & 1) != 0 ? 0xc : 0xac;
-            var y = 6 * state.ClueListSelection + 7;
-            world.Graphics.RecolorRect(state.Rp1, x, y, 0x88, 9, Grey, White);
+            var row = ClueRowArea(state.ClueListSelection);
+            world.Graphics.RecolorRect(state.Rp1, row.X, row.Y, row.Width, row.Height, Grey, White);
             screens.Output.WaitVsync(0x14);
             int key;
+            var pointed = PointerEvent.Nothing;
             do
             {
                 key = screens.Input.PollJoystickKey();
+                // DIVERGENCE: D-632 with the mouse option on, the pointer on a row moves the highlight there; a click takes it, a right click is Escape.
+                if (key == noKey)
+                {
+                    pointed = screens.Input.ReadPointer(ClueRowAt);
+                }
             }
-            while (key == noKey && world.Input.NoKeyWaiting());
-            if (!world.Input.NoKeyWaiting())
+            while (key == noKey && pointed.Action == PointerAction.None && world.Input.NoKeyWaiting());
+            if (pointed.Action == PointerAction.None && !world.Input.NoKeyWaiting())
             {
                 key = screens.Input.ReadKey();
+            }
+            switch (pointed.Action)
+            {
+                case PointerAction.Point:
+                    state.ClueListSelection = (short)pointed.Choice;
+                    break;
+                case PointerAction.Accept when pointed.Choice >= 0:
+                    state.ClueListSelection = (short)pointed.Choice;
+                    key = enter;
+                    break;
+                case PointerAction.Cancel:
+                    key = escape;
+                    break;
             }
             switch (key)
             {
@@ -121,11 +141,25 @@ public sealed class ClueScreens(CampaignState state, Boundaries world, CampaignS
                     answer = -1;
                     break;
             }
-            world.Graphics.RecolorRect(state.Rp1, x, y, 0x88, 9, White, Grey);
+            world.Graphics.RecolorRect(state.Rp1, row.X, row.Y, row.Width, row.Height, White, Grey);
         }
         while (answer == 0);
         screens.Input.FlushInput();
         return answer != -1;
+    }
+
+    /// <summary>Where a row of the clue list is highlighted: odd rows in the left column, even in the right, 6 pixels apart.</summary>
+    private static HitArea ClueRowArea(int row) => new((row & 1) != 0 ? 0xc : 0xac, 6 * row + 7, 0x88, 9);
+
+    /// <summary>The clue list's mouse hit test: the listed row whose highlight holds a pixel, -1 for none.</summary>
+    private int ClueRowAt(int x, int y)
+    {
+        var rows = new HitArea[state.Mindex];
+        for (var row = 0; row < rows.Length; row++)
+        {
+            rows[row] = ClueRowArea(row);
+        }
+        return PointerHit.Area(x, y, rows);
     }
 
     /// <summary>

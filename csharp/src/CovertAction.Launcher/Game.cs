@@ -85,6 +85,7 @@ public sealed class Game
     private readonly GameFolderFiles _files;
     private readonly SoundDriverChoice _sound;
     private readonly GameOptions _options;
+    private readonly KeyboardDriver _keyboard;
 
     /// <summary>Sets the game up: reads the fonts and colours from the player's files and puts the drivers on the host.</summary>
     /// <param name="folder">The player's copy of the game.</param>
@@ -114,15 +115,26 @@ public sealed class Game
         var link = new HostLink(Graphics, host);
         // the slow routines of the graphics code (the dissolve) show their progress frame by frame
         Graphics.FrameShown = link.WaitForFrame;
-        _sound = new SoundDriverChoice(folder, host, romFolder: options.Mt32RomFolder);
+        _sound = new SoundDriverChoice(folder, host, romFolder: options.Mt32RomFolder, musicLetter: options.MusicLetter, effectsLetter: options.EffectsLetter);
         _files = new GameFolderFiles(folder, savesFolder);
-        _world = new Boundaries(Graphics, _sound, new KeyboardDriver(link), new NoMouseDriver(), new GameTimer(link), _files);
+        _world = new Boundaries(Graphics, _sound, _keyboard = new KeyboardDriver(link), MouseDriver(host, options), new GameTimer(link), _files);
         _host = host;
         _link = link;
     }
 
     /// <summary>The game's drawing code and its screen.</summary>
     public McgaGraphicsDriver Graphics { get; }
+
+    /// <summary>The mouse driver the game's parts get (for tests: without the mouse option it is <see cref="NoMouseDriver"/>; new code).</summary>
+    internal IMouseDriver Mouse => _world.Mouse;
+
+    /// <summary>
+    /// The PC's mouse: none (the original's assumption, and every test's and the oracle's), unless the player turned the
+    /// mouse on and the host has a pointer (new code).
+    /// </summary>
+    // DIVERGENCE: D-630 the mouse is a player option, off by default; with it off the game's world has no mouse, as the original assumes.
+    private static IMouseDriver MouseDriver(IHost host, GameOptions options) =>
+        options.Mouse && host.Input.Pointer is { } pointer ? new HostMouseDriver(pointer) : new NoMouseDriver();
 
     /// <summary>The text page the host shows while the display is in text mode (the set-up screen), else null (for tests and tools; new code).</summary>
     public TextScreen? TextPage => _link.TextPage;
@@ -340,6 +352,8 @@ public sealed class Game
     {
         var state = new RaidState();
         TacDgroup.Layout.Load(Executable.Read(_folder.Read(RaidProgram)).DataSegment(), state);
+        // DIVERGENCE: D-610 the player option "arrow keys walk" applies to the building raid only
+        _keyboard.ArrowKeysWalk = _options.ArrowKeysWalk;
         try
         {
             new BuildingRaid(state, shared, _world, OriginalBehaviour.Player).TacInit();
@@ -351,6 +365,10 @@ public sealed class Game
         catch (ProgramExitException e)
         {
             throw PartFailed("the building raid", e);
+        }
+        finally
+        {
+            _keyboard.ArrowKeysWalk = false;
         }
     }
 

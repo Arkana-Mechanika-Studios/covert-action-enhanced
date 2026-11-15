@@ -36,6 +36,32 @@ public static class HostKeys
     public const int Keypad = 0x10000;
 
     /// <summary>
+    /// Marks a grey cursor key (the arrows, Home, End, PgUp, PgDn; above the 16 bits of a key code) as the host's key
+    /// events give it, so that the player option "arrow keys walk" can treat it like the keypad's key (see
+    /// <see cref="ResolveArrow"/>). New code (Covert Action; D-610): the BIOS code of the key is the low 16 bits.
+    /// </summary>
+    public const int GreyArrow = 0x20000;
+
+    /// <summary>Marks a <see cref="GreyArrow"/> pressed while Shift was held.</summary>
+    public const int ShiftHeld = 0x40000;
+
+    /// <summary>
+    /// Takes the host's marks off a grey cursor key. With <paramref name="arrowsWalk"/> (the player option; D-610) a
+    /// grey key without Shift becomes the same key of the numeric keypad (<see cref="Keypad"/>), which the keyboard
+    /// driver then gives as a digit while Num Lock is on, so the building raid walks; with Shift, or without the
+    /// option, the key is the plain cursor code the BIOS gives for it (in the raid, the lunge).
+    /// </summary>
+    public static int ResolveArrow(int key, bool arrowsWalk)
+    {
+        if ((key & GreyArrow) == 0)
+        {
+            return key;
+        }
+        var code = key & 0xFFFF;
+        return arrowsWalk && (key & ShiftHeld) == 0 ? code | Keypad : code;
+    }
+
+    /// <summary>
     /// A keypad key as the BIOS gives it: with Num Lock on, its digit (or the decimal point) with the key's scan code
     /// (keypad 1 is 0x4F31); with Num Lock off, the cursor key's code (<see cref="End"/>). A key without the
     /// <see cref="Keypad"/> mark is given as it is.

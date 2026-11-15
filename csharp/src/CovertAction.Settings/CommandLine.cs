@@ -30,7 +30,9 @@ internal sealed class CommandLine
         --sound <card>     none, speaker, tandy, adlib (default) or mt32
         --controls <how>   joystick (keyboard and joystick; default) or keyboard (keyboard only)
         --mt32-roms <dir>  the MT-32 ROM files' folder (default MT32_ROMS next to the program; COVERT_MT32_ROMS)
+        --arrow-keys-walk  in a building raid the grey arrows walk like the keypad (Shift+arrow lunges)
         --key-repeat <how> pc (the PC keyboard's repeat; default) or windows (COVERT_KEY_REPEAT=system)
+        --mouse, --no-mouse  the mouse in the menus, lists and maps (not in the original; default: off)
         --settings <file>  read and save this settings file instead of the one found
         --setup            open the launcher first; its Play starts the game
         --no-launcher      never open the launcher (a missing game folder ends the program with a message)
@@ -57,9 +59,14 @@ internal sealed class CommandLine
 
     public string? Controls { get; private set; }
 
+    public bool? ArrowKeysWalk { get; private set; }
+
     public string? Mt32Roms { get; private set; }
 
     public string? KeyRepeat { get; private set; }
+
+    /// <summary>--mouse (true) or --no-mouse (false): the mouse in the menus (input.mouse); null: not given.</summary>
+    public bool? Mouse { get; private set; }
 
     public string? SettingsFile { get; private set; }
 
@@ -99,6 +106,15 @@ internal sealed class CommandLine
                     break;
                 case "--fullscreen":
                     cli.Fullscreen = true;
+                    break;
+                case "--arrow-keys-walk":
+                    cli.ArrowKeysWalk = true;
+                    break;
+                case "--mouse":
+                    cli.Mouse = true;
+                    break;
+                case "--no-mouse":
+                    cli.Mouse = false;
                     break;
                 case "--saves":
                     cli.SavesFolder = Value() ?? cli.Fail("--saves needs a folder");

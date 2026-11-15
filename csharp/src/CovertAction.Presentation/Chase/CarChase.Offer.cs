@@ -1,6 +1,7 @@
 using System.Globalization;
 using CovertAction.Core.Chase;
 using CovertAction.Core.Shared;
+using CovertAction.Presentation.Library;
 
 namespace CovertAction.Presentation.Chase;
 
@@ -157,17 +158,37 @@ public sealed partial class CarChase
         var slot = firstPick == 0 ? 1 : 0;
         MarkOffer(slot, FrameLit, HighlightOff, HighlightOn);
         var picked = false;
+        Input.BeginPointer();
+        int OfferAt(int x, int y)
+        {
+            // the offers' rows, as MarkOffer highlights them; the first pick cannot be pointed at
+            var offer = PointerHit.Row(x, y, new HitArea(0, 0, OfferScreenWidth, OfferRowHeight), OfferRowHeight, Offers);
+            return offer == firstPick ? -1 : offer;
+        }
         do
         {
-            while (_world.Input.NoKeyWaiting())
+            var pointed = PointerEvent.Nothing;
+            while (_world.Input.NoKeyWaiting() && pointed.Action is PointerAction.None or PointerAction.Cancel)
             {
                 MarkOffer(slot, FrameDark, HighlightOn, HighlightOff);
                 Output.WaitVsync(BlinkFrames);
                 MarkOffer(slot, FrameLit, HighlightOff, HighlightOn);
                 Output.WaitVsync(BlinkFrames);
+                // DIVERGENCE: D-632 with the mouse option on, the pointer on an offer moves the highlight there; a click takes it (no key here is Esc).
+                pointed = Input.ReadPointer(OfferAt);
             }
             MarkOffer(slot, FrameWaiting, HighlightOn, HighlightOff);
-            var key = Input.ReadKey();
+            var key = pointed.Action switch
+            {
+                PointerAction.Point => -1,
+                PointerAction.Accept when pointed.Choice >= 0 => Keys.Return,
+                PointerAction.Accept => -1,
+                _ => Input.ReadKey(),
+            };
+            if (pointed.Choice >= 0)
+            {
+                slot = pointed.Choice;
+            }
             switch (key)
             {
                 case Keys.Down:

@@ -201,6 +201,42 @@ public sealed class LauncherTests
         Assert.Equal("D:/Roms", model.Mt32Roms);
     }
 
+    [Fact]
+    public void TheMixOfTheSoundDriversIsOffByDefaultAndSavesAsChosenOnTheAdvancedTab()
+    {
+        var test = new Test();
+        var (screen, model, canvas) = Open(Context(settings: new GameSettings { GameFolder = Game, SoundCard = "adlib" }, test: test));
+        Assert.False(model.Mixing);
+        Assert.False(screen.Shown(Item.Music));
+        Click(screen, canvas, Item.TabAdvanced);
+        Assert.True(screen.Shown(Item.Music) && screen.Shown(Item.Effects) && screen.Shown(Item.MixTest));
+        Assert.DoesNotContain(screen.Blocks, b => b.What.Contains("mixing the sound drivers", StringComparison.Ordinal));
+
+        // the music on the MT-32, the effects on the sound card (the AdLib): the test plays the two
+        Click(screen, canvas, Item.Music, Part.Previous);
+        Click(screen, canvas, Item.Music, Part.Previous);
+        Assert.Equal("mt32", model.MusicCard);
+        Assert.True(model.Mixing);
+        Click(screen, canvas, Item.MixTest);
+        Assert.Equal(new SoundTestRequest("mt32", Game, null, "adlib"), test.Asked);
+        Click(screen, canvas, Item.MixTest);
+        Assert.False(test.Playing);
+        Click(screen, canvas, Item.Effects, Part.Next);
+        Click(screen, canvas, Item.Effects, Part.Next);
+        Assert.Equal("speaker", model.EffectsCard);
+
+        var changes = model.Changes();
+        Assert.Equal(["sound.effects", "sound.music"], changes.Keys.Order());
+        var saved = SettingsFile.Parse(SettingsFileEdits.Set(SettingsFile.Template, changes)).Settings;
+        var start = StartSettings.Resolve(CommandLine.Parse([]), _ => null, saved);
+        Assert.Equal(("mt32", "speaker"), (start.MusicCard, start.EffectsCard));
+        Assert.Equal(('R', 'I'), (GameSettings.PartLetter(start.MusicCard), GameSettings.PartLetter(start.EffectsCard)));
+        // the defaults: both parts on the sound card, which is no letter of its own
+        var defaults = StartSettings.Resolve(CommandLine.Parse([]), _ => null, SettingsFile.Parse(SettingsFile.Template).Settings);
+        Assert.Equal(("card", "card"), (defaults.MusicCard, defaults.EffectsCard));
+        Assert.Null(GameSettings.PartLetter(defaults.MusicCard));
+    }
+
     // ---- layout ----
 
     public static TheoryData<string> States => ["not found", "found", "mt32 without ROMs", "start failed", "advanced", "fixed", "many notes", "no notes", "hover"];

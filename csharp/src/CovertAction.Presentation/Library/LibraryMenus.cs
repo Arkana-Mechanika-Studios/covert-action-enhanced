@@ -497,16 +497,19 @@ public sealed class LibraryMenus(ILibraryState state, SharedState shared, Bounda
             menu.MenuPauseMode = false;
             return -1;
         }
+        input.BeginPointer();
 
         var closed = false;
         do
         {
             menu.MenuFirstDraw = false;
             var optionsBefore = state.Status;
-            var joystickKey = WaitForInput();
-            if (!world.Input.NoKeyWaiting() || joystickKey != -1)
+            var joystickKey = WaitForInput(x, y, out var pointed);
+            // DIVERGENCE: D-631 with the mouse option on, the pointer moves the highlight and a click stands for a key.
+            var deviceKey = joystickKey != -1 ? joystickKey : PointerKey(pointed, ref selected);
+            if (!world.Input.NoKeyWaiting() || deviceKey != -1)
             {
-                var key = joystickKey == -1 ? ReadKey() : joystickKey;
+                var key = deviceKey == -1 ? ReadKey() : deviceKey;
                 switch (key)
                 {
                     case Keys.Down:
@@ -643,13 +646,18 @@ public sealed class LibraryMenus(ILibraryState state, SharedState shared, Bounda
     }
 
     /// <summary>
-    /// Waits until a key is in the keyboard buffer or the joystick stands for one.
+    /// Waits until a key is in the keyboard buffer or the joystick stands for one (or, with the mouse option, the mouse
+    /// did something: <see cref="LibraryInput.ReadPointer"/>).
     /// </summary>
-    /// <returns>The key the joystick stands for, or -1 when the wait ended with a key in the keyboard buffer.</returns>
-    private int WaitForInput()
+    /// <param name="x">The box's left edge.</param>
+    /// <param name="y">The box's top edge.</param>
+    /// <param name="pointed">What the mouse did; nothing without the mouse option.</param>
+    /// <returns>The key the joystick stands for, or -1 when the wait ended with a key in the keyboard buffer or a mouse action.</returns>
+    private int WaitForInput(int x, int y, out PointerEvent pointed)
     {
         var joystickKey = -1;
-        while (world.Input.NoKeyWaiting() && joystickKey == -1)
+        pointed = PointerEvent.Nothing;
+        while (world.Input.NoKeyWaiting() && joystickKey == -1 && pointed.Action == PointerAction.None)
         {
             if (state.Animation.AnimationActive)
             {
@@ -664,8 +672,56 @@ public sealed class LibraryMenus(ILibraryState state, SharedState shared, Bounda
                 }
             }
             joystickKey = input.PollJoystickKey();
+            if (joystickKey == -1)
+            {
+                pointed = input.ReadPointer((px, py) => ChoiceAt(x, y, px, py));
+            }
         }
         return joystickKey;
+    }
+
+    /// <summary>
+    /// The key a mouse action stands for in the box, the choice it points at put into <paramref name="selected"/> as the
+    /// cursor keys would move it there: a move only moves the highlight (no key); a left click takes the choice under it
+    /// (Return), or closes a box without a choice to take (a "press a key" box: Return there too); a right click is Esc.
+    /// A click beside the choices of a box that has some does nothing.
+    /// </summary>
+    /// <returns>The key, or -1 for none.</returns>
+    private int PointerKey(PointerEvent pointed, ref int selected)
+    {
+        switch (pointed.Action)
+        {
+            case PointerAction.Point:
+                selected = pointed.Choice;
+                return -1;
+            case PointerAction.Accept when pointed.Choice >= 0:
+                selected = pointed.Choice;
+                return Keys.Return;
+            case PointerAction.Accept:
+                return HasChoiceToTake() ? -1 : Keys.Return;
+            case PointerAction.Cancel:
+                return Keys.Esc;
+            default:
+                return -1;
+        }
+    }
+
+    /// <summary>Whether the box has choices the highlight can be on (not a title-only box, a box without highlight or an OK box).</summary>
+    private bool HasChoiceToTake()
+    {
+        var menu = state.Menu;
+        return menu.MenuFirstItem != -1 && menu.MenuItemCount > 0 && !menu.NoHi && !menu.MenuOkButton;
+    }
+
+    /// <summary>The box's mouse hit test: the choice whose highlight bar holds a pixel of the screen, -1 for none.</summary>
+    private int ChoiceAt(int x, int y, int px, int py) =>
+        HasChoiceToTake() ? PointerHit.Row(px, py, ChoiceBar(x, y, 0), LineHeight, state.Menu.MenuItemCount) : -1;
+
+    /// <summary>The rectangle of a choice's line: where its highlight bar is drawn, and what the mouse points at.</summary>
+    private HitArea ChoiceBar(int x, int y, int choice)
+    {
+        var line = state.Menu.MenuFirstItem + choice;
+        return new HitArea(x + 3, y + 4 + line * LineHeight, state.Menu.MenuTextWidth + 3, LineHeight + 1);
     }
 
     /// <summary>
@@ -742,7 +798,7 @@ public sealed class LibraryMenus(ILibraryState state, SharedState shared, Bounda
     /// <summary>Changes one colour into another in the rectangle of a choice's line: this is how the highlight bar is drawn and removed.</summary>
     private void RecolorChoice(int x, int y, int choice, int from, int to)
     {
-        var line = state.Menu.MenuFirstItem + choice;
-        world.Graphics.RecolorRect(state.Rp1, x + 3, y + 4 + line * LineHeight, state.Menu.MenuTextWidth + 3, LineHeight + 1, from, to);
+        var bar = ChoiceBar(x, y, choice);
+        world.Graphics.RecolorRect(state.Rp1, bar.X, bar.Y, bar.Width, bar.Height, from, to);
     }
 }

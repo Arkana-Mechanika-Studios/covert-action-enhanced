@@ -741,6 +741,7 @@ public sealed class CityScreens(CampaignState state, SharedState shared, Boundar
         world.Graphics.CopyRect(state.Rp1, 0, 0, screenWidth, screenHeight, state.RpBack, 0, 0);
         var line = StayHere;
         bool chosen = false, byJoystick = false;
+        screens.Input.BeginPointer();
         do
         {
             screens.DrawMapCity(state.InCity, state.CGA ? White : Light);
@@ -755,15 +756,34 @@ public sealed class CityScreens(CampaignState state, SharedState shared, Boundar
             }
             var previous = line;
             int key;
+            var pointed = PointerEvent.Nothing;
             do
             {
                 key = screens.Input.PollJoystickKey();
+                // DIVERGENCE: D-632 with the mouse option on, the pointer on a line of the list or a city's dot moves the highlight there; a click takes it.
+                if (key == -1)
+                {
+                    pointed = screens.Input.ReadPointer(DestinationAt);
+                }
             }
-            while (key == -1 && world.Input.NoKeyWaiting());
-            byJoystick = world.Input.NoKeyWaiting();
-            if (!byJoystick)
+            while (key == -1 && pointed.Action == PointerAction.None && world.Input.NoKeyWaiting());
+            byJoystick = pointed.Action == PointerAction.None && world.Input.NoKeyWaiting();
+            if (!byJoystick && pointed.Action == PointerAction.None)
             {
                 key = screens.Input.ReadKey();
+            }
+            switch (pointed.Action)
+            {
+                case PointerAction.Point:
+                    line = pointed.Choice - 1;
+                    break;
+                case PointerAction.Accept when pointed.Choice >= 0:
+                    line = pointed.Choice - 1;
+                    chosen = true;
+                    break;
+                case PointerAction.Cancel:
+                    key = Keys.Esc;
+                    break;
             }
             switch (key)
             {
@@ -793,6 +813,30 @@ public sealed class CityScreens(CampaignState state, SharedState shared, Boundar
         screens.Input.FlushInput();
         state.Rp1.BPen = Light;
         return line;
+    }
+
+    /// <summary>
+    /// The flight map's mouse hit test: the list's line under a pixel (stay here, the sixteen cities, the data files;
+    /// where the highlight is drawn), else the city whose dot on the map is within three pixels.
+    /// </summary>
+    /// <returns>The line plus one (0 for "stay here", 1..16 a city, 17 the data files), -1 for none.</returns>
+    private int DestinationAt(int x, int y)
+    {
+        const int firstLine = 0x21, lineHeight = 8, menuLeft = 0xc0, menuWidth = 0x80, mapWidth = 0xc0, dotReach = 3;
+        // the lines from "stay here" (line -1) to the data files (line 16), each 8 pixels high as its highlight
+        var row = PointerHit.Row(x, y, new HitArea(menuLeft, (StayHere << 3) + firstLine, menuWidth, lineHeight), lineHeight, Cities + 2);
+        if (row >= 0 || x >= mapWidth)
+        {
+            return row;
+        }
+        var dots = new HitArea[Cities];
+        for (var city = 0; city < Cities; city++)
+        {
+            // around the 3x3 dot of DrawMapCity, centred on the city's place
+            dots[city] = new HitArea(state.Ct[city].GeoX - dotReach, state.Ct[city].GeoY - dotReach, 2 * dotReach + 1, 2 * dotReach + 1);
+        }
+        var dot = PointerHit.Area(x, y, dots);
+        return dot < 0 ? -1 : dot + 1;
     }
 
     /// <summary>Loads the map of the world the case plays in onto the back page.</summary>

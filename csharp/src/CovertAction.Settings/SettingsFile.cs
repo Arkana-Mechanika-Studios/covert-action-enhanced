@@ -236,6 +236,8 @@ internal static class SettingsFile
                     break;
                 case "card": settings.SoundCard = OneOf(key, property.Value, GameSettings.SoundCards) ?? settings.SoundCard; break;
                 case "mt32Roms": settings.Mt32Roms = FilePath(key, property.Value); break;
+                case "music": settings.MusicCard = OneOf(key, property.Value, GameSettings.PartCards) ?? settings.MusicCard; break;
+                case "effects": settings.EffectsCard = OneOf(key, property.Value, GameSettings.PartCards) ?? settings.EffectsCard; break;
                 default: Unknown(key); break;
             }
         }
@@ -259,6 +261,8 @@ internal static class SettingsFile
             {
                 case "controls": settings.Controls = OneOf(key, property.Value, GameSettings.ControlChoices) ?? settings.Controls; break;
                 case "keyRepeat": settings.KeyRepeat = OneOf(key, property.Value, GameSettings.KeyRepeats) ?? settings.KeyRepeat; break;
+                case "arrowKeysWalk": settings.ArrowKeysWalk = Boolean(key, property.Value) ?? settings.ArrowKeysWalk; break;
+                case "mouse": settings.Mouse = Boolean(key, property.Value) ?? settings.Mouse; break;
                 default: Unknown(key); break;
             }
         }
@@ -370,7 +374,11 @@ internal static class SettingsFile
             // The folder with your MT-32 (or CM-32L) ROM files. "": MT32_ROMS next to the program.
             // Without the ROMs the AdLib driver plays instead (one line on the console says so).
             // Command line: --mt32-roms <folder>; environment: COVERT_MT32_ROMS.
-            "mt32Roms": ""
+            "mt32Roms": "",
+            // Music on one card, sound effects on another, mixed: "card" (the sound card plays both, as the original),
+            // or "none", "speaker", "tandy", "adlib", "mt32" for the tunes, and for the effects (D-620).
+            "music": "card",
+            "effects": "card"
           },
 
           "input": {
@@ -380,7 +388,16 @@ internal static class SettingsFile
             "controls": "joystick",
             // How a held key repeats: "pc" (as the PC keyboard: after half a second, 10.9 times a second) or "windows"
             // (Windows' own delay and rate). Command line: --key-repeat <pc|windows>; environment: COVERT_KEY_REPEAT=system.
-            "keyRepeat": "pc"
+            "keyRepeat": "pc",
+
+            // true: in a building raid the grey arrow keys walk the agent like the keypad's digits, and Shift with an
+            // arrow lunges. false: the original's keys (the keypad walks, the grey arrows lunge). Command line:
+            // --arrow-keys-walk.
+            "arrowKeysWalk": false,
+
+            // true: the mouse in the menus, lists and maps (not in the original): pointing moves the highlight, a left
+            // click takes the choice, a right click is Esc. Command line: --mouse, --no-mouse.
+            "mouse": false
           }
         }
         """;

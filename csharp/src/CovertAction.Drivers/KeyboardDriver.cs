@@ -188,6 +188,12 @@ public sealed class KeyboardDriver(HostLink link) : IInputDriver
     /// <summary>distance / span as a 16-bit fraction (0..65535): the driver's division of the distance times 65536 by the span.</summary>
     private static uint Fraction(int distance, ushort span) => ((uint)distance << 16) / span;
 
+    /// <summary>
+    /// The grey cursor keys walk like the keypad's digits (Shift with them lunges). New code, a player option off by default
+    /// (DIVERGENCE: D-610); the host sets it while the building raid runs, so no other part sees it.
+    /// </summary>
+    public bool ArrowKeysWalk { get; set; }
+
     /// <summary>Num Lock as the game last set it; on at start, as on the PCs of the time.</summary>
     private bool _numLock = true;
 
@@ -207,7 +213,7 @@ public sealed class KeyboardDriver(HostLink link) : IInputDriver
             if (link.Host.Input.TryReadKey(out var key))
             {
                 // a keypad key is a digit or a cursor key by the game's Num Lock, as the BIOS gives it
-                _waiting = HostKeys.ResolveKeypad(key, _numLock);
+                _waiting = HostKeys.ResolveKeypad(HostKeys.ResolveArrow(key, ArrowKeysWalk), _numLock);
             }
             else
             {

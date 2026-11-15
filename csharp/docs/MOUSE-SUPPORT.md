@@ -1,6 +1,7 @@
 # Mouse support: how it could be added
 
-Study of 14 November 2026 (no code changed). Question: the original's shared library carries int 33h mouse
+Study of 14 November 2026; **phases 0, 1 and 2 implemented on 15 November 2026** (section 6): the mouse works in the
+menus, the lists and on the flight map as a player option, off by default. Phases 3 to 5 are still planned. Question: the original's shared library carries int 33h mouse
 routines that no program calls (`LibraryInput.cs` "DORMANT", `docs/cut-content.md` CC-15). Could the rewrite offer
 a mouse, how much of it is the original's own code, and what does it cost?
 
@@ -164,9 +165,9 @@ Sizes are rough (new lines incl. tests; one developer-day = about 300 lines of r
 
 | phase | content | size | risk |
 |---|---|---|---|
-| 0 | **Plumbing**: `IInput.Pointer`, `SdlHost` events + mapping (copy `DisplayLayout`), `HeadlessHost` scripted pointer, `HostMouseDriver`, setting + flag, divergence/register rows, mapping test against the drawn picture. Nothing consumes it yet; faithful mode unchanged | ~450 lines, 1.5 days | low; the mapping details (pixel-art scaling, text page, high-DPI) are the only subtle part, and Darklands already solved them |
-| 1 | **Menu boxes** (rows 1, 3, 13): in `LibraryMenus.ShowBox` input loop add a pointer branch beside `PollJoystickKey`: hover moves the highlight (reusing `MoveHighlight`), left click accepts, right click = Esc; "press a key" boxes close on a click. One place serves city, hotel, HQ, data menus, quit boxes in all parts | ~200 lines, 1 day | low-medium: must not change timing (`WaitVsync(0xf)` after a move), the animation-skip and the Alt-key paths; the C# `Menus` is shared with `Func<int>? readKey` hooks used by tests |
-| 2 | **Lists and maps** (rows 2, 4, 5): travel map list + city dots, clue/briefing lists, car offers, kit selection, faces grid; a small `PointerHit` helper (rectangles in game pixels -> choice index) | ~350 lines, 1.5 days | medium: each loop has its own redraw and sound order; the travel map needs the dot hit test and a visible hover cue (the highlight already exists) |
+| 0 (**done**) | **Plumbing**: `IInput.Pointer`, `SdlHost` events + mapping (copy `DisplayLayout`), `HeadlessHost` scripted pointer, `HostMouseDriver`, setting + flag, divergence/register rows, mapping test against the drawn picture. Nothing consumes it yet; faithful mode unchanged | ~450 lines, 1.5 days | low; the mapping details (pixel-art scaling, text page, high-DPI) are the only subtle part, and Darklands already solved them |
+| 1 (**done**) | **Menu boxes** (rows 1, 3, 13): in `LibraryMenus.ShowBox` input loop add a pointer branch beside `PollJoystickKey`: hover moves the highlight (reusing `MoveHighlight`), left click accepts, right click = Esc; "press a key" boxes close on a click. One place serves city, hotel, HQ, data menus, quit boxes in all parts | ~200 lines, 1 day | low-medium: must not change timing (`WaitVsync(0xf)` after a move), the animation-skip and the Alt-key paths; the C# `Menus` is shared with `Func<int>? readKey` hooks used by tests |
+| 2 (**done**) | **Lists and maps** (rows 2, 4, 5): travel map list + city dots, clue/briefing lists, car offers, kit selection, faces grid; a small `PointerHit` helper (rectangles in game pixels -> choice index) | ~350 lines, 1.5 days | medium: each loop has its own redraw and sound order; the travel map needs the dot hit test and a visible hover cue (the highlight already exists) |
 | 3 | **Mini-games** (rows 8, 9): crypto (click letter or cell chooses the cipher letter, right click clears, hot spots for hint/clear/leave) and electronics (click slot = cursor + swap, hot spot = done) | ~350 lines, 1.5 days | medium: the crypto plain-letter step needs a decision (keep typing, or draw an alphabet strip: new graphics and a new faithfulness boundary: the picture would differ from the original's, only with the option on); timer loops must keep their `WaitVsync` cadence |
 | 4 | **Real-time parts** (rows 10, 11): raid walking by pointer, car-chase turning; needs game design (no analogue in the original) | ~600 lines, 3 days + play testing | high: easy to make the game easier or harder than the original; keep it an opt-in "mouse steering" sub-setting; verify with sessions on the headless host |
 | 5 | **Set-up screen** (row 12): click a choice line = its digit; code-name field click-to-position (row 7, optional) | ~120 lines, 0.5 day | low |
@@ -188,3 +189,62 @@ Risks common to all phases:
   frames); hit tests should come from the same measured values the drawing uses, not hard-coded numbers
   (`MenuRight`, `MenuBottom`, `MenuStartItem`, `MenuTextWidth`).
 * **Scope creep.** Text entry (row 7) and the Alt-letter toggles stay keyboard-only.
+
+## 6. What is implemented (phases 0, 1, 2) and what is left
+
+**The option.** `input.mouse` in the settings file, `--mouse` / `--no-mouse` on the command line, the launcher's
+Advanced tab, Player options, **Mouse in the menus** (with a line saying it is not in the original). Off by default.
+Off, `Launcher.Game` gives the game's world `NoMouseDriver` (`MouseOptionTests.WithoutTheOptionTheGamesWorldHasNoMouse`)
+and no menu calls the mouse driver at all (`LibraryInput.PointerOn` is asked first), so the oracle, the session proof
+and every key session are unchanged. Divergences D-630 (the option, the driver, the hosts), D-631 (the boxes), D-632
+(the lists and maps), D-633 ("press a key").
+
+**Phase 0, plumbing.**
+
+* `Platform`: `IInput.Pointer` (an `IPointer`: position in game pixels, inside the picture or not, buttons held,
+  presses and releases latched until taken), `PointerLatch` (the latch both hosts keep), `IMouseDriver.Installed` (the
+  reset's answer the original never reads; false by default).
+* `Drivers.HostMouseDriver`: the nine services on the host's pointer, in the driver's units (x times 2, 0..639), the
+  game's ranges clamp what it reads; `SetPosition`, `ShowCursor`, `HideCursor` do nothing (nothing in the game calls
+  them; the player's pointer is never moved).
+* `Host.Sdl`: `PictureLayout` (adapted from Darklands' `DisplayLayout`, docs/REUSED.md): the picture's 4:3 place (the
+  host's own arithmetic, now in one place), SDL's window coordinates to drawing-area pixels (high pixel density),
+  the game pixel under the window pixel's centre (pixel-art and nearest scaling alike; SDL's software renderer's
+  16.16 stepping where it draws), the black bars outside the picture, the text page's cells over the same place.
+  `MouseMappingTests` checks it at nine window sizes and densities against the picture as drawn. `SdlHost` handles
+  motion, left and right buttons and the window's mouse-leave event.
+* **The pointer picture: the system's pointer**, shown over the game's window only while the option is on (hidden
+  with it off: the game has no mouse then). Nothing is drawn into the 320x200 picture, so the screen comparisons and
+  the 4:3 picture are untouched.
+* `Host.Headless`: the scripted mouse: key-list entries `HeadlessHost.PointerMove`, `PointerPress`, `PointerRelease`,
+  `Click` (the game finds no key at such a moment), `PointerReads` (how often the game looked), and in the command-line
+  program `--mouse on` with `{move x y}`, `{click x y}`, `{rclick x y}`. The key list is read as the game asks for it,
+  so a test can compute an entry from the screen.
+
+**Phase 1, the boxes** (`LibraryMenus.QuitPrompt`, every part's boxes): `LibraryInput.BeginPointer` when the box
+starts waiting (forgets earlier clicks, as `FlushInput` forgets keys), `ReadPointer` beside `PollJoystickKey` in the
+wait. A move onto a choice moves the highlight (`selected`, then the box's own `MoveHighlight`; no joystick pause, as
+for the keys), a left click on a choice is Return on it, a left click on a box without a choice to take (a "press a
+key" box, a box without highlight, an OK box) is Return, a right click is Esc. The hit rectangles are the highlight
+bars' (`ChoiceBar`, which `RecolorChoice` draws with). The animation step and the Alt keys are unchanged. The
+"press a key" waits (`LibraryScreens.WaitForKey`) take a left click as Space, a right click as Esc. The menus read the
+driver's services directly rather than through the ported `mouse_get_status` routines, which would also write the
+part's mouse variables: the state with the option on stays the state the keys give.
+
+**Phase 2, lists and maps** (`PointerHit`, `HitArea`; each screen's rectangles from the values it draws with): the
+flight map (its 18 lines, and a city's dot within three pixels), the clue list, the car offers (the first pick cannot
+be pointed at; there is no Esc there), the equipment screen's items (click = Space: take or give back; right click =
+Esc), the copy-protection faces (click = Return; right click = Esc, which picks too).
+
+**Proof.** `MouseOptionTests`: the menus part's Practice / level / skill path by clicks and by pointing ends in the
+same hand-off block as by the keys; a right click is Esc (same block and picture); the campaign's walk (city screen,
+flight map by its list and by the city's dot, hotel, quit) ends in the same block as by the keys.
+
+**Left (planned, not in this version):**
+
+* Phase 3, the workstations: cryptography (click a letter or a text cell) and electronics (click a slot).
+* Phase 4, the real-time parts: the raid's walking and the car chase's steering (needs game design; a sub-setting).
+* Phase 5, the set-up screen (click a choice line = its digit; `PictureLayout.TextCell` is ready) and the code-name
+  field.
+* Unchanged on purpose: text entry (row 7, keyboard only), the Alt-letter toggles (row 14), the animation skips and
+  the bulletins' ticker (a key stops them; a click does not).

@@ -12,6 +12,13 @@ public interface IMouseDriver
     /// <summary>Resets the mouse: pointer hidden, in the middle of the screen, no limits.</summary>
     void Reset();
 
+    /// <summary>
+    /// Whether a mouse is there: what the reset answers (0xffff in AX for a driver with a mouse), which the original's
+    /// routine never reads. New code: the rewrite's menus ask it before they read the mouse at all, so that a game
+    /// without the mouse makes exactly the original's calls (csharp/docs/MOUSE-SUPPORT.md; D-630).
+    /// </summary>
+    bool Installed => false;
+
     /// <summary>Shows the pointer.</summary>
     void ShowCursor();
 

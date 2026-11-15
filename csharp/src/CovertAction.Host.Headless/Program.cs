@@ -12,15 +12,18 @@ namespace CovertAction.Host.Headless;
 internal static class Program
 {
     private const string Usage = """
-        CovertAction.Host.Headless [game folder] [--practice crypto|chase] [--level 0..3] [--seed n] [--keys script] [--out picture.bmp] [--saves folder]
+        CovertAction.Host.Headless [game folder] [--practice crypto|chase] [--level 0..3] [--seed n] [--keys script] [--out picture.bmp] [--saves folder] [--mouse on|off]
 
         game folder  without it, the folder named by COVERT_GAME_DIR, else the current folder
         --practice   a developer's shortcut: one practice session of the part, without the set-up and the menus;
                      without it the game starts as the player's does, with the set-up screen's title (no sound, keyboard only)
         --saves      the folder the game's saves are written to; without it the run cannot save (a check leaves no files)
+        --mouse      on: the mouse in the menus, lists and maps (the settings' input.mouse); off (the default): no mouse
 
         script   the keys to press, in order: a character is its key; {enter} {esc} {up} {down} {left} {right}
-                 {f1} {f10} {alt-q} name the others. After the last key the session is left.
+                 {f1} {f10} {alt-q} name the others; {wait} or {wait n} is a moment (n moments) without a key. The
+                 mouse (with --mouse on): {move x y} moves the pointer to a pixel of the 320x200 picture, {click x y}
+                 and {rclick x y} click the left or right button there. After the last key the session is left.
         """;
 
     private static readonly Dictionary<string, int> NamedKeys = new()
@@ -34,6 +37,7 @@ internal static class Program
         string script = "", output = "", practice = "";
         string? path = null, saves = null;
         int level = 0, seed = 0;
+        var mouse = false;
         var first = 0;
         if (args.Length > 0 && !args[0].StartsWith('-'))
         {
@@ -55,6 +59,7 @@ internal static class Program
                 case "--practice" when args[i + 1] is "crypto" or "chase": practice = args[i + 1]; break;
                 case "--out": output = args[i + 1]; break;
                 case "--saves": saves = args[i + 1]; break;
+                case "--mouse" when args[i + 1] is "on" or "off": mouse = args[i + 1] == "on"; break;
                 default:
                     Console.Error.WriteLine(Usage);
                     return 2;
@@ -63,7 +68,7 @@ internal static class Program
         var host = new HeadlessHost(Keys(script), seed);
         var folder = path is not null ? new GameFolder(path) : GameFolder.FromEnvironment() ?? new GameFolder(Environment.CurrentDirectory);
         // the set-up's answers a host without sound and without a joystick gives: no sound, keyboard only
-        var game = new Game(folder, host, saves, new GameOptions(SoundLetter: 'N', Joystick: false));
+        var game = new Game(folder, host, saves, new GameOptions(SoundLetter: 'N', Joystick: false, Mouse: mouse));
         if (practice == "")
         {
             game.Main();
@@ -99,6 +104,17 @@ internal static class Program
             if (wait.Success)
             {
                 keys.AddRange(Enumerable.Repeat(HeadlessHost.NoKeyYet, wait.Groups[1].Success ? int.Parse(wait.Groups[1].Value) : 1));
+                i = close;
+            }
+            else if (System.Text.RegularExpressions.Regex.Match(name, @"^(move|click|rclick) (\d+) (\d+)$") is { Success: true } pointer)
+            {
+                var (x, y) = (int.Parse(pointer.Groups[2].Value), int.Parse(pointer.Groups[3].Value));
+                keys.AddRange(pointer.Groups[1].Value switch
+                {
+                    "move" => [HeadlessHost.PointerMove(x, y)],
+                    "click" => HeadlessHost.Click(x, y),
+                    _ => HeadlessHost.Click(x, y, button: 1),
+                });
                 i = close;
             }
             else if (close > i && NamedKeys.TryGetValue(name, out var named))

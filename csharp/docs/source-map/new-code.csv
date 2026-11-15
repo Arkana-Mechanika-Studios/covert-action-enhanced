@@ -19,6 +19,12 @@ CovertAction.Core.Graphics.ImageRegister.For,the image a stored word stands for 
 CovertAction.Core.Graphics.ImageRegister.NameOf,the word of an image (needed where a state is written as the original's bytes)
 CovertAction.Core.Graphics.ImageRegister.Set,gives a word its image (oracle tests that read images from the original's memory)
 CovertAction.Presentation.Library.LibraryPictures.ReadToEnd,"reads a file to its end for the loaders that decode at once (D-12, D-13); the original reads through a 512-byte buffer"
+CovertAction.Presentation.Library.LibraryInput.BeginPointer,"the mouse in the menus and lists, a player option (D-630, csharp/docs/MOUSE-SUPPORT.md): forgets earlier clicks when a menu starts waiting; the original's menus never read the mouse"
+CovertAction.Presentation.Library.LibraryInput.ReadPointer,"the mouse in the menus and lists, a player option (D-630): a move, click or right click read through the mouse driver's services and a menu's hit test"
+CovertAction.Presentation.Library.LibraryInput.ReadPointerKey,"the mouse in the ""press a key"" waits, a player option (D-633): a click stands for a key"
+CovertAction.Presentation.Library.HitArea.Contains,"the mouse's hit test, a player option (D-630): whether a pixel lies in a choice's rectangle"
+CovertAction.Presentation.Library.PointerHit.Area,"the mouse's hit test, a player option (D-630): which of a screen's rectangles (from the values its drawing uses) holds a pixel"
+CovertAction.Presentation.Library.PointerHit.Row,"the mouse's hit test, a player option (D-630): which row of a list holds a pixel"
 CovertAction.Presentation.Library.TextStream.ScanWord,"the C library's fscanf for the format %32s; the routine's coordinates are claimed by ScanLine, its other format (one original routine, one C# method per format the game reads with)"
 CovertAction.Presentation.Game.CampaignSaves.SaveScreens,"builds the library's save screens on the campaign's own load and save routines (the original has the screens' calls to load_game and save_to_named_file written into its copies of them)"
 CovertAction.Core.Shared.TextBufferTable.Add,"an operation of the list the library's text routines take the placeholder values through (the original's table of pointers to fixed buffers; adding and removing are not supported)"
