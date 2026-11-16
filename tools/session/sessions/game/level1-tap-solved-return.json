@@ -1,0 +1,11 @@
+{
+  "part": "GAME",
+  "start": "campaign-v1",
+  "handoff_from": {
+    "recording": "BUG/level1-tap-solved"
+  },
+  "note": "Back from BUG/level1-tap-solved (every phone cut off, 30 per cent tapped, code 0) in the level-1 case: the Rev. Guards hideout, Place wiretap again: \"The guards are unsuspecting. You will have 9 minutes.\", the hand-off to the electronics part (code 4, the tapped share 30).",
+  "handoff": {},
+  "unix_time": 657970001,
+  "keys": "{wait 5}{enter}{wait 12}{enter}{wait 12}{enter}{wait 12}{enter}{wait 12}"
+}

@@ -109,7 +109,7 @@ data), and [cut content](docs/cut-content.md) found in the original's code and d
 * Player options beyond the original (the mouse, arrow keys that walk in raids, music and effects on different sound
   cards) come after 1.0, which stays faithful to the original.
 * A few outcomes are proven function by function but not yet in a recorded session: a jailbreak foiled (the agent
-  winning the jailbreak raid) and a campaign wiretap solved above level 0.
+  winning the jailbreak raid).
 * The joystick is not yet tried with a real controller; how a real stick's position turns into the game's readings is
   a model ([U-12](csharp/docs/faithfulness/UNCERTAIN.md)).
 * A damaged save (cut short or the wrong size) is listed as empty instead of loading into a broken campaign

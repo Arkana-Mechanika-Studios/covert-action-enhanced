@@ -814,8 +814,7 @@ What the work found:
   Test: `BugDgroupTests.TheCodedFlagIsTheClueReportsSource`.
 * The guards' boxes at each level (unsuspecting, suspicious, nervous: nine, six and two minutes) and the building lines
   after an alarm agree.
-* Not covered: a tap solved (every phone cut off) at levels 1 to 3; the alarms ended both boards here. A level-3 board's
-  hidden chips were not planned around.
+* Not covered here: a tap solved (every phone cut off) at levels 1 to 3; the alarms ended both boards. Item 16 does it.
 
 Recording order (after items 1-9): FINAL/level1-new-case, FINAL/level3-new-case, GAME/level1-tap, GAME/level3-tap,
 BUG/level1-tap, BUG/level3-tap, GAME/level1-tap-return, GAME/level3-tap-return.
@@ -1066,6 +1065,35 @@ Recording order: GAME/save-cannot-create takes nothing from another session; GAM
 Not recorded: a full disk (above), a missing picture (the original's part ends in text mode and its launcher starts it
 again; a part session stops at the mode change, which it does not model, and the rewrite ends the play by design, D-12).
 
+### Item 16: a campaign wiretap solved, as recorded (16 November 2026)
+
+Item 10's two level-1 and level-3 boards ended on an alarm. Here the same blocks (GAME/level1-tap and GAME/level3-tap's
+Place wiretap) are played again with the board planned: every phone cut off, no alarm powered at any step. The boards are
+the ones the part builds from the same hand-off block and time of day (the board is a function of the seed). Each was read
+from the rewrite's board (a throwaway dump after `build_circuit_board`, not kept: the rewrite's board agrees with the
+original's at every checkpoint of items 6 and 10) and searched breadth-first over the circuit rules, a swap at a time
+(the carried chip against any chip that is not fixed, a hidden chip by its real type), keeping only the states with no
+alarm powered; both boards fall to four swaps. The keys then walk the cursor to each slot; each phone newly cut off opens
+its clue (a report, a message screen, a map: one or more keys, stepped through from contact sheets). GAME's return follows.
+
+| Session | Block from | What it covers | Checkpoints | End |
+|---|---|---|---|---|
+| BUG/level1-tap-solved | GAME/level1-tap | **a campaign wiretap solved at level 1**: six phones, nine minutes; four swaps, the clue of each new phone (Libyan Emb. report, message screens); "Phone taps completed. No Alarms", Enter: hand-off to GAME (code 0, 30 per cent tapped) | 413 | exit |
+| BUG/level3-tap-solved | GAME/level3-tap | **a campaign wiretap solved at level 3**: hidden and fixed chips, five phones; four swaps (two hidden chips shown for ten ticks as taken); the clues (messages, a map); "Phone taps completed. No Alarms", hand-off to GAME (code 0, 25 per cent tapped) | 475 | exit |
+| GAME/level1-tap-solved-return | BUG/level1-tap-solved | back at the Rev. Guards hideout, Place wiretap: "The guards are unsuspecting. You will have 9 minutes." (code 4, 30 per cent tapped) | 8 | exit |
+| GAME/level3-tap-solved-return | BUG/level3-tap-solved | back at the Mercenaries agent's building, Place wiretap again (code 4, 25 per cent tapped) | 8 | exit |
+
+904 checkpoints. Every checkpoint agrees (picture, colours, hand-off block, sound requests) and so do the ends and the final
+blocks. No registered difference was met and no C# bug was found: the solved board's clue screens (the report, the
+message screens, a map), the tapped share handed back and the clock agree with the original. The original side is
+unchanged, so no earlier recording became stale.
+
+Not covered: a tap solved at level 2 as a campaign board (item 8's tap was ended by an alarm; level 2's board is the
+same code), a tap solved against the clock's last seconds.
+
+Recording order (after item 10): BUG/level1-tap-solved, BUG/level3-tap-solved, GAME/level1-tap-solved-return,
+GAME/level3-tap-solved-return.
+
 ## Summary: what the session proof covers, and what it does not
 
 Covered, against the original's own code run whole with its own drivers (103 recorded sessions after items 8, 9
@@ -1091,11 +1119,12 @@ checkpoints), with a full disk, missing files and saves that are not whole read 
 rewrite. Item 12:
 the joystick moving in a whole session (joystick-menu, 70 checkpoints), on a model of the stick's counts (U-12). Item 13:
 the jailbreak raid (code 8), reached in a level-3 case from an arrest held by evidence, and GAME before and after it
-(5 more sessions, 1532 checkpoints).
+(5 more sessions, 1532 checkpoints). Item 16: a campaign wiretap solved at levels 1 and 3, with GAME's returns (4 more
+sessions, 904 checkpoints).
 
 Not covered: the graphics drivers other than MCGA (D-600), the sound itself as heard (the chips' writes are compared,
 not the synthesised sound), a real joystick's counts (item 12 uses a model, U-12) and the mouse, a jail break foiled (item 13's raid is lost),
-a campaign tap solved above level 0, the timing of a real PC (frames are counted, not timed), and a full disk on the
+the timing of a real PC (frames are counted, not timed), and a full disk on the
 rewrite's side (item 14: the original's answer is read from its code, a model of free space would be new product code).
 A session
 proves only its own path: the rest of the game is proven function by function by the oracle, not as a whole.
