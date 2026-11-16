@@ -1,0 +1,11 @@
+{
+  "part": "TAC",
+  "start": "tacphoto-v1",
+  "handoff_from": {
+    "recording": "GAME/jailbreak-warning"
+  },
+  "note": "The jail-break raid (code 8) from GAME/jailbreak-warning won: the agent stands in the jail's cafeteria and shoots each attacker as he comes into the room (keys chosen on the original side by looking a few frames ahead for the shots that hit, as in TAC/level3-arrest); all attackers down, no guard awake: \"You have eliminated all of your enemies.\" and the hand-off to GAME (code 0, person 0: the attempt foiled).",
+  "handoff": {},
+  "unix_time": 657970000,
+  "keys": "{wait 91} {wait 45} {wait 121} {wait 17}7{wait 41}4{wait 51} {wait}7{wait 3}8{wait 3} {wait 19}7{wait 89}1{wait}5{wait 3}5{wait 3}7{wait 3}4{wait 3} {wait 5}8{wait 11} {wait 7} {wait 12}"
+}

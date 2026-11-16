@@ -1,0 +1,11 @@
+{
+  "part": "GAME",
+  "start": "campaign-v1",
+  "handoff_from": {
+    "recording": "TAC/jailbreak-foiled"
+  },
+  "note": "Back from TAC/jailbreak-foiled in entry mode 8 (CityScreens.EndJailBreak, person 0): the other branch, the attempt foiled: the raid's scene is cleared and the box says the escape was foiled; then the city screen, the airport's travel map, Stay here, the city screen again.",
+  "handoff": {},
+  "unix_time": 657980000,
+  "keys": "{wait 5}{enter}{wait 12}{enter}{wait 12}{enter}{wait 12}"
+}

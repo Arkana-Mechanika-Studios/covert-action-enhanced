@@ -280,7 +280,7 @@ regional-capture, regional-ambush, street-ambush, ambush-return; item 11: street
 regional-ambush), then those of item 6 (the practices
 practice-electronics-0, -1, -3, the BUG sessions but nervous-tap, practice-bug-return, tap-return, tap-alarm-return,
 nervous-tap), and item 13's chain after FINAL/level3-new-case (level3-arrest-breakin, level3-arrest, jailbreak-warning,
-jailbreak, jailbreak-return). The whole sessions (item 7) are recorded by their own tool, new-case-tap-save before loaded-game-raid (its
+jailbreak, jailbreak-return; item 15 after jailbreak-warning: jailbreak-foiled, jailbreak-foiled-return). The whole sessions (item 7) are recorded by their own tool, new-case-tap-save before loaded-game-raid (its
 disk holds the former's save):
 
 ```
@@ -969,8 +969,8 @@ grenades) and chose each key at the frame's first look (items 5b and 11): waypoi
 grenades by type, and shots at an awake guard with a clear line who sees the agent or stands close. A few tries of the
 plan (the grenades' order, when to shoot) got the agent out alive; the keys it played are the sessions' ordinary scripts, replayed alike on both sides.
 
-Not reached: the jail break foiled (`EndJailBreak`'s other branch: the agent wins the jail-break raid against eight
-attackers at level 4; the controller that shot the visible ones lost by frame 200, standing still by frame 570).
+Not reached here: the jail break foiled (`EndJailBreak`'s other branch; the controller that shot the visible ones lost
+by frame 200, standing still by frame 570): item 15.
 
 Recording order (after item 10's FINAL/level3-new-case): GAME/level3-arrest-breakin, TAC/level3-arrest,
 GAME/jailbreak-warning, TAC/jailbreak, GAME/jailbreak-return.
@@ -1065,6 +1065,44 @@ Recording order: GAME/save-cannot-create takes nothing from another session; GAM
 Not recorded: a full disk (above), a missing picture (the original's part ends in text mode and its launcher starts it
 again; a part session stops at the mode change, which it does not model, and the rewrite ends the play by design, D-12).
 
+
+### Item 15: the jail break foiled, as recorded (16 November 2026)
+
+The one branch left of item 13: the agent wins the jail-break raid, and GAME's `CityScreens.EndJailBreak` takes the other
+side of `shared.Person == NoOne`. Both sessions start from item 13's block (GAME/jailbreak-warning, the same one
+TAC/jailbreak was recorded on), so the jail, the attackers and the time of day are the same as in the lost raid.
+
+| Session | Block from | What it covers | Checkpoints | End |
+|---|---|---|---|---|
+| TAC/jailbreak-foiled | GAME/jailbreak-warning | **the jail-break raid won**: the fixed kit (Uzi, Kevlar vest, four fragmentation grenades), the agent in the jail's cafeteria (room 8, `Diff` 4) and the Libyan Emb. agents coming in through the one door from the corridor, one about every 32 frames; 19 keys (shots with a few steps to turn towards the next attacker), no wound; the last guard down and none awake: "You have eliminated all of your enemies." (`UpdatePlayer`'s end for the kill raid: `Rtime` > 0x40 and no guard awake, `InRoom` 0), the hand-off to GAME (code 0, person 0: not -1) | 548 | exit |
+| GAME/jailbreak-foiled-return | TAC/jailbreak-foiled | back in entry mode 8 with person 0 (`CityScreens.EndJailBreak`, the branch item 13 did not take): the scene's area cleared, the box "Escape attempt foiled!", the city screen, the airport's travel map, Stay here, the city screen again | 45 | script exhausted |
+
+593 checkpoints. Every checkpoint agrees (picture, colours, hand-off block, sound requests), and so do the ends and the final
+blocks, apart from CA-1 in the raid's final block (city 0's activity counter, 5 against 0: the original's count of awake
+guards, 0 once all are down). The original side is unchanged, so no earlier recording became stale.
+
+What the work found:
+
+* No C# bug and no new register entry: the raid's shots, hits, the attackers' arrivals and its end (`TacEndMessage`'s
+  "all enemies eliminated" branch in a kill raid), and `EndJailBreak`'s foiled branch, agreed at every checkpoint at the
+  first comparison.
+* The raid is won by killing the attackers, not by leaving the building: in a kill raid the raid is lost when an awake guard
+  is in the target room while the agent is not (`CountGuard`, so the agent stays in the room), and it ends as won
+  once the clock passes 0x40 frames and no guard is awake. The agent does not need to move from his start.
+
+How the keys were found: the lost raid's controller chose each key from the state alone and lost to the shooting. This time
+the exploration copy of the original side (kept out of the repository) could also branch: its memory and registers were
+saved at each frame's first look at the keyboard (items 5b and 11), and for each candidate key (nothing, space, F1, the
+walking keys) the next four frames were played on the original and scored (attackers down, wounds, bullets, the aim towards
+the nearest awake attacker); the best key was played for real. A shot is a draw (`aim_and_fire`: a hit below the chance in
+four), so this fires only the shots that hit: the attackers fell to 19 keys, without a wound. The keys it played are the
+session's ordinary script, replayed alike on both sides. The script holds the polls as the original took them, taken from
+the exploration run itself: a list rebuilt as two polls to a frame did not replay (the first recording of it, kept, ended
+early with the agent lost).
+
+Recording order (after item 13's TAC/jailbreak chain): TAC/jailbreak-foiled after GAME/jailbreak-warning, then
+GAME/jailbreak-foiled-return.
+
 ### Item 16: a campaign wiretap solved, as recorded (16 November 2026)
 
 Item 10's two level-1 and level-3 boards ended on an alarm. Here the same blocks (GAME/level1-tap and GAME/level3-tap's
@@ -1119,11 +1157,12 @@ checkpoints), with a full disk, missing files and saves that are not whole read 
 rewrite. Item 12:
 the joystick moving in a whole session (joystick-menu, 70 checkpoints), on a model of the stick's counts (U-12). Item 13:
 the jailbreak raid (code 8), reached in a level-3 case from an arrest held by evidence, and GAME before and after it
-(5 more sessions, 1532 checkpoints). Item 16: a campaign wiretap solved at levels 1 and 3, with GAME's returns (4 more
+(5 more sessions, 1532 checkpoints), and item 15: the same raid won, and GAME's return with the escape foiled (2 more
+sessions, 593 checkpoints). Item 16: a campaign wiretap solved at levels 1 and 3, with GAME's returns (4 more
 sessions, 904 checkpoints).
 
 Not covered: the graphics drivers other than MCGA (D-600), the sound itself as heard (the chips' writes are compared,
-not the synthesised sound), a real joystick's counts (item 12 uses a model, U-12) and the mouse, a jail break foiled (item 13's raid is lost),
+not the synthesised sound), a real joystick's counts (item 12 uses a model, U-12) and the mouse,
 the timing of a real PC (frames are counted, not timed), and a full disk on the
 rewrite's side (item 14: the original's answer is read from its code, a model of free space would be new product code).
 A session

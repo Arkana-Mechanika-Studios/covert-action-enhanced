@@ -52,7 +52,7 @@ Proven function by function by the oracle, not yet in a recorded whole session (
 - [x] The jailbreak raid (raid code 8): `docs/SESSION-PROOF.md` item 13, 5 sessions in a level-3 case (the Paymaster
   arrested with the Payoff's evidence, made Sprung by the plot, GAME's warning, the jail-break raid, GAME's return with
   the prisoner escaped), 1532 checkpoints, all agree; two C# bugs fixed in the raid (the plot object's guards, tile 63).
-  Not reached: the jail break foiled (the agent wins the raid).
+  The jail break foiled (the agent wins the raid): item 15, 2 sessions, 593 checkpoints, all agree.
 - [x] Campaign wire taps at levels 1 and 3 (level 2 is done): `docs/SESSION-PROOF.md` item 10, 8 sessions from a new
   case at each level to the tap and back to GAME, all agree; one C# bug fixed (BUG's clue report source, `coded_flag`).
 - [x] An ambush won: TAC/street-ambush-won (the five attackers shot, "You have eliminated all of your enemies.") and
