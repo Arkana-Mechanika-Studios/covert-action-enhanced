@@ -22,5 +22,15 @@ namespace CovertAction.Launcher;
 /// the host's pointer, when the host has one; off (or without a pointer), the PC has no mouse, as the original assumes
 /// (docs/faithfulness/DIVERGENCES.md D-630).
 /// </param>
+/// <param name="FixOriginalBugs">The launcher's option "Fix the original's bugs" (fixes.originalBugs): the safe group of the register's bugs is fixed (<see cref="CovertAction.Core.OriginalBehaviour.ForPlayer"/>); off by default.</param>
+/// <param name="FixCampaignBugs">The launcher's option "Also fix campaign-logic bugs" (fixes.campaignBugs): the bugs of the campaign's logic as well; off by default.</param>
 public sealed record GameOptions(char SoundLetter = 'A', bool Joystick = true, string? Mt32RomFolder = null, bool AskSetUpQuestions = false,
-    bool ArrowKeysWalk = false, char? MusicLetter = null, char? EffectsLetter = null, bool Mouse = false, string? AmigaFolder = null, bool AmigaOnlyWhereOriginal = false, bool AmigaPictures = false);
+    bool ArrowKeysWalk = false, char? MusicLetter = null, char? EffectsLetter = null, bool Mouse = false, string? AmigaFolder = null, bool AmigaOnlyWhereOriginal = false, bool AmigaPictures = false,
+    bool FixOriginalBugs = false, bool FixCampaignBugs = false)
+{
+    /// <summary>
+    /// Which of the original's bugs the game reproduces, from the two fix options: every part of the game gets this one object.
+    /// With both options off it is the release 1.0's (<see cref="CovertAction.Core.OriginalBehaviour.Player"/>).
+    /// </summary>
+    public CovertAction.Core.OriginalBehaviour Behaviour => CovertAction.Core.OriginalBehaviour.ForPlayer(FixOriginalBugs, FixCampaignBugs);
+}

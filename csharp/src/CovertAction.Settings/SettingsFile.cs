@@ -162,6 +162,7 @@ internal static class SettingsFile
                     case "startup": Section(name, value, settings, Startup); break;
                     case "input": Section(name, value, settings, Input); break;
                     case "graphics": Section(name, value, settings, Graphics); break;
+                    case "fixes": Section(name, value, settings, Fixes); break;
                     default: Unknown(name); break;
                 }
             }
@@ -276,6 +277,17 @@ internal static class SettingsFile
             switch (property.Name)
             {
                 case "amiga": settings.AmigaPictures = Boolean(key, property.Value) ?? settings.AmigaPictures; break;
+                default: Unknown(key); break;
+            }
+        }
+
+        private void Fixes(string section, JsonProperty property, GameSettings settings)
+        {
+            var key = $"{section}.{property.Name}";
+            switch (property.Name)
+            {
+                case "originalBugs": settings.FixOriginalBugs = Boolean(key, property.Value) ?? settings.FixOriginalBugs; break;
+                case "campaignBugs": settings.FixCampaignBugs = Boolean(key, property.Value) ?? settings.FixCampaignBugs; break;
                 default: Unknown(key); break;
             }
         }
@@ -427,6 +439,15 @@ internal static class SettingsFile
             // true: the mouse in the menus, lists and maps (not in the original): pointing moves the highlight, a left
             // click takes the choice, a right click is Esc. Command line: --mouse, --no-mouse.
             "mouse": false
+          },
+
+          "fixes": {
+            // true: fix the original's bugs that do not change the story (a clue text, a key left in the buffer, the
+            // name field's Delete key, the chief's comment after a capture, the Tandy driver's second pause, and
+            // others the release notes list). false: the original's bugs, as it played in 1990.
+            "originalBugs": false,
+            // true: also fix the bugs of the campaign's logic. false: as the original.
+            "campaignBugs": false
           }
         }
         """;

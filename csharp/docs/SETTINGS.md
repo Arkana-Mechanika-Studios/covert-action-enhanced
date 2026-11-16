@@ -43,6 +43,8 @@ launcher but cannot be changed there (its details say what sets it); the launche
 | `display.resolution` | | `--window WxH` | any window size, e.g. `"1280x960"`; when set it replaces `scale` |
 | `display.fullscreen` | false | `--fullscreen` | the window fills the screen (the picture keeps its shape) |
 | `display.scaling` | `"pixelart"` | `--scaling <name>` | how the 320x200 picture (and the set-up's text page) is enlarged: `pixelart` (every game pixel the same size, only the edges between them blended; SDL 3.4), `nearest` (hard pixels, some a window pixel wider than others), `smooth` (linear) |
+| `fixes.originalBugs` | false | none | fix the original's bugs, the safe group (D-650): a clue's text (CA-16), the key that skips an animation (CA-34), the chief's comment after a capture (CA-41), the Delete key of the name field (CA-43), the car chase's "enter the building" with an unknown location (CA-4), the wiretap puzzle's last count (CA-40) and the Tandy driver's second pause (CA-55). None changes the story; a campaign saved with it loads in the original. Off: the original's bugs as release 1.0 plays them (the five fixes of 1.0, CA-1, 5, 17, 26 and 27, stay on) |
+| `fixes.campaignBugs` | false | none | also fix the bugs of the campaign's logic (D-650): those that change events, scores or layouts. No fix is in this group yet |
 | `graphics.amiga` | false | none | the Amiga version's pictures (D-642, AMIGA-PICTURES.md): the faces, icons, maps, the hotel, the equipment sheet, the car chase's windscreen and 23 of the city pictures are the Amiga version's, read from your own Amiga files (`sound.amigaFiles` names their folder; the `.pix` files of the three disks), in the Amiga's colours; every picture the Amiga redrew in another layout stays the PC's. Without the files the PC's pictures show, and the launcher says so |
 | `sound.card` | `"adlib"` | `--sound <card>` | the card the game plays on, the set-up screen's sound answer (D-603): `none`, `speaker`, `tandy`, `adlib`, `mt32`. An earlier file's `"setup"` (the set-up screen asked) reads as the default, without a message |
 | `sound.mt32Roms` | `MT32_ROMS` next to the program | `--mt32-roms`; `COVERT_MT32_ROMS` | your MT-32 (or CM-32L) ROM files (found by themselves in the usual places, below); without them the AdLib driver plays instead (D-20) |
@@ -123,7 +125,7 @@ project, not affiliated with or endorsed by MicroProse or the game's rights hold
 * **Advanced**: Roland MT-32 (the ROM folder, **Change…**, found or missing with the D-20 note), Keyboard (key
   repeat), and the player options: **Arrow keys walk** (D-610), **Music on** with **Test mix** and **Effects on**
   (each "The sound card", a card of its own or the Amiga's, a line saying what plays where, D-620, D-640, D-641), **Amiga files** (the folder, **Change…**, a line saying whether the music, sound effect and picture files are found) with **Only where the Amiga had it** and **Amiga pictures** (Yes or No, D-642, AMIGA-PICTURES.md), **Mouse in the menus**
-  (`input.mouse`, with a line saying it is not in the original, D-630), and room for those planned for later (the mouse
+  (`input.mouse`, with a line saying it is not in the original, D-630), **Fix the original's bugs** and **Also campaign-logic bugs** (`fixes.originalBugs`, `fixes.campaignBugs`, D-650), and room for those planned for later (the mouse
   at the workstations, in the raid and the chase), shown as planned and not offered.
 
 Rows show `‹ value ›`: a click on ‹ or › (or ←/→) steps through the values, a click on the row or Enter/Space steps on.

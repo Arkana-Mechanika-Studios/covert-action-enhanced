@@ -31,8 +31,10 @@ namespace CovertAction.Launcher;
 /// <param name="effectsLetter">The driver of the sound effects on two cards (D-620); null: the chosen card's. Both null: one card plays all, as the original.</param>
 /// <param name="amigaFolder">The folder with the player's Amiga files, for <see cref="AmigaMusic"/> as the music's or the effects' letter (D-640, D-641); null: found beside the program or the game.</param>
 /// <param name="amigaOnlyWhereOriginal">The Amiga music and effects play only where the Amiga game had them (D-640, D-641): the music's commands 39 to 43 and the effects the Amiga has no twin for play nothing.</param>
+/// <param name="fixTandySecondPause">The Tandy driver ignores a second pause with no resume between (CA-55, the option "Fix the original's bugs").</param>
 internal sealed class SoundDriverChoice(GameFolder folder, IHost host, Action<string>? report = null, string? romFolder = null,
-    char? musicLetter = null, char? effectsLetter = null, string? amigaFolder = null, bool amigaOnlyWhereOriginal = false) : ISoundDriver
+    char? musicLetter = null, char? effectsLetter = null, string? amigaFolder = null, bool amigaOnlyWhereOriginal = false,
+    bool fixTandySecondPause = false) : ISoundDriver
 {
     private const char Ibm = 'I';
     private const string IbmDriverFile = "ISOUND.CA";
@@ -103,7 +105,7 @@ internal sealed class SoundDriverChoice(GameFolder folder, IHost host, Action<st
     private ClockedSoundDriver? Make(char letter, Action<SoundDeviceEvent>? watch) => letter switch
     {
         Ibm => IbmSoundDriver.OnSpeaker(SpeakerDriverFile.Read(folder.Read(IbmDriverFile)), host.Audio.SampleRate, host.Clock, watch),
-        Tandy => TandySoundDriver.OnChip(folder.Read(TandyDriverFileName), host.Audio.SampleRate, host.Clock, watch),
+        Tandy => TandySoundDriver.OnChip(folder.Read(TandyDriverFileName), host.Audio.SampleRate, host.Clock, watch, fixTandySecondPause),
         Adlib => OnAdlib(watch),
         Roland => OnRoland(watch),
         // DIVERGENCE: D-18 the Custom choice plays nothing.

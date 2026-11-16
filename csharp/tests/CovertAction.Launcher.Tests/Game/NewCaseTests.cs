@@ -3,6 +3,7 @@ using CovertAction.Core;
 using CovertAction.Core.Final;
 using CovertAction.Core.Shared;
 using CovertAction.Host.Headless;
+using CovertAction.Persistence;
 using CovertAction.Persistence.Dgroup;
 using CovertAction.Platform;
 using CovertAction.Presentation;
@@ -38,7 +39,7 @@ public sealed class NewCaseTests
     /// The hand-off block the menus part leaves for a new case: a case of the first plot laid out in WORLD0.DTA as the
     /// menus part lays out a new one (without its briefing's boxes), nothing done in it yet, and "entered" 0.
     /// </summary>
-    private static SharedState FreshCase(GameFolder folder, short level)
+    private static SharedState FreshCase(GameFolder folder, short level, short? crimeFile = null)
     {
         const short firstPlot = 1, europe = 0, startCity = 1, cia = 1;
         var state = new FinalState();
@@ -53,7 +54,7 @@ public sealed class NewCaseTests
         career.Type = firstPlot;
         career.World = europe;
         career.Index = 0;
-        career.Crime = state.Plots[firstPlot].CrimeFile[0];
+        career.Crime = crimeFile ?? state.Plots[firstPlot].CrimeFile[0];
         // the MasterMind: the first organisation (from the fourth on) that has one and that the plot allows
         career.BigOrg = (short)Enumerable.Range(4, 12).First(org => state.Org[org].Clues != -1 && (state.Org[org].Clues & state.Plots[firstPlot].OrgMask) != 0);
         career.BigLoc = 0;
@@ -99,5 +100,32 @@ public sealed class NewCaseTests
         // the briefing is over (the part marked the case entered) and the keys then took the agent through the city screens
         Assert.Equal(1, shared.Entered);
     }
-}
 
+    /// <summary>
+    /// CA-6 (docs/original-bugs.md): the case tables of the hardest level outrun the original's 12000-byte hand-off block
+    /// for the two crimes with the most cast and events. The rewrite hands its parts a typed state, not the block, so the
+    /// game itself is not touched: the case is laid out, the part runs, and the saved campaign is written and read back.
+    /// </summary>
+    [SkippableTheory]
+    [InlineData(3)]
+    [InlineData(8)]
+    public void Ca6AHardestLevelCaseOfTheLargestCrimesOutrunsTheOriginalsBlockButTheGameDoesNotBreak(short crime)
+    {
+        var folder = GameFiles();
+        var shared = FreshCase(folder, 3, crime);
+        // the tables the original keeps from byte 0x400 of the block, which has 12000 bytes
+        var needed = CampaignTablesCodec.Size(shared.Campaign.Cast.Count, shared.Campaign.Events.Count);
+        Assert.True(needed > SharedState.Size - SharedState.TablesOffset, $"{shared.Campaign.Cast.Count} cast and {shared.Campaign.Events.Count} events need {needed} bytes of the {SharedState.Size - SharedState.TablesOffset} the block has after its text");
+        // the byte codec of the tests (the original's block as bytes) says so, and says it plainly
+        Assert.ThrowsAny<Exception>(() => SharedBlockCodec.StoreCampaign(shared, new byte[SharedState.Size]));
+
+        var keys = Enumerable.Repeat(new[] { HeadlessHost.NoKeyYet, HostKeys.Enter }, 200).SelectMany(pair => pair);
+        new Game(folder, new HeadlessHost(keys, unixSeconds: 600_000_000)).RunPart(shared);
+
+        // a saved campaign is as long as its tables are, and reads back whole
+        var file = SaveFileCodec.Write(shared);
+        var read = new SharedState();
+        SaveFileCodec.Load(file, read);
+        Assert.Equal((shared.Campaign.Cast.Count, shared.Campaign.Events.Count), (read.Campaign.Cast.Count, read.Campaign.Events.Count));
+    }
+}

@@ -284,8 +284,12 @@ public sealed partial class Headquarters
             if (key == delete)
             {
                 // C: the character that moves under the cursor is blanked too: Delete takes out two characters
+                // BUG: CA-43 (OriginalBehaviour.FixNameFieldDelete)
                 PutText(text, cursor, CopyOfText(text, cursor + 1));
-                text[cursor] = ' ';
+                if (!_behaviour.FixNameFieldDelete)
+                {
+                    text[cursor] = ' ';
+                }
                 text[width - 1] = ' ';
                 text.Truncate(width);
             }

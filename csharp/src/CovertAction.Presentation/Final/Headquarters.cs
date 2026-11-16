@@ -37,7 +37,7 @@ public sealed partial class Headquarters
         Output = new LibraryOutput(state, world);
         Input = new LibraryInput(state, world);
         Pictures = new LibraryPictures(world);
-        Animation = new LibraryAnimation(state, state.Pan, world, Output, Input, Pictures);
+        Animation = new LibraryAnimation(state, state.Pan, world, Output, Input, Pictures, behaviour);
         // FINAL's copy of the message box runs the animation beside it through the animation player
         Menus = new LibraryMenus(state, shared, world, Output, Input, player: Animation);
         Text = new LibraryText(state, state, world, Output, state.Random, behaviour);

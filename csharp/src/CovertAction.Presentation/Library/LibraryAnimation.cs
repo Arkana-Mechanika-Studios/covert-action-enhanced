@@ -1,4 +1,5 @@
 using CovertAction.Content;
+using CovertAction.Core;
 using CovertAction.Core.Animation;
 using CovertAction.Core.Shared;
 using CovertAction.Msc;
@@ -30,8 +31,11 @@ namespace CovertAction.Presentation.Library;
 /// <param name="output">The part's sound and frame-wait routines.</param>
 /// <param name="input">The part's key and joystick routines.</param>
 /// <param name="pictures">The part's picture files (an animation file is opened like a picture).</param>
-public sealed class LibraryAnimation(ILibraryState state, PanEngineState pan, Boundaries world, LibraryOutput output, LibraryInput input, LibraryPictures pictures)
+/// <param name="behaviourOrNull">Which of the original's bugs to reproduce; the original's own when left out.</param>
+public sealed class LibraryAnimation(ILibraryState state, PanEngineState pan, Boundaries world, LibraryOutput output, LibraryInput input, LibraryPictures pictures, OriginalBehaviour? behaviourOrNull = null)
 {
+    private readonly OriginalBehaviour behaviour = behaviourOrNull ?? OriginalBehaviour.Faithful;
+
     private const int ScreenWidth = 320;
     private const int ScreenHeight = 200;
 
@@ -99,7 +103,11 @@ public sealed class LibraryAnimation(ILibraryState state, PanEngineState pan, Bo
         }
         // BUG: CA-34 the original means to take the key out of the buffer here, but tests the address of the routine
         // no_key_waiting instead of calling it; an address is never 0, so the key is never read and stays for
-        // whoever reads keys next.
+        // whoever reads keys next (OriginalBehaviour.FixAnimationSkipKeyLeftInBuffer).
+        if (behaviour.FixAnimationSkipKeyLeftInBuffer && !world.Input.NoKeyWaiting())
+        {
+            input.ReadKey();
+        }
         if (pan.IgnoreSkip != 0)
         {
             pan.IgnoreSkip = 0;

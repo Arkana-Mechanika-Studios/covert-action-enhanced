@@ -299,11 +299,12 @@ public static class ChaseRules
     /// <param name="shared">The hand-off block; its <see cref="SharedState.OrgOut"/> is set on success.</param>
     /// <param name="x">World x of the car.</param>
     /// <param name="y">World y of the car.</param>
+    /// <param name="behaviour">Which of the original's bugs to reproduce; the original's own when left out.</param>
     /// <returns>Whether a location was reached.</returns>
-    /// <exception cref="UninitialisedReadException">Location 1 is unknown: the original then tests a distance it never computed.</exception>
+    /// <exception cref="UninitialisedReadException">Location 1 is unknown: the original then tests a distance it never computed (not with <see cref="OriginalBehaviour.FixChaseEntryAtUnknownLocation"/>).</exception>
     // orig: CHASE 00df:3190 check_location_entry (src/c/chase/chase_00df_3190.c) matched; tests: ChaseRulesTests, ChaseOracleTests
-    // BUG: CA-4 the distance of an unknown location is the previous location's (for location 1, stack garbage).
-    public static bool CheckLocationEntry(ChaseState state, SharedState shared, int x, int y)
+    // BUG: CA-4 the distance of an unknown location is the previous location's (for location 1, stack garbage). OriginalBehaviour.FixChaseEntryAtUnknownLocation
+    public static bool CheckLocationEntry(ChaseState state, SharedState shared, int x, int y, OriginalBehaviour? behaviour = null)
     {
         int? distance = null;
         for (var location = 1; location < ChaseState.Locations; location++)
@@ -311,6 +312,11 @@ public static class ChaseRules
             if ((state.Ct[state.InCity].OrgClues & 1 << location) != 0)
             {
                 distance = C16.Int(C16.Abs(C16.Int(x - state.LocX[location])) + C16.Abs(C16.Int(y - state.LocY[location])));
+            }
+            else if (behaviour?.FixChaseEntryAtUnknownLocation == true)
+            {
+                // fixed: a location the player does not know is not reached
+                continue;
             }
             if ((distance ?? throw new UninitialisedReadException("check_location_entry's distance, location 1 being unknown")) <= EntryDistance)
             {

@@ -114,6 +114,8 @@ internal sealed class LauncherScreen
         KeyRepeat,
         ArrowKeysWalk,
         Mouse,
+        FixOriginalBugs,
+        FixCampaignBugs,
         TabGeneral,
         TabAdvanced,
         Save,
@@ -161,12 +163,12 @@ internal sealed class LauncherScreen
     /// <summary>A sound test is playing: the launcher draws again now and then to show its status.</summary>
     public bool Animating => _context.SoundTest is { Playing: true };
 
-    private bool OnAdvanced(Item item) => item is Item.Roms or Item.RomsChange or Item.AmigaFiles or Item.AmigaChange or Item.AmigaOriginalOnly or Item.AmigaPictures or Item.KeyRepeat or Item.ArrowKeysWalk or Item.Music or Item.MixTest or Item.Effects or Item.Mouse;
+    private bool OnAdvanced(Item item) => item is Item.Roms or Item.RomsChange or Item.AmigaFiles or Item.AmigaChange or Item.AmigaOriginalOnly or Item.AmigaPictures or Item.KeyRepeat or Item.ArrowKeysWalk or Item.Music or Item.MixTest or Item.Effects or Item.Mouse or Item.FixOriginalBugs or Item.FixCampaignBugs;
 
     // Tab and the arrows go through General's rows, then Advanced's (its tab opens), then the buttons
     private IEnumerable<Item> Order =>
         new[] { Item.GameFolder, Item.GameChange, Item.Window, Item.Fullscreen, Item.Scaling, Item.Sound, Item.Test, Item.Controls, Item.Saves, Item.SavesChange,
-            Item.Roms, Item.RomsChange, Item.AmigaFiles, Item.AmigaChange, Item.AmigaOriginalOnly, Item.AmigaPictures, Item.KeyRepeat, Item.ArrowKeysWalk, Item.Music, Item.MixTest, Item.Effects, Item.Mouse, Item.Save, Item.Play }
+            Item.Roms, Item.RomsChange, Item.AmigaFiles, Item.AmigaChange, Item.AmigaOriginalOnly, Item.AmigaPictures, Item.KeyRepeat, Item.ArrowKeysWalk, Item.Music, Item.MixTest, Item.Effects, Item.Mouse, Item.FixOriginalBugs, Item.FixCampaignBugs, Item.Save, Item.Play }
             .Where(i => i is not (Item.Test or Item.MixTest) || _context.SoundTest is not null);
 
     /// <summary>Handles one input; returns the player's choice when the launcher should end.</summary>
@@ -222,7 +224,7 @@ internal sealed class LauncherScreen
 
     private static bool IsButton(Item item) => item is Item.GameChange or Item.SavesChange or Item.RomsChange or Item.AmigaChange or Item.Test or Item.MixTest or Item.Save or Item.Play;
 
-    private static bool IsSelect(Item item) => item is Item.Window or Item.Fullscreen or Item.Scaling or Item.Sound or Item.Controls or Item.AmigaOriginalOnly or Item.AmigaPictures or Item.KeyRepeat or Item.ArrowKeysWalk or Item.Music or Item.Effects or Item.Mouse;
+    private static bool IsSelect(Item item) => item is Item.Window or Item.Fullscreen or Item.Scaling or Item.Sound or Item.Controls or Item.AmigaOriginalOnly or Item.AmigaPictures or Item.KeyRepeat or Item.ArrowKeysWalk or Item.Music or Item.Effects or Item.Mouse or Item.FixOriginalBugs or Item.FixCampaignBugs;
 
     private LauncherChoice? Key(KeyPressed key)
     {
@@ -299,6 +301,8 @@ internal sealed class LauncherScreen
         Item.Music => "sound.music",
         Item.Effects => "sound.effects",
         Item.Mouse => "input.mouse",
+        Item.FixOriginalBugs => "fixes.originalBugs",
+        Item.FixCampaignBugs => "fixes.campaignBugs",
         _ => null,
     };
 
@@ -394,6 +398,12 @@ internal sealed class LauncherScreen
                 break;
             case Item.Mouse:
                 _model.Mouse = !_model.Mouse;
+                break;
+            case Item.FixOriginalBugs:
+                _model.FixOriginalBugs = !_model.FixOriginalBugs;
+                break;
+            case Item.FixCampaignBugs:
+                _model.FixCampaignBugs = !_model.FixCampaignBugs;
                 break;
             case Item.Test when _context.SoundTest is { Playing: true } playing:
                 playing.Stop();
@@ -865,16 +875,16 @@ internal sealed class LauncherScreen
             y = Status(y, AmigaStatusLine());
             y = Select(y, "Only where the Amiga had it", _model.AmigaOriginalOnly ? "Yes" : "No", Item.AmigaOriginalOnly);
             y = Select(y, "Amiga pictures", _model.AmigaPictures ? "Yes" : "No", Item.AmigaPictures);
-            y = Section("Keyboard", y);
+            y = Section("Keyboard and player options", y);
             y = Select(y, "Key repeat", LauncherModel.Label(LauncherModel.KeyRepeats, _model.KeyRepeat), Item.KeyRepeat);
-            y = Section("Player options", y);
             y = Select(y, "Arrow keys walk", _model.ArrowKeysWalk ? "Yes" : "No", Item.ArrowKeysWalk);
             var mixTest = _context.SoundTest is { } mixSound ? (mixSound.Playing ? "Stop" : "Test mix") : null;
             y = Select(y, "Music on", LauncherModel.Label(LauncherModel.MusicChoices, _model.MusicCard), Item.Music, mixTest, Item.MixTest);
             y = Select(y, "Effects on", LauncherModel.Label(LauncherModel.EffectsChoices, _model.EffectsCard), Item.Effects);
             y = Status(y, MixStatus());
             y = Select(y, "Mouse in the menus", _model.Mouse ? "Yes" : "No", Item.Mouse);
-            y = Status(y, ("Not in the original: point and click to choose, right click is Esc.", Note));
+            y = Select(y, "Fix the original's bugs", _model.FixOriginalBugs ? "Yes" : "No", Item.FixOriginalBugs);
+            y = Select(y, "Also campaign-logic bugs", _model.FixCampaignBugs ? "Yes" : "No", Item.FixCampaignBugs);
         }
 
         // the foot: Play at the right, Save and quit at the left
@@ -1097,6 +1107,8 @@ internal sealed class LauncherScreen
             Item.MixTest => "Plays the theme on the music's card and a shot, the Uzi and a door on the effects' card, for a few seconds, through your game's own sound drivers.",
             Item.AmigaPictures => "Not in the original (D-642). Yes: the Amiga version's faces, icons, maps, hotel and most city pictures, in the Amiga's colours, read from your own Amiga files (the .pix files; none come with the program); pictures the Amiga redrew stay the PC's. No (the default): the PC's pictures, also when the files are missing." + fixedNote,
             Item.Mouse => "Not in the original. Yes: the mouse works in the menus, the lists and on the flight map: point at a choice to highlight it, left click to take it, right click for Esc; a click also answers \"press a key\". The keys work as before. No: no mouse, as the original (the default)." + fixedNote,
+            Item.FixOriginalBugs => "Not in the original. Yes: the original's bugs that do not change the story are fixed (a clue's text, a key left in the buffer, the Delete key of the name field, the chief's comment after a capture, the Tandy driver's second pause, and others the release notes list). A game saved this way loads in the original. No (the default): the original as it was played in 1990." + fixedNote,
+            Item.FixCampaignBugs => "Not in the original. Yes: also the bugs of the campaign's logic are fixed; this changes the story's events. No (the default): as the original." + fixedNote,
             Item.TabGeneral or Item.TabAdvanced => "General: the game, the display, the sound card, the controls and the saves. Advanced: the MT-32 ROMs, the Amiga files, the keyboard and the player options (not in the original, all off by default). Ctrl+Tab goes to the other tab.",
             Item.Save => _context.SettingsPath is { } path ? $"Saves the settings into {path} and closes. Esc and the window's close button save too." : "Closes (no settings file can be written here: the changes are lost).",
             Item.Play => _model.CanPlay ? "Saves the settings and starts the game." : "Choose the folder of your copy of the game first.",

@@ -270,6 +270,47 @@ public sealed class ChaseRulesTests
     }
 
     [Fact]
+    public void Ca4WithTheFixAnUnknownLocationIsNotReached()
+    {
+        // location 1 is unknown (the original reads a distance it never set; the rewrite stops with an error): fixed, it is skipped
+        var state = Chase();
+        var shared = new SharedState();
+        state.InCity = 0;
+        state.Ct[0].OrgClues = 1 << 2;
+        state.LocX[2] = 100;
+        state.LocY[2] = 100;
+        state.CampaignMode = true;
+        var fixedBugs = OriginalBehaviour.ForPlayer(true, false);
+        Assert.Throws<UninitialisedReadException>(() => ChaseRules.CheckLocationEntry(state, shared, 100, 100, OriginalBehaviour.ForPlayer(false, false)));
+        // the known location 2 is still reached from near, and not from far
+        Assert.False(ChaseRules.CheckLocationEntry(state, shared, 120, 100, fixedBugs));
+        Assert.True(ChaseRules.CheckLocationEntry(state, shared, 103, 102, fixedBugs));
+        Assert.Equal(2, state.AtLoc);
+        // no known location at all: nothing to enter
+        state.Ct[0].OrgClues = 0;
+        Assert.False(ChaseRules.CheckLocationEntry(state, shared, 100, 100, fixedBugs));
+    }
+
+    [Fact]
+    public void Ca4WithTheFixAKnownLocationIsReachedAsBefore()
+    {
+        var state = Chase();
+        var shared = new SharedState();
+        state.Ct[0].OrgClues = 1 << 1 | 1 << 4;
+        state.LocX[1] = 100;
+        state.LocY[1] = 100;
+        state.LocX[4] = 300;
+        state.LocY[4] = 400;
+        state.CampaignMode = true;
+        foreach (var behaviour in new[] { OriginalBehaviour.ForPlayer(false, false), OriginalBehaviour.ForPlayer(true, false) })
+        {
+            Assert.False(ChaseRules.CheckLocationEntry(state, shared, 300, 393, behaviour));
+            Assert.True(ChaseRules.CheckLocationEntry(state, shared, 303, 397, behaviour));
+            Assert.Equal(4, state.AtLoc);
+        }
+    }
+
+    [Fact]
     public void TheClockShowsTheLastDigitOfTheHourMinutesAndFramesAsSeconds()
     {
         var state = Chase();

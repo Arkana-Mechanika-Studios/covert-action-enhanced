@@ -29,6 +29,7 @@ public sealed class CampaignScreens
 
     private readonly CampaignState state;
     private readonly Boundaries world;
+    private readonly OriginalBehaviour behaviour;
 
     /// <summary>The part on its variables and the outside world.</summary>
     /// <param name="state">The part's variables.</param>
@@ -41,14 +42,15 @@ public sealed class CampaignScreens
         this.world = world;
         Output = new LibraryOutput(state, world);
         Input = new LibraryInput(state, world);
-        Text = new LibraryText(state, state, world, Output, state.Random, behaviour ?? OriginalBehaviour.Faithful);
+        this.behaviour = behaviour ?? OriginalBehaviour.Faithful;
+        Text = new LibraryText(state, state, world, Output, state.Random, this.behaviour);
         Screens = new LibraryScreens(state, state, world, Output, Input, Text);
         Pictures = new LibraryPictures(world);
         Clues = new ClueTexts(state, Text);
         DataFiles = new DataFileScreens(state, this);
         Messages = new CodedMessages(state, this);
         ClueLists = new ClueScreens(state, world, this);
-        Animation = new LibraryAnimation(state, state.Pan, world, Output, Input, Pictures);
+        Animation = new LibraryAnimation(state, state.Pan, world, Output, Input, Pictures, behaviour);
         // GAME's copy of the message box redraws the place and clock plate, runs the animation beside it and draws the face
         // behind it (draw_face, not the framed draw_portrait)
         // (GAME 00f7:c6ae popup_menu calls draw_face(picface, FaceX, FaceY): GAME 00f7:c6ae)
@@ -162,14 +164,25 @@ public sealed class CampaignScreens
     public void LoadProseText(TextBuffer key, int width, string replacement, int variant)
     {
         var last = key.Length - 1;
+        var tag = key.Text;
         if (key[last] == '0')
         {
             // BUG: CA-41 the tag is the caller's text in the program's data; once moved on it no longer ends in '0',
             // and every later call reads the first call's variant until the program is loaded again
-            key.Bytes[last] = (byte)(key.Bytes[last] + variant);
+            // (OriginalBehaviour.FixCaptureCommentVariant: the variant goes into a copy of the tag)
+            var moved = (byte)(key.Bytes[last] + variant);
+            if (behaviour.FixCaptureCommentVariant)
+            {
+                tag = tag[..last] + (char)moved;
+            }
+            else
+            {
+                key.Bytes[last] = moved;
+                tag = key.Text;
+            }
         }
         // the reader fills in one placeholder of the message texts, $VICTIM; the prose texts have none
-        Text.ReadClearedText(state.ProseFileName, key.Text, state.VariableNames, state.VariableValues, 1);
+        Text.ReadClearedText(state.ProseFileName, tag, state.VariableNames, state.VariableValues, 1);
         CampaignTexts.ReplaceInTextBuffer(state, state.ProseReplacementToken, replacement);
         CampaignTexts.ReplaceInTextBuffer(state, state.ProseNameToken, state.HeroName);
         CampaignTexts.ReplaceInTextBuffer(state, state.ProseCityToken, state.Ct[state.InCity].Name);

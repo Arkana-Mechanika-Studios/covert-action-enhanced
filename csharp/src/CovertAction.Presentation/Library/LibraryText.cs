@@ -68,7 +68,7 @@ public sealed class LibraryText(ILibraryState state, ILibraryTextState text, Bou
         {
             scanned = file.ScanLine(ref line);
         }
-        while (line != tag && scanned != TextStream.EndOfFile);
+        while (!IsTagLine(line, tag) && scanned != TextStream.EndOfFile);
         bool found;
         if (scanned != TextStream.EndOfFile)
         {
@@ -82,6 +82,14 @@ public sealed class LibraryText(ILibraryState state, ILibraryTextState text, Bou
         }
         file.Close();
         return found;
+    }
+
+    /// <summary>Whether a line of the file is the tag: the whole line, as the original matches it.</summary>
+    private bool IsTagLine(string line, string tag)
+    {
+        // BUG: CA-16 CLUES.TXT files one entry under "*C0904 " with a blank at the end, which the whole-line match never
+        // finds (OriginalBehaviour.FixClueTagTrailingBlank)
+        return line == tag || (behaviour.FixClueTagTrailingBlank && line.TrimEnd(' ') == tag);
     }
 
     /// <summary>Appends the notice that stands for a missing entry, and the entry's tag.</summary>

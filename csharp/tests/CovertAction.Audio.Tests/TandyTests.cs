@@ -162,4 +162,50 @@ public sealed class TandyTests
         Assert.Empty(recorder.Bytes);
         Assert.Throws<ArgumentOutOfRangeException>(() => driver.Play(-1, 0, 0));
     }
+
+    /// <summary>A tune on tone 1 plays one tick, is paused twice and resumed once: the chip bytes of the six ticks after the resume.</summary>
+    private static List<byte[]> TicksAfterTwoPauses(bool ignoreSecondPause)
+    {
+        var recorder = new Recorder();
+        var driver = new TandySoundDriver(SmallTune(), recorder, recorder) { IgnoreSecondPause = ignoreSecondPause };
+        driver.Start();
+        driver.Play(19, 0, 0);
+        driver.TimerInterrupt();
+        driver.Play(37, 0, 0);
+        driver.Play(37, 0, 0);
+        driver.Play(38, 0, 0);
+        List<byte[]> ticks = [];
+        for (var i = 0; i < 6; i++)
+        {
+            recorder.Bytes.Clear();
+            driver.TimerInterrupt();
+            ticks.Add([.. recorder.Bytes]);
+        }
+        return ticks;
+    }
+
+    [Fact]
+    public void Ca55ASecondPauseInARowLosesTheMusic()
+    {
+        // the second pause saves the silenced voices over the saved ones: the resume brings nothing back
+        Assert.All(TicksAfterTwoPauses(ignoreSecondPause: false), tick => Assert.Empty(tick));
+    }
+
+    [Fact]
+    public void Ca55WithTheFixASecondPauseIsIgnoredAndTheMusicComesBack()
+    {
+        var ticks = TicksAfterTwoPauses(ignoreSecondPause: true);
+        Assert.Contains(ticks, tick => tick.Length > 0);
+        // a single pause and resume is the same with or without the fix
+        var plain = new Recorder();
+        var driver = new TandySoundDriver(SmallTune(), plain, plain) { IgnoreSecondPause = true };
+        driver.Start();
+        driver.Play(19, 0, 0);
+        driver.TimerInterrupt();
+        driver.Play(37, 0, 0);
+        driver.Play(38, 0, 0);
+        plain.Bytes.Clear();
+        driver.TimerInterrupt();
+        Assert.Equal(ticks[0], plain.Bytes);
+    }
 }

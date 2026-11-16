@@ -31,6 +31,7 @@ public sealed partial class ElectronicsWorkbench
     private readonly ElectronicsState state;
     private readonly Boundaries world;
     private readonly SharedState shared;
+    private readonly OriginalBehaviour behaviour;
 
     /// <summary>The part on its variables, the hand-off block and the outside world.</summary>
     /// <param name="state">The part's variables.</param>
@@ -42,6 +43,7 @@ public sealed partial class ElectronicsWorkbench
         this.state = state;
         this.world = world;
         this.shared = shared;
+        this.behaviour = behaviour;
         Output = new LibraryOutput(state, world);
         Input = new LibraryInput(state, world);
         Menus = new LibraryMenus(state, shared, world, Output, Input);
@@ -251,7 +253,8 @@ public sealed partial class ElectronicsWorkbench
                 {
                     // C: the original calls bug_status_message without its argument: what it takes for "draw" is the
                     // word on top of advance_timer's stack, this loop's counter
-                    BugStatusMessage(tick != 0);
+                    // BUG: CA-40 (OriginalBehaviour.FixPuzzleTimeOutEvaluation: the evaluation always draws)
+                    BugStatusMessage(behaviour.FixPuzzleTimeOutEvaluation || tick != 0);
                 }
             }
             SelectPalette(state.TickCount & (flickerPalettes - 1));

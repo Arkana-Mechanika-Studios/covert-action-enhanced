@@ -17,6 +17,16 @@ plays exactly as 1.0 and the original.
   - **Pictures** (D-642): 32 pictures whose layout is the PC's: the faces, icons, three flight maps, the hotel, the
     raid's item icons, the car chase's windscreen and most city pictures, in the Amiga's colours. Pictures the Amiga
     redrew in another layout, those the game reads back, and the animations stay the PC's.
+- **Fix the original's bugs** (D-650, off by default; on the Advanced tab, `fixes.originalBugs`). The original's bugs that
+  do not change the story, each confirmed by a test (docs/original-bugs.md has the list and the evidence):
+  the Bagman's clue no longer reads "is information requires security clearance" (CA-16); the key that skips an
+  animation is taken out of the keyboard buffer (CA-34); the chief's comment after a capture is the one for that
+  rank, not the first capture's (CA-41); Delete in the name field takes out one character, not two (CA-43); in a car
+  chase F2 with a building you do not know yet no longer stops the game (CA-4); the wiretap puzzle's last evaluation
+  at the end of the time always draws the terminals (CA-40); the Tandy driver ignores a second pause with no resume
+  (CA-55; the game never does this). A game saved with the option on loads without it and in the original. The
+  second option, **Also fix campaign-logic bugs** (`fixes.campaignBugs`), is there for the bugs that change events,
+  scores or layouts; it fixes nothing yet.
 - **Everything of 1.1.5, 1.1 and 1.0.** The mouse in the menus and the action parts, arrow keys that walk in a raid,
   music and effects on different sound cards, and the whole faithful game.
 
@@ -34,7 +44,7 @@ Saves made with 1.0, 1.1, 1.1.5 (or with the original) load as they are.
 
 With the player options off, the same as 1.0: see its release notes (csharp/releases/1.0.0/release-notes.md) and
 csharp/docs/faithfulness/. With them on, the options above and those of 1.1 and 1.1.5 (D-610, D-620, D-630 to D-636,
-D-640 to D-642).
+D-640 to D-642, D-650).
 
 ## Known limits
 
@@ -44,4 +54,8 @@ D-640 to D-642).
 - Amiga effects: how often an effect repeats is read from the Amiga program, not heard on an Amiga; the
   cryptography workstation's effect is a probable match.
 - The mouse works everywhere but the car chase. The joystick's readings of a real stick are still a model (U-12).
+- The bug fixes: with "Fix the original's bugs" off the game keeps the original's bugs, also the car chase stop of CA-4
+  (the original reads a leftover value there; the rewrite stops with an error). The campaign-logic option fixes nothing
+  yet. CA-6 (the original's 12000-byte hand-off block is too small for two crimes at the hardest level) does not occur
+  in this game, which does not keep that block; what the original does there was not tested.
 - Windows only (64-bit).

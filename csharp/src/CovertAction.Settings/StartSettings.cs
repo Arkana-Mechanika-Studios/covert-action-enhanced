@@ -65,6 +65,12 @@ internal sealed record StartSettings
     /// <summary>The mouse in the menus, lists and maps (input.mouse; off by default, as the original has none).</summary>
     public bool Mouse { get; init; }
 
+    /// <summary>Fix the original's bugs, the safe group (fixes.originalBugs; off by default).</summary>
+    public bool FixOriginalBugs { get; init; }
+
+    /// <summary>Also fix the campaign-logic bugs (fixes.campaignBugs; off by default).</summary>
+    public bool FixCampaignBugs { get; init; }
+
     /// <summary>The Amiga version's pictures in place of the PC's where it has the same one (graphics.amiga, D-642; off by default).</summary>
     public bool AmigaPictures { get; init; }
 
@@ -149,6 +155,8 @@ internal sealed record StartSettings
             AmigaOriginalOnly = file.AmigaOriginalOnly ?? false,
             AmigaPictures = file.AmigaPictures ?? false,
             Mouse = mouse,
+            FixOriginalBugs = file.FixOriginalBugs ?? false,
+            FixCampaignBugs = file.FixCampaignBugs ?? false,
             FixedKeys = fixedKeys,
         };
     }

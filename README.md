@@ -99,6 +99,12 @@ Not in the original, each off by default, on the launcher's Advanced tab ([the s
 * **The Amiga version's pictures** ([D-642](csharp/docs/faithfulness/DIVERGENCES.md), [the list](csharp/docs/AMIGA-PICTURES.md)):
   the faces, icons, maps, the hotel and most city pictures of the Amiga version, in its colours, read from the Amiga picture
   files you own; a picture the Amiga redrew in another layout stays the PC's.
+* **Fix the original's bugs** ([D-650](csharp/docs/faithfulness/DIVERGENCES.md), [the register](docs/original-bugs.md)): the
+  original's bugs that do not change the story are fixed: a clue that read "is information requires security clearance",
+  the key that skips an animation staying in the keyboard buffer, the chief's comment after every capture being the
+  first one's, the Delete key of the name field taking out two characters, a car chase that stops when you press F2 with
+  a building not yet known. A second option, **Also fix campaign-logic bugs**, is for the bugs that change the story;
+  it has none yet. With both off the game is the original, bug for bug.
 
 ## How it is made faithful
 

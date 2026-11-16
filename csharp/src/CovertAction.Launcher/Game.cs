@@ -86,6 +86,9 @@ public sealed class Game
     private readonly GameFolderFiles _files;
     private readonly SoundDriverChoice _sound;
     private readonly GameOptions _options;
+
+    /// <summary>The original's bugs the game reproduces or fixes: chosen by the two fix options, the same for every part.</summary>
+    private readonly OriginalBehaviour _behaviour;
     private readonly KeyboardDriver _keyboard;
 
     /// <summary>Sets the game up: reads the fonts and colours from the player's files and puts the drivers on the host.</summary>
@@ -109,6 +112,7 @@ public sealed class Game
     public Game(GameFolder folder, IHost host, string? savesFolder, GameOptions options)
     {
         _options = options;
+        _behaviour = options.Behaviour;
         _folder = folder;
         var fonts = new FontSet(folder.Read(FontFile));
         var driverFile = McgaDriverFile.Read(folder.Read(GraphicsDriverFile));
@@ -117,7 +121,7 @@ public sealed class Game
         // the slow routines of the graphics code (the dissolve) show their progress frame by frame
         Graphics.FrameShown = link.WaitForFrame;
         _sound = new SoundDriverChoice(folder, host, romFolder: options.Mt32RomFolder, musicLetter: options.MusicLetter, effectsLetter: options.EffectsLetter,
-            amigaFolder: options.AmigaFolder, amigaOnlyWhereOriginal: options.AmigaOnlyWhereOriginal);
+            amigaFolder: options.AmigaFolder, amigaOnlyWhereOriginal: options.AmigaOnlyWhereOriginal, fixTandySecondPause: options.FixOriginalBugs);
         _files = new GameFolderFiles(folder, savesFolder);
         // DIVERGENCE: D-642 a player's option: the Amiga version's pictures, read from the player's own Amiga files, in place of the PC's where the layouts agree.
         var pictures = AmigaPictures = options.AmigaPictures ? AmigaPictureSource.Open(Graphics.PictureColours, options.AmigaFolder, folder.Path) : null;
@@ -353,7 +357,7 @@ public sealed class Game
         state.GMode = (sbyte)McgaLetter;
         state.Diff = (short)level;
         state.TheSeed = LibraryRandom.SeedRandom(state.Random, _world.Timer);
-        new Headquarters(state, shared, _world, OriginalBehaviour.Player).StartPracticeModule((int)skill);
+        new Headquarters(state, shared, _world, _behaviour).StartPracticeModule((int)skill);
         RunPart(shared);
         return shared;
     }
@@ -370,7 +374,7 @@ public sealed class Game
         _keyboard.ArrowKeysWalk = _options.ArrowKeysWalk;
         try
         {
-            new BuildingRaid(state, shared, _world, OriginalBehaviour.Player).TacInit();
+            new BuildingRaid(state, shared, _world, _behaviour).TacInit();
         }
         catch (ProgramExitException e) when (e.Code == 0)
         {
@@ -393,7 +397,7 @@ public sealed class Game
         BugDgroup.Layout.Load(Executable.Read(_folder.Read(ElectronicsProgram)).DataSegment(), state);
         try
         {
-            new ElectronicsWorkbench(state, shared, _world, OriginalBehaviour.Player).BugInit();
+            new ElectronicsWorkbench(state, shared, _world, _behaviour).BugInit();
         }
         catch (ProgramExitException e) when (e.Code == 0)
         {
@@ -407,7 +411,7 @@ public sealed class Game
 
     /// <summary>
     /// Runs the car chase once with a hand-off block. Like every part it starts from the values its program has on
-    /// disk (the player's CHASE.EXE); the original's bugs are fixed as for a player (<see cref="OriginalBehaviour.Player"/>).
+    /// disk (the player's CHASE.EXE); the original's bugs are handled as the fix options say (<see cref="OriginalBehaviour.ForPlayer"/>).
     /// </summary>
     private void PlayChase(SharedState shared)
     {
@@ -415,7 +419,7 @@ public sealed class Game
         ChaseDgroup.Layout.Load(Executable.Read(_folder.Read(ChaseProgram)).DataSegment(), state);
         try
         {
-            new CarChase(state, shared, _world, OriginalBehaviour.Player).Main();
+            new CarChase(state, shared, _world, _behaviour).Main();
         }
         catch (ProgramExitException e) when (e.Code == 0)
         {
@@ -436,7 +440,7 @@ public sealed class Game
         var state = LoadMenus();
         try
         {
-            new Headquarters(state, shared, _world, OriginalBehaviour.Player).TitleStartup();
+            new Headquarters(state, shared, _world, _behaviour).TitleStartup();
         }
         catch (ProgramExitException e) when (e.Code == 0)
         {
@@ -476,8 +480,8 @@ public sealed class Game
     /// <summary>
     /// Runs the campaign part once with a hand-off block (a new case is briefed first): the agent's walk between the cities until he chooses a
     /// mission or leaves the game; the block then holds the campaign and the part to run next. Like every part it
-    /// starts from the values its program has on disk (the player's GAME.EXE); the original's bugs are fixed as for a
-    /// player (<see cref="OriginalBehaviour.Player"/>).
+    /// starts from the values its program has on disk (the player's GAME.EXE); the original's bugs are handled as the fix options say
+    /// (<see cref="OriginalBehaviour.ForPlayer"/>).
     /// </summary>
     private void PlayCampaign(SharedState shared)
     {
@@ -485,7 +489,7 @@ public sealed class Game
         GameDgroup.Layout.Load(Executable.Read(_folder.Read(CampaignProgram)).DataSegment(), state);
         try
         {
-            new CampaignPart(state, shared, _world, OriginalBehaviour.Player).GameMain();
+            new CampaignPart(state, shared, _world, _behaviour).GameMain();
         }
         catch (ProgramExitException e) when (e.Code == 0)
         {

@@ -93,6 +93,12 @@ internal sealed class GameSettings
     /// <summary>The game's pictures are replaced, where the Amiga version has the same one, by the Amiga version's, from the player's own Amiga files (graphics.amiga, D-642; off by default).</summary>
     public bool? AmigaPictures { get; set; }
 
+    /// <summary>Fix the original's bugs: the safe group (fixes.originalBugs; not in the original, off by default).</summary>
+    public bool? FixOriginalBugs { get; set; }
+
+    /// <summary>Also fix the bugs of the campaign's logic (fixes.campaignBugs; not in the original, off by default).</summary>
+    public bool? FixCampaignBugs { get; set; }
+
     /// <summary>A copy (a change to it leaves this one as it is).</summary>
     public GameSettings Copy() => (GameSettings)MemberwiseClone();
 

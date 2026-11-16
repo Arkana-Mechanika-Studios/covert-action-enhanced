@@ -65,6 +65,9 @@ internal sealed class LauncherModel
     /// <summary>The mouse option as the launcher opened.</summary>
     private readonly bool _initialMouse;
 
+    /// <summary>The two bug-fix options as the launcher opened.</summary>
+    private readonly (bool Original, bool Campaign) _initialFixes;
+
     /// <summary>The folder shown at the start without the player choosing it (given at the start or found), or null.</summary>
     private readonly string? _automatic;
 
@@ -95,6 +98,9 @@ internal sealed class LauncherModel
         KeyRepeat = start.SystemKeyRepeat ? "windows" : "pc";
         ArrowKeysWalk = IsFixed("input.arrowKeysWalk", out _) ? start.ArrowKeysWalk : s.ArrowKeysWalk ?? false;
         Mouse = _initialMouse = start.Mouse;
+        FixOriginalBugs = start.FixOriginalBugs;
+        FixCampaignBugs = start.FixCampaignBugs;
+        _initialFixes = (FixOriginalBugs, FixCampaignBugs);
         Found = context.FoundGameFolders();
         var fileFolder = Blank(s.GameFolder);
         // the folder the command line (or COVERT_GAME_DIR) gives is the one the game would start with: shown first
@@ -187,6 +193,12 @@ internal sealed class LauncherModel
 
     /// <summary>The mouse in the menus, lists and maps (input.mouse).</summary>
     public bool Mouse { get; set; }
+
+    /// <summary>Fix the original's bugs, the safe group (fixes.originalBugs).</summary>
+    public bool FixOriginalBugs { get; set; }
+
+    /// <summary>Also fix the campaign-logic bugs (fixes.campaignBugs).</summary>
+    public bool FixCampaignBugs { get; set; }
 
     /// <summary>The Amiga version's pictures in place of the PC's where it has the same one (graphics.amiga, D-642).</summary>
     public bool AmigaPictures { get; set; }
@@ -334,6 +346,14 @@ internal sealed class LauncherModel
         {
             changes["input.mouse"] = Mouse;
         }
+        if (FixOriginalBugs != _initialFixes.Original)
+        {
+            changes["fixes.originalBugs"] = FixOriginalBugs;
+        }
+        if (FixCampaignBugs != _initialFixes.Campaign)
+        {
+            changes["fixes.campaignBugs"] = FixCampaignBugs;
+        }
         if (AmigaPictures != _initialAmigaPictures)
         {
             changes["graphics.amiga"] = AmigaPictures;
@@ -366,6 +386,8 @@ internal sealed class LauncherModel
         s.AmigaFiles = AmigaFiles;
         s.AmigaOriginalOnly = AmigaOriginalOnly;
         s.Mouse = Mouse;
+        s.FixOriginalBugs = FixOriginalBugs;
+        s.FixCampaignBugs = FixCampaignBugs;
         s.AmigaPictures = AmigaPictures;
         return s;
     }

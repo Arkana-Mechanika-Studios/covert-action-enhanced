@@ -83,6 +83,16 @@ public sealed class TandySoundDriver : ISoundProgram
     private ushort _gunfireLevel, _gunfireIntensity, _gunfirePreviousLevel, _gunfireCount, _gunfireCountStart;
     private bool _gunfireOn, _gunfireOnKept;
 
+    /// <summary>The pause is on: no resume has come since the last pause (new code, for <see cref="IgnoreSecondPause"/>).</summary>
+    private bool _paused;
+
+    /// <summary>
+    /// CA-55: a second pause with no resume between is ignored. Off (the default): it saves the silenced voices over the
+    /// saved ones, as the original driver does, and the resume brings back no music. Set by the launcher's option "Fix
+    /// the original's bugs"; the game always resumes after a pause, so only a test can tell.
+    /// </summary>
+    public bool IgnoreSecondPause { get; init; }
+
     /// <summary>Makes the driver from a copy of the player's TSOUND.CA data segment, playing on <paramref name="chip"/>.</summary>
     /// <param name="data">The driver file's data segment (<see cref="Content.TandyDriverFile.Segment"/>), changed as the driver plays.</param>
     /// <param name="chip">The sound chip.</param>
@@ -100,13 +110,14 @@ public sealed class TandySoundDriver : ISoundProgram
     /// <param name="sampleRate">The device's frames per second.</param>
     /// <param name="clock">Real time, for a caller that waits (the Tandy driver never makes the game wait).</param>
     /// <param name="watch">Told of every byte to the chip and every rate and interrupt (for tests and tools); null: nothing is told.</param>
-    public static ClockedSoundDriver OnChip(ReadOnlySpan<byte> file, int sampleRate, CovertAction.Platform.IClock clock, Action<SoundDeviceEvent>? watch = null)
+    /// <param name="ignoreSecondPause">CA-55 fixed: see <see cref="IgnoreSecondPause"/>.</param>
+    public static ClockedSoundDriver OnChip(ReadOnlySpan<byte> file, int sampleRate, CovertAction.Platform.IClock clock, Action<SoundDeviceEvent>? watch = null, bool ignoreSecondPause = false)
     {
         var data = Content.TandyDriverFile.Segment(file);
         return new(sampleRate, clock, timer =>
         {
             var chip = new Synthesis.Sn76496Voice(sampleRate);
-            return (new TandySoundDriver(data, WatchedDevice.Chip(chip, watch), timer), chip);
+            return (new TandySoundDriver(data, WatchedDevice.Chip(chip, watch), timer) { IgnoreSecondPause = ignoreSecondPause }, chip);
         }, watch);
     }
 
@@ -274,6 +285,7 @@ public sealed class TandySoundDriver : ISoundProgram
         _seed = _noiseWritten = 0;
         (_gunfireCount, _gunfireCountStart, _gunfirePreviousLevel, _gunfireLevel, _gunfireIntensity) = (0, 0, 0, 0, 0);
         _gunfireOn = _gunfireOnKept = false;
+        _paused = false;
         SilenceChip();
     }
 
@@ -291,6 +303,12 @@ public sealed class TandySoundDriver : ISoundProgram
     // orig: TSOUND 0000:08ed pause_sound driver; tests: TandySoundOracleTests
     private void Pause()
     {
+        // BUG: CA-55 a second pause in a row saves the voices the first one silenced; IgnoreSecondPause leaves it out
+        if (IgnoreSecondPause && _paused)
+        {
+            return;
+        }
+        _paused = true;
         _gunfireOnKept = _gunfireOn;
         _gunfireOn = false;
         foreach (var voice in _voices)
@@ -301,10 +319,11 @@ public sealed class TandySoundDriver : ISoundProgram
         SilenceChip();
     }
 
-    /// <summary>The voices go on with the ticks the pause kept (a second pause in a row kept none).</summary>
+    /// <summary>The voices go on with the ticks the pause kept (a second pause in a row kept none, unless <see cref="IgnoreSecondPause"/>).</summary>
     // orig: TSOUND 0000:092a resume_sound driver; tests: TandySoundOracleTests
     private void Resume()
     {
+        _paused = false;
         _gunfireOn = _gunfireOnKept;
         foreach (var voice in _voices)
         {

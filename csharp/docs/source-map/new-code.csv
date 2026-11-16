@@ -42,3 +42,4 @@ CovertAction.Presentation.Library.LibraryInput.ReadPointerHold,"the mouse in the
 CovertAction.Presentation.Library.LibraryInput.ReadPointerRightPress,"the mouse in the building raid, a player option (D-636): whether the right button was pressed"
 CovertAction.Presentation.Library.PointerHit.Cell,"the mouse's hit test, a player option (D-634, D-635): the cell of a grid under a pixel"
 CovertAction.Presentation.Library.PointerHit.Direction8,"the mouse in the building raid, a player option (D-636): the keypad direction nearest the vector from the agent to the pointer"
+CovertAction.Core.OriginalBehaviour.ForPlayer,"the bug-fix options of the launcher (D-650): the behaviour a player gets from the two options"

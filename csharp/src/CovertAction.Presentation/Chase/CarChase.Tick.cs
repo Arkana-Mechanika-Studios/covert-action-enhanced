@@ -249,7 +249,7 @@ public sealed partial class CarChase
     /// <summary>F2: when car 0 stands at a building the player knows, the chase ends there.</summary>
     private void EnterBuilding()
     {
-        if (ChaseRules.CheckLocationEntry(_state, _shared, _state.Cars[0].X, _state.Cars[0].Y))
+        if (ChaseRules.CheckLocationEntry(_state, _shared, _state.Cars[0].X, _state.Cars[0].Y, _behaviour))
         {
             _state.DoneFlag = ChaseState.DoneNormal;
             _state.Outcome = ChaseOutcome.Lost;
