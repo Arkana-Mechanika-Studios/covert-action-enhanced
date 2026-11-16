@@ -50,7 +50,8 @@ internal static class LauncherHost
             ReleaseNotes(),
             settingsPath,
             Picture,
-            AutomaticRoms);
+            AutomaticRoms,
+            DescribeAmiga);
 
     /// <summary>The program's version (Directory.Build.props; the release script sets it).</summary>
     internal static string Version =>
@@ -92,6 +93,27 @@ internal static class LauncherHost
         var (folder, source) = RomFolderSearch.Automatic(gameFolder);
         var status = DescribeRoms(folder);
         return source is null ? status : status with { Source = source };
+    }
+
+    /// <summary>
+    /// What the Amiga files' folder holds (D-640): the folder the player chose (the folder itself, or its disk1 folder), or when
+    /// none is chosen the one <see cref="AmigaFolderSearch"/> finds beside the program or the game, else the default folder.
+    /// </summary>
+    internal static AmigaStatus DescribeAmiga(string? chosen, string? gameFolder)
+    {
+        string? source = null;
+        string folder;
+        if (string.IsNullOrWhiteSpace(chosen))
+        {
+            var found = AmigaFolderSearch.Automatic(gameFolder);
+            (folder, source) = found is { } place ? (place.Folder, place.Source) : (AmigaFolderSearch.DefaultFolder, null);
+        }
+        else
+        {
+            folder = AmigaFolderSearch.Resolve(chosen) ?? chosen;
+        }
+        var missing = AmigaFolderSearch.Missing(folder);
+        return new AmigaStatus(folder, missing.Count == 0, source, missing);
     }
 
     /// <summary>A picture of the player's game in its own colours (the graphics driver's), or null when it cannot be read.</summary>

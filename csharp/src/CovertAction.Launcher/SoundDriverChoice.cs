@@ -1,5 +1,6 @@
 using CovertAction.Audio;
 using CovertAction.Audio.Adlib;
+using CovertAction.Audio.Amiga;
 using CovertAction.Audio.Mt32;
 using CovertAction.Audio.Roland;
 using CovertAction.Audio.Speaker;
@@ -27,8 +28,10 @@ namespace CovertAction.Launcher;
 /// <param name="romFolder">The MT-32 ROMs' folder; null: COVERT_MT32_ROMS, else the folder RomFolderSearch finds (MT32_ROMS next to the program, in or by the game folder, DOSBox's ...).</param>
 /// <param name="musicLetter">The driver of the tunes when the music and the effects play on two cards (D-620); null: the chosen card's.</param>
 /// <param name="effectsLetter">The driver of the sound effects on two cards (D-620); null: the chosen card's. Both null: one card plays all, as the original.</param>
+/// <param name="amigaFolder">The folder with the player's Amiga music files, for <see cref="AmigaMusic"/> as the music's letter (D-640); null: found beside the program or the game.</param>
+/// <param name="amigaOnlyWhereOriginal">The Amiga music plays only where the Amiga game had music (D-640): the commands 39 to 43 play nothing.</param>
 internal sealed class SoundDriverChoice(GameFolder folder, IHost host, Action<string>? report = null, string? romFolder = null,
-    char? musicLetter = null, char? effectsLetter = null) : ISoundDriver
+    char? musicLetter = null, char? effectsLetter = null, string? amigaFolder = null, bool amigaOnlyWhereOriginal = false) : ISoundDriver
 {
     private const char Ibm = 'I';
     private const string IbmDriverFile = "ISOUND.CA";
@@ -37,6 +40,10 @@ internal sealed class SoundDriverChoice(GameFolder folder, IHost host, Action<st
     private const char Adlib = 'A';
     private const string AdlibDriverFile = "ASOUND.CA";
     private const char Roland = 'R';
+
+    /// <summary>The music's letter for the Amiga version's music (D-640): not a sound card of the set-up, a music driver of its own.</summary>
+    public const char AmigaMusic = 'G';
+
     private const string RolandDriverFile = "RSOUND.CA";
 
     /// <summary>The ROM folder's variable; else MT32_ROMS next to the program (Darklands: DARKLANDS_MT32_ROMS).</summary>
@@ -58,7 +65,7 @@ internal sealed class SoundDriverChoice(GameFolder folder, IHost host, Action<st
         _chosen = true;
         if (musicLetter is not null || effectsLetter is not null)
         {
-            ChooseTwo(musicLetter ?? letter, effectsLetter ?? letter);
+            ChooseTwo(musicLetter ?? letter, effectsLetter ?? letter, letter);
             return;
         }
         var driver = Make(letter, Watch);
@@ -73,10 +80,13 @@ internal sealed class SoundDriverChoice(GameFolder folder, IHost host, Action<st
     /// The tunes on the driver of one letter, the effects on the driver of another, each on a device of its own, the
     /// two mixed into the host's sound device; the game's commands go to one, the other or both by their role.
     /// </summary>
-    private void ChooseTwo(char music, char effects)
+    /// <param name="music">The letter of the music's driver; <see cref="AmigaMusic"/> for the Amiga version's music.</param>
+    /// <param name="effects">The letter of the effects' driver.</param>
+    /// <param name="card">The sound card's letter: the music plays on it when the Amiga files cannot be read.</param>
+    private void ChooseTwo(char music, char effects, char card)
     {
         // DIVERGENCE: D-620 a player's option: the music and the sound effects on two drivers at once, mixed.
-        var musicDriver = Make(music, PartWatch(SoundRole.Music));
+        ISoundDriver? musicDriver = music == AmigaMusic ? MakeAmigaMusic(card, PartWatch(SoundRole.Music)) : Make(music, PartWatch(SoundRole.Music));
         var effectsDriver = Make(effects, PartWatch(SoundRole.Effect));
         var sources = new[] { musicDriver, effectsDriver }.OfType<IPcmSource>().ToArray();
         if (sources.Length > 0)
@@ -96,6 +106,29 @@ internal sealed class SoundDriverChoice(GameFolder folder, IHost host, Action<st
         // DIVERGENCE: D-18 the Custom choice plays nothing.
         _ => null,
     };
+
+    /// <summary>
+    /// The Amiga version's music from the player's files, or, when they cannot be found or read, the sound card's driver in its
+    /// place with one line to say so (as the MT-32 without ROMs, D-20).
+    /// </summary>
+    private ISoundDriver? MakeAmigaMusic(char card, Action<SoundDeviceEvent>? watch)
+    {
+        // DIVERGENCE: D-640 a player's option: the music is the Amiga version's, played from the player's own Amiga files.
+        try
+        {
+            var found = amigaFolder is { Length: > 0 } named ? AmigaFolderSearch.Resolve(named) : AmigaFolderSearch.Automatic(folder.Path)?.Folder;
+            if (found is null)
+            {
+                throw new FileNotFoundException(amigaFolder is { Length: > 0 } ? $"{AmigaTunes.ThemeFile} is not in {amigaFolder}" : $"{AmigaTunes.ThemeFile} is not beside the program or the game");
+            }
+            return new AmigaMusicDriver(AmigaTunes.Read(found), host.Audio.SampleRate, amigaOnlyWhereOriginal);
+        }
+        catch (Exception e) when (e is IOException or InvalidDataException or UnauthorizedAccessException)
+        {
+            (report ?? Console.Error.WriteLine)($"warning: the Amiga music needs your Amiga files, but {e.Message}; the sound card's music plays instead.");
+            return card == AmigaMusic ? null : Make(card, watch);
+        }
+    }
 
     private ClockedSoundDriver OnAdlib(Action<SoundDeviceEvent>? watch) =>
         AdlibSoundDriver.OnOpl(Content.AdlibDriverFile.Read(folder.Read(AdlibDriverFile)), host.Audio.SampleRate, host.Clock, watch);

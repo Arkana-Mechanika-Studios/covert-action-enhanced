@@ -51,6 +51,9 @@ internal sealed class LauncherModel
         ("tandy", "Tandy"),
     ];
 
+    /// <summary>The choices for the music: the cards of <see cref="PartCards"/>, and the Amiga version's music from the player's own Amiga files (D-640).</summary>
+    public static readonly IReadOnlyList<(string Value, string Label)> MusicChoices = [.. PartCards, ("amiga", "Amiga (your own Amiga disks)")];
+
     private static readonly int[] WindowScales = [2, 3, 4, 5, 6];
 
     private readonly LauncherContext _context;
@@ -66,6 +69,9 @@ internal sealed class LauncherModel
 
     private string? _mt32Roms;
     private RomStatus? _roms;
+    private string? _amigaFiles;
+    private AmigaStatus? _amiga;
+    private readonly (string? Files, bool OriginalOnly) _initialAmiga;
 
     public LauncherModel(LauncherContext context, (int Width, int Height)? display)
     {
@@ -97,6 +103,9 @@ internal sealed class LauncherModel
         _initial = (fileFolder, Windows[WindowIndex], Fullscreen, Scaling, SoundCard, Controls, _mt32Roms, SavesFolder, KeyRepeat, ArrowKeysWalk);
         _automatic = GameFolder;
         (MusicCard, EffectsCard) = _initialParts = (start.MusicCard, start.EffectsCard);
+        _amigaFiles = Blank(start.AmigaFiles);
+        AmigaOriginalOnly = start.AmigaOriginalOnly;
+        _initialAmiga = (_amigaFiles, AmigaOriginalOnly);
     }
 
     private static string? Blank(string? text) => string.IsNullOrWhiteSpace(text) ? null : text;
@@ -136,7 +145,7 @@ internal sealed class LauncherModel
     /// <summary>In a building raid the grey arrow keys walk (D-610).</summary>
     public bool ArrowKeysWalk { get; set; }
 
-    /// <summary>One of <see cref="PartCards"/>' values: the card the tunes play on.</summary>
+    /// <summary>One of <see cref="MusicChoices"/>' values: the card the tunes play on, or "amiga".</summary>
     public string MusicCard { get; set; }
 
     /// <summary>One of <see cref="PartCards"/>' values: the card the sound effects play on.</summary>
@@ -144,6 +153,26 @@ internal sealed class LauncherModel
 
     /// <summary>Whether the music and the effects play on two cards (either is set to a card of its own, D-620).</summary>
     public bool Mixing => MusicCard != "card" || EffectsCard != "card";
+
+    /// <summary>The Amiga version's music is chosen for the music (D-640).</summary>
+    public bool AmigaMusic => MusicCard == "amiga";
+
+    /// <summary>The Amiga music plays only where the Amiga game had music (D-640).</summary>
+    public bool AmigaOriginalOnly { get; set; }
+
+    /// <summary>The folder with the Amiga music files, as chosen; null: found beside the program or the game.</summary>
+    public string? AmigaFiles
+    {
+        get => _amigaFiles;
+        set
+        {
+            _amigaFiles = value;
+            _amiga = null;
+        }
+    }
+
+    /// <summary>What the Amiga files' folder holds; looked at once for each folder (it reads the disk); null when the host cannot tell.</summary>
+    public AmigaStatus? Amiga => _amiga ??= _context.DescribeAmiga?.Invoke(AmigaFiles, GameFolderChecked);
 
     /// <summary>The card a part plays on: its own, else the sound card.</summary>
     public string CardOf(string part) => part == "card" ? SoundCard : part;
@@ -177,6 +206,7 @@ internal sealed class LauncherModel
         GameFolderChecked = folder is null ? null : _context.CheckGameFolder(folder);
         GameFolderSource = GameFolderChecked is null ? null : source;
         _roms = null; // the ROMs looked for around the game when no folder is chosen depend on the game folder
+        _amiga = null; // and so do the Amiga files
     }
 
     /// <summary>The next (or previous) of the folders found, after the current one.</summary>
@@ -201,7 +231,7 @@ internal sealed class LauncherModel
 
     public void CycleKeyRepeat(int step) => KeyRepeat = Step(KeyRepeats, KeyRepeat, step);
 
-    public void CycleMusicCard(int step) => MusicCard = Step(PartCards, MusicCard, step);
+    public void CycleMusicCard(int step) => MusicCard = Step(MusicChoices, MusicCard, step);
 
     public void CycleEffectsCard(int step) => EffectsCard = Step(PartCards, EffectsCard, step);
 
@@ -281,6 +311,14 @@ internal sealed class LauncherModel
         {
             changes["sound.effects"] = EffectsCard;
         }
+        if (AmigaFiles != _initialAmiga.Files)
+        {
+            changes["sound.amigaFiles"] = Written(AmigaFiles);
+        }
+        if (AmigaOriginalOnly != _initialAmiga.OriginalOnly)
+        {
+            changes["sound.amigaOriginalOnly"] = AmigaOriginalOnly;
+        }
         if (Mouse != _initialMouse)
         {
             changes["input.mouse"] = Mouse;
@@ -310,6 +348,8 @@ internal sealed class LauncherModel
         s.ArrowKeysWalk = ArrowKeysWalk;
         s.MusicCard = MusicCard;
         s.EffectsCard = EffectsCard;
+        s.AmigaFiles = AmigaFiles;
+        s.AmigaOriginalOnly = AmigaOriginalOnly;
         s.Mouse = Mouse;
         return s;
     }

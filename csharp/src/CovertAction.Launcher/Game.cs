@@ -115,7 +115,8 @@ public sealed class Game
         var link = new HostLink(Graphics, host);
         // the slow routines of the graphics code (the dissolve) show their progress frame by frame
         Graphics.FrameShown = link.WaitForFrame;
-        _sound = new SoundDriverChoice(folder, host, romFolder: options.Mt32RomFolder, musicLetter: options.MusicLetter, effectsLetter: options.EffectsLetter);
+        _sound = new SoundDriverChoice(folder, host, romFolder: options.Mt32RomFolder, musicLetter: options.MusicLetter, effectsLetter: options.EffectsLetter,
+            amigaFolder: options.AmigaFolder, amigaOnlyWhereOriginal: options.AmigaOnlyWhereOriginal);
         _files = new GameFolderFiles(folder, savesFolder);
         _world = new Boundaries(Graphics, _sound, _keyboard = new KeyboardDriver(link), MouseDriver(host, options), new GameTimer(link), _files);
         _host = host;

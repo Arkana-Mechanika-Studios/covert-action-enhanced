@@ -236,7 +236,9 @@ internal static class SettingsFile
                     break;
                 case "card": settings.SoundCard = OneOf(key, property.Value, GameSettings.SoundCards) ?? settings.SoundCard; break;
                 case "mt32Roms": settings.Mt32Roms = FilePath(key, property.Value); break;
-                case "music": settings.MusicCard = OneOf(key, property.Value, GameSettings.PartCards) ?? settings.MusicCard; break;
+                case "music": settings.MusicCard = OneOf(key, property.Value, GameSettings.MusicChoices) ?? settings.MusicCard; break;
+                case "amigaFiles": settings.AmigaFiles = FilePath(key, property.Value); break;
+                case "amigaOriginalOnly": settings.AmigaOriginalOnly = Boolean(key, property.Value) ?? settings.AmigaOriginalOnly; break;
                 case "effects": settings.EffectsCard = OneOf(key, property.Value, GameSettings.PartCards) ?? settings.EffectsCard; break;
                 default: Unknown(key); break;
             }
@@ -376,9 +378,16 @@ internal static class SettingsFile
             // Command line: --mt32-roms <folder>; environment: COVERT_MT32_ROMS.
             "mt32Roms": "",
             // Music on one card, sound effects on another, mixed: "card" (the sound card plays both, as the original),
-            // or "none", "speaker", "tandy", "adlib", "mt32" for the tunes, and for the effects (D-620).
+            // or "none", "speaker", "tandy", "adlib", "mt32" for the tunes, and for the effects (D-620). The tunes may also
+            // be "amiga": the Amiga version's music, played from your own Amiga files (D-640).
             "music": "card",
-            "effects": "card"
+            "effects": "card",
+            // The folder with your Amiga music files (thememusic.dat, finalmusic.dat, spy6music.dat; the Amiga disk 1).
+            // "": amiga/files next to the program, or next to the game. Without them the sound card's music plays.
+            "amigaFiles": "",
+            // true: the Amiga music only where the Amiga game had music (the title, the menus and FINAL); the selection
+            // screens' and the vacations' tunes stay silent. false: they play the Amiga's tunes too.
+            "amigaOriginalOnly": false
           },
 
           "input": {

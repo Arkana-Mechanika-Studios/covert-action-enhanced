@@ -40,6 +40,7 @@ internal enum LauncherReason
 /// <param name="FoundGameFolders">The game folders found in the usual places, with where each was found.</param>
 /// <param name="DescribeRoms">The ROM folder of the settings (null: the default) → what is in the folder it stands for.</param>
 /// <param name="AutomaticRoms">The game folder (or null) → the ROM folder looked for in the usual places when none is chosen, and what is in it; null: only the default folder.</param>
+/// <param name="DescribeAmiga">The Amiga files' folder of the settings (null: none chosen) and the game folder (or null) → what is in the folder it stands for, looking in the usual places when none is chosen (D-640); null: the host cannot tell.</param>
 /// <param name="DefaultSavesFolder">The saves folder used when none is set.</param>
 /// <param name="SoundTest">Plays a little of the game's music on request; null when the host cannot.</param>
 /// <param name="ReleaseNotes">The release notes shipped with the program (Markdown; its items up to "Getting started" are shown).</param>
@@ -60,7 +61,8 @@ internal sealed record LauncherContext(
     string ReleaseNotes,
     string? SettingsPath,
     Func<string, uint[]?>? Picture = null,
-    Func<string?, RomStatus>? AutomaticRoms = null);
+    Func<string?, RomStatus>? AutomaticRoms = null,
+    Func<string?, string?, AmigaStatus>? DescribeAmiga = null);
 
 /// <summary>
 /// The sound test: a little of the game's music on the chosen card. It starts in the background; while it plays the
@@ -82,9 +84,19 @@ internal interface ISoundTest
 
 /// <summary>
 /// What the sound test plays on: the sound card ("adlib", "mt32" ...), the game folder (its drivers) and the ROM folder;
-/// for the test of the mix (D-620) also the effects' card, the music then playing on <paramref name="Card"/>.
+/// for the test of the mix (D-620) also the effects' card, the music then playing on <paramref name="Card"/>. With the Amiga
+/// music (<paramref name="Card"/> "amiga", D-640) also the sound card (which plays when the Amiga files are missing), the
+/// Amiga files' folder and whether the music plays only where the Amiga had it.
 /// </summary>
-internal sealed record SoundTestRequest(string Card, string GameFolder, string? RomFolder, string? EffectsCard = null);
+internal sealed record SoundTestRequest(string Card, string GameFolder, string? RomFolder, string? EffectsCard = null,
+    string? SoundCard = null, string? AmigaFolder = null, bool AmigaOriginalOnly = false);
+
+/// <summary>The Amiga music files in a folder (D-640).</summary>
+/// <param name="Folder">The folder the files are looked in (the default one when none is set).</param>
+/// <param name="Found">All three files (thememusic.dat, finalmusic.dat, spy6music.dat) are there.</param>
+/// <param name="Source">Where the folder was found ("beside the program") when the player did not choose it; null when chosen, or the default.</param>
+/// <param name="Missing">The files the folder lacks (null or empty when it holds all).</param>
+internal sealed record AmigaStatus(string Folder, bool Found, string? Source = null, IReadOnlyList<string>? Missing = null);
 
 /// <summary>The Roland ROMs in a folder.</summary>
 /// <param name="Folder">The folder looked in (the default one when none is set).</param>

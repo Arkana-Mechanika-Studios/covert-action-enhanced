@@ -66,8 +66,20 @@ internal sealed class GameSettings
     /// <summary>The cards the music or the effects can play on: "card" (the sound card plays both, as the original), else a card of its own (D-620).</summary>
     public static readonly IReadOnlyList<string> PartCards = ["card", "none", "speaker", "tandy", "adlib", "mt32"];
 
-    /// <summary>One of <see cref="PartCards"/>: the card the tunes play on.</summary>
+    /// <summary>
+    /// The choices for the music: the cards of <see cref="PartCards"/> and "amiga", the Amiga version's music played from the
+    /// player's own Amiga files (D-640).
+    /// </summary>
+    public static readonly IReadOnlyList<string> MusicChoices = [.. PartCards, "amiga"];
+
+    /// <summary>One of <see cref="MusicChoices"/>: the card the tunes play on, or "amiga".</summary>
     public string? MusicCard { get; set; }
+
+    /// <summary>The folder with the player's Amiga music files (sound.amigaFiles); null: found beside the program or the game (D-640).</summary>
+    public string? AmigaFiles { get; set; }
+
+    /// <summary>The Amiga music plays only where the Amiga game had music (sound.amigaOriginalOnly, D-640).</summary>
+    public bool? AmigaOriginalOnly { get; set; }
 
     /// <summary>One of <see cref="PartCards"/>: the card the sound effects play on.</summary>
     public string? EffectsCard { get; set; }
@@ -78,6 +90,9 @@ internal sealed class GameSettings
     /// <summary>A copy (a change to it leaves this one as it is).</summary>
     public GameSettings Copy() => (GameSettings)MemberwiseClone();
 
+    /// <summary>The music's letter for the Amiga version's music (D-640): not a sound card of the set-up; the launcher's <c>SoundDriverChoice.AmigaMusic</c> is the same letter.</summary>
+    public const char AmigaMusicLetter = 'G';
+
     /// <summary>The sound driver's letter of a sound card (the set-up's letters: N, I, T, A, R); the AdLib's for any other.</summary>
     public static char SoundLetter(string? card) => card switch
     {
@@ -85,6 +100,7 @@ internal sealed class GameSettings
         "speaker" => 'I',
         "tandy" => 'T',
         "mt32" => 'R',
+        "amiga" => AmigaMusicLetter,
         _ => 'A',
     };
 

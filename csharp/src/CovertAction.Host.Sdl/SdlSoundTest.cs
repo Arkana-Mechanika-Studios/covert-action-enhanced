@@ -87,6 +87,7 @@ internal sealed class SdlSoundTest : ISoundTest, IDisposable
     private void PlayMix(SoundTestRequest request)
     {
         var (music, effects) = (GameSettings.SoundLetter(request.Card), GameSettings.SoundLetter(request.EffectsCard));
+        var amiga = music == GameSettings.AmigaMusicLetter;
         if (music == 'N' && effects == 'N')
         {
             Status = "Nothing to play: choose a card for the music or for the effects.";
@@ -101,7 +102,8 @@ internal sealed class SdlSoundTest : ISoundTest, IDisposable
         string? warning = null;
         try
         {
-            _mix = SoundCheck.PlayMix(new GameFolder(request.GameFolder), new TestHost(output), music, effects, request.RomFolder, message => warning = message);
+            _mix = SoundCheck.PlayMix(new GameFolder(request.GameFolder), new TestHost(output), music, effects, request.RomFolder, message => warning = message,
+                amiga ? GameSettings.SoundLetter(request.SoundCard) : null, request.AmigaFolder, request.AmigaOriginalOnly);
         }
         catch (Exception e) when (e is FileNotFoundException or InvalidDataException or IOException)
         {
@@ -112,8 +114,8 @@ internal sealed class SdlSoundTest : ISoundTest, IDisposable
         _output = output;
         _effectsPlayed = 0;
         _playing = System.Diagnostics.Stopwatch.StartNew();
-        var (musicCard, effectsCard) = (LauncherModel.Label(LauncherModel.PartCards, request.Card), LauncherModel.Label(LauncherModel.PartCards, request.EffectsCard!));
-        Status = $"Playing: the theme on {musicCard}, effects on {effectsCard}…" + (warning is null ? "" : " (no MT-32 ROMs: AdLib for it, D-20)");
+        var (musicCard, effectsCard) = (LauncherModel.Label(LauncherModel.MusicChoices, request.Card), LauncherModel.Label(LauncherModel.PartCards, request.EffectsCard!));
+        Status = $"Playing: the theme on {musicCard}, effects on {effectsCard}…" + (warning is null ? "" : amiga ? " (no Amiga music files: the sound card's music, D-640)" : " (no MT-32 ROMs: AdLib for it, D-20)");
     }
 
     public void Stop()

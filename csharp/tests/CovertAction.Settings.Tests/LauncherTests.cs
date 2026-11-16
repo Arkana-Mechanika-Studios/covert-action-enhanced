@@ -212,7 +212,8 @@ public sealed class LauncherTests
         Assert.True(screen.Shown(Item.Music) && screen.Shown(Item.Effects) && screen.Shown(Item.MixTest));
         Assert.DoesNotContain(screen.Blocks, b => b.What.Contains("mixing the sound drivers", StringComparison.Ordinal));
 
-        // the music on the MT-32, the effects on the sound card (the AdLib): the test plays the two
+        // the music on the MT-32 (the list ends with Amiga, Tandy, then the MT-32 before it), the effects on the sound card (the AdLib): the test plays the two
+        Click(screen, canvas, Item.Music, Part.Previous);
         Click(screen, canvas, Item.Music, Part.Previous);
         Click(screen, canvas, Item.Music, Part.Previous);
         Assert.Equal("mt32", model.MusicCard);

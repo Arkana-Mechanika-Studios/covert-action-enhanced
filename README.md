@@ -90,6 +90,9 @@ Not in the original, each off by default, on the launcher's Advanced tab ([the s
   walk the agent as the keypad does, and Shift with an arrow lunges.
 * **Music and sound effects on different sound cards** ([D-620](csharp/docs/faithfulness/DIVERGENCES-INTRO.md)), for example
   the music on the MT-32 and the effects on the AdLib.
+* **The Amiga version's music** ([D-640](csharp/docs/faithfulness/DIVERGENCES.md), [how it plays](csharp/docs/AMIGA-MUSIC.md)):
+  the tunes of the Amiga version, played from the Amiga music files you own (none come with the program), in place of the
+  sound card's music while the effects stay on the card.
 
 ## How it is made faithful
 

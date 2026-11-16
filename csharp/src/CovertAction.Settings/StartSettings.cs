@@ -56,6 +56,12 @@ internal sealed record StartSettings
     /// <summary>The card the sound effects play on: "card" (the sound card, as the original) or a card of its own (D-620).</summary>
     public string EffectsCard { get; init; } = "card";
 
+    /// <summary>The folder with the player's Amiga music files (sound.amigaFiles), or null: found beside the program or the game (D-640).</summary>
+    public string? AmigaFiles { get; init; }
+
+    /// <summary>The Amiga music plays only where the Amiga game had music (sound.amigaOriginalOnly, D-640).</summary>
+    public bool AmigaOriginalOnly { get; init; }
+
     /// <summary>The mouse in the menus, lists and maps (input.mouse; off by default, as the original has none).</summary>
     public bool Mouse { get; init; }
 
@@ -136,6 +142,8 @@ internal sealed record StartSettings
             ArrowKeysWalk = arrowsWalk,
             MusicCard = file.MusicCard ?? "card",
             EffectsCard = file.EffectsCard ?? "card",
+            AmigaFiles = file.AmigaFiles,
+            AmigaOriginalOnly = file.AmigaOriginalOnly ?? false,
             Mouse = mouse,
             FixedKeys = fixedKeys,
         };
