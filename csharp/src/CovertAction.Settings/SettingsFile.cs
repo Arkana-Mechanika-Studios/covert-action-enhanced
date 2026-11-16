@@ -239,7 +239,7 @@ internal static class SettingsFile
                 case "music": settings.MusicCard = OneOf(key, property.Value, GameSettings.MusicChoices) ?? settings.MusicCard; break;
                 case "amigaFiles": settings.AmigaFiles = FilePath(key, property.Value); break;
                 case "amigaOriginalOnly": settings.AmigaOriginalOnly = Boolean(key, property.Value) ?? settings.AmigaOriginalOnly; break;
-                case "effects": settings.EffectsCard = OneOf(key, property.Value, GameSettings.PartCards) ?? settings.EffectsCard; break;
+                case "effects": settings.EffectsCard = OneOf(key, property.Value, GameSettings.EffectsChoices) ?? settings.EffectsCard; break;
                 default: Unknown(key); break;
             }
         }
@@ -379,14 +379,16 @@ internal static class SettingsFile
             "mt32Roms": "",
             // Music on one card, sound effects on another, mixed: "card" (the sound card plays both, as the original),
             // or "none", "speaker", "tandy", "adlib", "mt32" for the tunes, and for the effects (D-620). The tunes may also
-            // be "amiga": the Amiga version's music, played from your own Amiga files (D-640).
+            // be "amiga": the Amiga version's music, played from your own Amiga files (D-640); the effects likewise (D-641).
             "music": "card",
             "effects": "card",
-            // The folder with your Amiga music files (thememusic.dat, finalmusic.dat, spy6music.dat; the Amiga disk 1).
-            // "": amiga/files next to the program, or next to the game. Without them the sound card's music plays.
+            // The folder with your Amiga files: the music (thememusic.dat, finalmusic.dat, spy6music.dat; the Amiga disk 1)
+            // and the sound effects (gamesnd.dat, tacsnd.dat, codesnd.dat, bugsnd.dat; disk 2, chasesnd.dat; disk 3).
+            // "": amiga/files next to the program, or next to the game. Without them the sound card plays instead.
             "amigaFiles": "",
-            // true: the Amiga music only where the Amiga game had music (the title, the menus and FINAL); the selection
-            // screens' and the vacations' tunes stay silent. false: they play the Amiga's tunes too.
+            // true: the Amiga music and effects only where the Amiga game had them (music: the title, the menus and FINAL; the
+            // selection screens' and the vacations' tunes stay silent; effects: those the Amiga game does not play stay silent).
+            // false: the sound card plays those.
             "amigaOriginalOnly": false
           },
 

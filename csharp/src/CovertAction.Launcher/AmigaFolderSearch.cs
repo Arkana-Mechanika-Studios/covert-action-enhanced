@@ -3,11 +3,13 @@ using CovertAction.Audio.Amiga;
 namespace CovertAction.Launcher;
 
 /// <summary>
-/// Where the player's own Amiga music files (thememusic.dat, finalmusic.dat, spy6music.dat, from the Amiga version's disk 1)
-/// are, for the Amiga music option (D-640; new code, outside the game). A folder the player names always wins and is looked
-/// at as it is (<see cref="Resolve"/>); the automatic search only runs when none is named: an <c>amiga/files</c> (or
-/// <c>amiga</c>) folder beside the program, or beside the game folder and the two folders above it, counting when it holds
-/// thememusic.dat itself, in its <c>disk1</c> folder or in a folder directly below it. No disk is scanned.
+/// Where the player's own Amiga files are, for the Amiga music option (D-640) and the Amiga sound effects option (D-641; new
+/// code, outside the game): the music files (thememusic.dat, finalmusic.dat, spy6music.dat, from the Amiga version's disk 1)
+/// and the five sound banks (gamesnd.dat, tacsnd.dat, codesnd.dat and bugsnd.dat from disk 2, chasesnd.dat from disk 3). A
+/// folder the player names always wins and is looked at as it is (<see cref="Resolve"/>, <see cref="ResolveBanks"/>); the
+/// automatic search only runs when none is named: an <c>amiga/files</c> (or <c>amiga</c>) folder beside the program, or beside
+/// the game folder and the two folders above it, counting when it holds the first file itself, in its <c>disk1</c> (the
+/// banks: <c>disk2</c>) folder or in a folder directly below it. No disk is scanned.
 /// </summary>
 public static class AmigaFolderSearch
 {
@@ -27,11 +29,22 @@ public static class AmigaFolderSearch
     /// <summary>The first of <see cref="Candidates"/> that holds the music (see <see cref="Resolve"/>); null when none does.</summary>
     /// <param name="gameFolder">The game folder, or null.</param>
     /// <param name="programFolder">The program's folder.</param>
-    public static (string Folder, string Source)? Find(string? gameFolder, string programFolder)
+    public static (string Folder, string Source)? Find(string? gameFolder, string programFolder) => Find(gameFolder, programFolder, Resolve);
+
+    /// <summary>The folder with the sound banks to use when none is chosen: the first place of <see cref="Candidates"/> that holds them, and where it was found; else null.</summary>
+    /// <param name="gameFolder">The game folder in use or found; null: none.</param>
+    public static (string Folder, string Source)? AutomaticBanks(string? gameFolder) => FindBanks(gameFolder, AppContext.BaseDirectory);
+
+    /// <summary>The first of <see cref="Candidates"/> that holds the sound banks (see <see cref="ResolveBanks"/>); null when none does.</summary>
+    /// <param name="gameFolder">The game folder, or null.</param>
+    /// <param name="programFolder">The program's folder.</param>
+    public static (string Folder, string Source)? FindBanks(string? gameFolder, string programFolder) => Find(gameFolder, programFolder, ResolveBanks);
+
+    private static (string Folder, string Source)? Find(string? gameFolder, string programFolder, Func<string, string?> resolve)
     {
         foreach (var (folder, source) in Candidates(gameFolder, programFolder))
         {
-            if (Resolve(folder) is { } holding)
+            if (resolve(folder) is { } holding)
             {
                 return (holding, source);
             }
@@ -69,7 +82,38 @@ public static class AmigaFolderSearch
     /// none holds it or the folder cannot be read.
     /// </summary>
     /// <param name="folder">The folder.</param>
-    public static string? Resolve(string folder)
+    public static string? Resolve(string folder) => Holding(folder, AmigaTunes.ThemeFile, "disk1");
+
+    /// <summary>
+    /// The folder that holds gamesnd.dat for a folder the player named or a place searched: the folder itself, its
+    /// <c>disk2</c> folder or a folder directly below it, or, for a folder named like a disk (<c>disk1</c>), the same below
+    /// its parent (<c>disk2</c> beside it); null when none holds it or the folder cannot be read. The other banks are looked
+    /// for around that folder (<see cref="BankFile"/>): chasesnd.dat is on disk 3.
+    /// </summary>
+    /// <param name="folder">The folder.</param>
+    public static string? ResolveBanks(string folder)
+    {
+        if (Holding(folder, GameBank, "disk2") is { } holding)
+        {
+            return holding;
+        }
+        try
+        {
+            var trimmed = Path.TrimEndingDirectorySeparator(folder);
+            return Path.GetFileName(trimmed).StartsWith("disk", StringComparison.OrdinalIgnoreCase) && Path.GetDirectoryName(trimmed) is { Length: > 0 } parent
+                ? Holding(parent, GameBank, "disk2")
+                : null;
+        }
+        catch (ArgumentException)
+        {
+            return null;
+        }
+    }
+
+    /// <summary>The first sound bank's file name: the folder that holds it is the folder of the banks.</summary>
+    private static string GameBank => AmigaSoundBanks.FileNames[0];
+
+    private static string? Holding(string folder, string marker, string preferred)
     {
         try
         {
@@ -77,23 +121,53 @@ public static class AmigaFolderSearch
             {
                 return null;
             }
-            if (File.Exists(Path.Combine(folder, AmigaTunes.ThemeFile)))
+            if (File.Exists(Path.Combine(folder, marker)))
             {
                 return folder;
             }
-            var disk1 = Path.Combine(folder, "disk1");
-            if (File.Exists(Path.Combine(disk1, AmigaTunes.ThemeFile)))
+            var disk = Path.Combine(folder, preferred);
+            if (File.Exists(Path.Combine(disk, marker)))
             {
-                return disk1;
+                return disk;
             }
             return Directory.EnumerateDirectories(folder).Order(StringComparer.OrdinalIgnoreCase)
-                .FirstOrDefault(below => File.Exists(Path.Combine(below, AmigaTunes.ThemeFile)));
+                .FirstOrDefault(below => File.Exists(Path.Combine(below, marker)));
         }
         catch (Exception e) when (e is IOException or UnauthorizedAccessException or ArgumentException)
         {
             return null;
         }
     }
+
+    /// <summary>
+    /// The path of a sound bank's file around the folder of the banks: in the folder itself, in a folder directly below it, in
+    /// its parent or in a folder directly below that (disk 2's folder has disk 3 beside it); null when it is not there.
+    /// </summary>
+    /// <param name="bankFolder">A folder as <see cref="ResolveBanks"/> gives it.</param>
+    /// <param name="name">The file's name (one of <see cref="AmigaSoundBanks.FileNames"/>).</param>
+    public static string? BankFile(string bankFolder, string name)
+    {
+        try
+        {
+            var places = new List<string> { bankFolder };
+            places.AddRange(Directory.EnumerateDirectories(bankFolder).Order(StringComparer.OrdinalIgnoreCase));
+            if (Path.GetDirectoryName(Path.TrimEndingDirectorySeparator(bankFolder)) is { Length: > 0 } parent)
+            {
+                places.Add(parent);
+                places.AddRange(Directory.EnumerateDirectories(parent).Order(StringComparer.OrdinalIgnoreCase));
+            }
+            return places.Select(place => Path.Combine(place, name)).FirstOrDefault(File.Exists);
+        }
+        catch (Exception e) when (e is IOException or UnauthorizedAccessException or ArgumentException)
+        {
+            return null;
+        }
+    }
+
+    /// <summary>The names of the sound banks' files that are not around a folder (none when it has all five).</summary>
+    /// <param name="bankFolder">A folder as <see cref="ResolveBanks"/> gives it; null: none was found, so all five are missing.</param>
+    public static IReadOnlyList<string> MissingBanks(string? bankFolder) =>
+        [.. AmigaSoundBanks.FileNames.Where(name => bankFolder is null || BankFile(bankFolder, name) is null)];
 
     /// <summary>The names of the three music files a folder lacks (none when it holds all).</summary>
     /// <param name="folder">A folder as <see cref="Resolve"/> gives it.</param>

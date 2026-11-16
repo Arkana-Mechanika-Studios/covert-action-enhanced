@@ -22,7 +22,8 @@ public sealed class AmigaMusicFilesTests : IDisposable
 
     public void Dispose() => Directory.Delete(_root, recursive: true);
 
-    private static string? RealFolder() => Environment.GetEnvironmentVariable(FolderVariable) is { Length: > 0 } folder && Directory.Exists(folder) ? folder : null;
+    /// <summary>The folder with the music files: COVERT_AMIGA_DIR itself, or its disk1 folder (the folder with the disks' folders in it also serves the sound effects, D-641).</summary>
+    private static string? RealFolder() => Environment.GetEnvironmentVariable(FolderVariable) is { Length: > 0 } folder && Directory.Exists(folder) ? AmigaFolderSearch.Resolve(folder) : null;
 
     private string Make(params string[] path)
     {

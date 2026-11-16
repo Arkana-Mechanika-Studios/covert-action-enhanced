@@ -1,3 +1,4 @@
+using CovertAction.Audio.Amiga;
 using CovertAction.Audio.Mt32;
 using CovertAction.Content;
 using CovertAction.Platform;
@@ -39,7 +40,7 @@ public static class SoundCheck
         sound.PlaySound(ThemeTune);
     }
 
-    /// <summary>Effects the mix test plays in turn over the theme: a shot, the Uzi's burst, a door (TAC's commands 3, 6, 13).</summary>
+    /// <summary>Effects the mix test plays in turn over the theme: a shot, the Uzi's burst, a door (TAC's commands 3, 6, 13; the Amiga's effects of the raid's bank play them).</summary>
     public static IReadOnlyList<int> TestEffects { get; } = [3, 6, 13];
 
     /// <summary>
@@ -51,16 +52,17 @@ public static class SoundCheck
     /// <param name="musicLetter">The music card's driver letter (N, I, T, A, R).</param>
     /// <param name="effectsLetter">The effects card's driver letter.</param>
     /// <param name="romFolder">The MT-32 ROMs' folder; null: the default.</param>
-    /// <param name="report">Told why a Roland plays the AdLib driver instead, or the Amiga music the sound card's, when it does (D-20, D-640).</param>
-    /// <param name="cardLetter">The sound card's driver letter, which plays the music when the Amiga files are missing; null: the music's letter.</param>
-    /// <param name="amigaFolder">With <see cref="SoundDriverChoice.AmigaMusic"/> as the music's letter: the player's Amiga files' folder; null: found beside the program or the game (D-640).</param>
-    /// <param name="amigaOnlyWhereOriginal">The Amiga music plays only where the Amiga game had music (D-640).</param>
+    /// <param name="report">Told why a Roland plays the AdLib driver instead, or the Amiga music or effects the sound card's, when it does (D-20, D-640, D-641).</param>
+    /// <param name="cardLetter">The sound card's driver letter, which plays when the Amiga files are missing, and the effects the Amiga has no twin for; null: the music's letter.</param>
+    /// <param name="amigaFolder">With <see cref="SoundDriverChoice.AmigaMusic"/> as the music's or the effects' letter: the player's Amiga files' folder; null: found beside the program or the game (D-640, D-641).</param>
+    /// <param name="amigaOnlyWhereOriginal">The Amiga music and effects play only where the Amiga game had them (D-640, D-641).</param>
     /// <exception cref="FileNotFoundException">A driver file is not in the game folder.</exception>
     /// <exception cref="InvalidDataException">A driver file is not the driver.</exception>
     public static ISoundDriver PlayMix(GameFolder folder, IHost host, char musicLetter, char effectsLetter, string? romFolder, Action<string> report,
         char? cardLetter = null, string? amigaFolder = null, bool amigaOnlyWhereOriginal = false)
     {
         var sound = new SoundDriverChoice(folder, host, report, romFolder ?? DefaultRomFolder, musicLetter, effectsLetter, amigaFolder, amigaOnlyWhereOriginal);
+        sound.AmigaBank = AmigaBank.Tac;
         sound.Choose(cardLetter ?? musicLetter);
         sound.PlaySound(ThemeTune);
         return sound;

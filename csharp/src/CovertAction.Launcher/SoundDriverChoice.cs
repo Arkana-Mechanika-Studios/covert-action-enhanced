@@ -20,7 +20,8 @@ namespace CovertAction.Launcher;
 /// New code: the original's launcher loads the program ?SOUND.CA of that letter and calls its start (D-602). Of the
 /// set-up's choices the PC speaker, the Tandy chip, the AdLib card and the Roland MT-32 are reconstructed; Custom plays
 /// nothing (D-18). The MT-32 is Munt's emulation with the player's ROMs; without them the AdLib driver plays (D-20).
-/// As a player's option the tunes and the sound effects play on two drivers at once (D-620, csharp/docs/SOUND-MIXING.md).
+/// As a player's option the tunes and the sound effects play on two drivers at once (D-620, csharp/docs/SOUND-MIXING.md),
+/// and either may be the Amiga version's, from the player's own Amiga files (D-640 the music, D-641 the sound effects).
 /// </remarks>
 /// <param name="folder">The player's game folder.</param>
 /// <param name="host">The host, whose sound device plays the driver.</param>
@@ -28,8 +29,8 @@ namespace CovertAction.Launcher;
 /// <param name="romFolder">The MT-32 ROMs' folder; null: COVERT_MT32_ROMS, else the folder RomFolderSearch finds (MT32_ROMS next to the program, in or by the game folder, DOSBox's ...).</param>
 /// <param name="musicLetter">The driver of the tunes when the music and the effects play on two cards (D-620); null: the chosen card's.</param>
 /// <param name="effectsLetter">The driver of the sound effects on two cards (D-620); null: the chosen card's. Both null: one card plays all, as the original.</param>
-/// <param name="amigaFolder">The folder with the player's Amiga music files, for <see cref="AmigaMusic"/> as the music's letter (D-640); null: found beside the program or the game.</param>
-/// <param name="amigaOnlyWhereOriginal">The Amiga music plays only where the Amiga game had music (D-640): the commands 39 to 43 play nothing.</param>
+/// <param name="amigaFolder">The folder with the player's Amiga files, for <see cref="AmigaMusic"/> as the music's or the effects' letter (D-640, D-641); null: found beside the program or the game.</param>
+/// <param name="amigaOnlyWhereOriginal">The Amiga music and effects play only where the Amiga game had them (D-640, D-641): the music's commands 39 to 43 and the effects the Amiga has no twin for play nothing.</param>
 internal sealed class SoundDriverChoice(GameFolder folder, IHost host, Action<string>? report = null, string? romFolder = null,
     char? musicLetter = null, char? effectsLetter = null, string? amigaFolder = null, bool amigaOnlyWhereOriginal = false) : ISoundDriver
 {
@@ -41,7 +42,7 @@ internal sealed class SoundDriverChoice(GameFolder folder, IHost host, Action<st
     private const string AdlibDriverFile = "ASOUND.CA";
     private const char Roland = 'R';
 
-    /// <summary>The music's letter for the Amiga version's music (D-640): not a sound card of the set-up, a music driver of its own.</summary>
+    /// <summary>The letter for the Amiga version's music (D-640) and sound effects (D-641): not a sound card of the set-up, a driver of its own.</summary>
     public const char AmigaMusic = 'G';
 
     private const string RolandDriverFile = "RSOUND.CA";
@@ -51,6 +52,8 @@ internal sealed class SoundDriverChoice(GameFolder folder, IHost host, Action<st
 
     private ISoundDriver _driver = new SilentSoundDriver();
     private bool _chosen;
+    private AmigaEffectsRouter? _amigaEffects;
+    private AmigaBank? _amigaBank;
 
     /// <summary>Loads the driver of a sound letter; only the first choice counts (the host's device is started once).</summary>
     /// <param name="letter">The set-up's letter: N no sound, I IBM (PC speaker), T Tandy, A AdLib, R Roland, X Custom.</param>
@@ -81,13 +84,13 @@ internal sealed class SoundDriverChoice(GameFolder folder, IHost host, Action<st
     /// two mixed into the host's sound device; the game's commands go to one, the other or both by their role.
     /// </summary>
     /// <param name="music">The letter of the music's driver; <see cref="AmigaMusic"/> for the Amiga version's music.</param>
-    /// <param name="effects">The letter of the effects' driver.</param>
-    /// <param name="card">The sound card's letter: the music plays on it when the Amiga files cannot be read.</param>
+    /// <param name="effects">The letter of the effects' driver; <see cref="AmigaMusic"/> for the Amiga version's effects.</param>
+    /// <param name="card">The sound card's letter: it plays when the Amiga files cannot be read, and the effects the Amiga has no twin for.</param>
     private void ChooseTwo(char music, char effects, char card)
     {
         // DIVERGENCE: D-620 a player's option: the music and the sound effects on two drivers at once, mixed.
         ISoundDriver? musicDriver = music == AmigaMusic ? MakeAmigaMusic(card, PartWatch(SoundRole.Music)) : Make(music, PartWatch(SoundRole.Music));
-        var effectsDriver = Make(effects, PartWatch(SoundRole.Effect));
+        var effectsDriver = effects == AmigaMusic ? MakeAmigaEffects(card, PartWatch(SoundRole.Effect)) : Make(effects, PartWatch(SoundRole.Effect));
         var sources = new[] { musicDriver, effectsDriver }.OfType<IPcmSource>().ToArray();
         if (sources.Length > 0)
         {
@@ -127,6 +130,48 @@ internal sealed class SoundDriverChoice(GameFolder folder, IHost host, Action<st
         {
             (report ?? Console.Error.WriteLine)($"warning: the Amiga music needs your Amiga files, but {e.Message}; the sound card's music plays instead.");
             return card == AmigaMusic ? null : Make(card, watch);
+        }
+    }
+
+    /// <summary>
+    /// The Amiga version's sound effects from the player's files, the commands without an Amiga twin on the sound card's driver
+    /// (or silent), or, when the files cannot be found or read, the sound card's driver for all, with one line to say so.
+    /// </summary>
+    private ISoundDriver? MakeAmigaEffects(char card, Action<SoundDeviceEvent>? watch)
+    {
+        // DIVERGENCE: D-641 a player's option: the sound effects are the Amiga version's, played from the player's own Amiga files.
+        try
+        {
+            var banks = amigaFolder is { Length: > 0 } named ? AmigaFolderSearch.ResolveBanks(named) : AmigaFolderSearch.AutomaticBanks(folder.Path)?.Folder;
+            if (banks is null)
+            {
+                throw new FileNotFoundException(amigaFolder is { Length: > 0 } ? $"{AmigaSoundBanks.FileNames[0]} is not in {amigaFolder}" : $"{AmigaSoundBanks.FileNames[0]} is not beside the program or the game");
+            }
+            var read = AmigaSoundBanks.Read(name => File.ReadAllBytes(AmigaFolderSearch.BankFile(banks, name) ?? throw new FileNotFoundException($"{name} is not around {banks}")));
+            var fillIn = amigaOnlyWhereOriginal || card == AmigaMusic ? null : Make(card, watch);
+            return _amigaEffects = new AmigaEffectsRouter(new AmigaEffectsDriver(read, host.Audio.SampleRate) { Bank = _amigaBank }, fillIn);
+        }
+        catch (Exception e) when (e is IOException or InvalidDataException or UnauthorizedAccessException)
+        {
+            (report ?? Console.Error.WriteLine)($"warning: the Amiga sound effects need your Amiga files, but {e.Message}; the sound card's effects play instead.");
+            return card == AmigaMusic ? null : Make(card, watch);
+        }
+    }
+
+    /// <summary>
+    /// The part of the game that plays now, for the Amiga sound effects (D-641): the part's bank gives the PC's sound commands their
+    /// Amiga meaning, and a part change silences the Amiga's voices. Null: a part the Amiga plays no effects in (FINAL, the menus).
+    /// </summary>
+    public AmigaBank? AmigaBank
+    {
+        get => _amigaBank;
+        set
+        {
+            _amigaBank = value;
+            if (_amigaEffects is not null)
+            {
+                _amigaEffects.Bank = value;
+            }
         }
     }
 

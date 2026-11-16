@@ -6,8 +6,8 @@ using Part = CovertAction.Settings.LauncherScreen.Part;
 namespace CovertAction.Settings.Tests;
 
 /// <summary>
-/// The Amiga music option (D-640): the settings keys, what the launcher offers for it and saves, and that without the
-/// player's choice nothing is asked of the game (the defaults are the original's).
+/// The Amiga music option (D-640) and the Amiga sound effects option (D-641): the settings keys, what the launcher offers for
+/// them and saves, and that without the player's choice nothing is asked of the game (the defaults are the original's).
 /// </summary>
 public sealed class AmigaMusicSettingTests
 {
@@ -31,7 +31,8 @@ public sealed class AmigaMusicSettingTests
 
     /// <summary>The host's answer: the files are in D:/Amiga and nowhere else.</summary>
     private static AmigaStatus Files(string? chosen, string? game) => new(chosen ?? "C:/Program/amiga/files", chosen == "D:/Amiga", null,
-        chosen == "D:/Amiga" ? [] : ["thememusic.dat", "finalmusic.dat", "spy6music.dat"]);
+        chosen == "D:/Amiga" ? [] : ["thememusic.dat", "finalmusic.dat", "spy6music.dat"], chosen == "D:/Amiga",
+        chosen == "D:/Amiga" ? [] : ["gamesnd.dat", "tacsnd.dat", "codesnd.dat", "bugsnd.dat", "chasesnd.dat"]);
 
     private sealed class Surface : ILauncherSurface
     {
@@ -105,12 +106,53 @@ public sealed class AmigaMusicSettingTests
     }
 
     [Fact]
-    public void OnlyTheMusicMayBeTheAmiga()
+    public void TheEffectsMayBeTheAmigaToo()
     {
-        var file = SettingsFile.Parse("{ \"sound\": { \"effects\": \"amiga\" } }");
-        Assert.Single(file.Problems);
-        Assert.Contains("sound.effects", file.Problems[0], StringComparison.Ordinal);
-        Assert.Null(file.Settings.EffectsCard);
+        var file = SettingsFile.Parse("{ \"sound\": { \"effects\": \"amiga\", \"amigaFiles\": \"D:/Amiga\" } }");
+        Assert.Empty(file.Problems);
+        var start = StartSettings.Resolve(CommandLine.Parse([]), _ => null, file.Settings);
+        Assert.Equal(("card", "amiga", "D:/Amiga"), (start.MusicCard, start.EffectsCard, start.AmigaFiles));
+        Assert.Equal('G', GameSettings.PartLetter(start.EffectsCard));
+        Assert.Null(GameSettings.PartLetter(start.MusicCard));
+        // anything else is still refused
+        var other = SettingsFile.Parse("{ \"sound\": { \"effects\": \"amigaa\" } }");
+        Assert.Single(other.Problems);
+        Assert.Contains("sound.effects", other.Problems[0], StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void TheEffectsChoiceEndsWithTheAmigaAndSavesAndTestsWithTheSharedSubSetting()
+    {
+        var test = new Test();
+        var (screen, model, canvas) = Open(Context(test: test, amiga: Files), new Surface { Picked = "D:/Amiga" });
+        Click(screen, canvas, Item.TabAdvanced);
+        Assert.Equal("Amiga (your own Amiga disks)", LauncherModel.Label(LauncherModel.EffectsChoices, "amiga"));
+        Click(screen, canvas, Item.Effects, Part.Previous);
+        Assert.Equal("amiga", model.EffectsCard);
+        Assert.True(model.AmigaEffects && !model.AmigaMusic && model.Mixing);
+        // no files yet: the music's and the effects' status both say so
+        Assert.False(model.Amiga!.EffectsFound);
+        Click(screen, canvas, Item.AmigaChange);
+        Assert.True(model.Amiga!.EffectsFound);
+        Click(screen, canvas, Item.AmigaOriginalOnly);
+
+        // the music stays on the sound card, the Amiga's effects take the card for what they lack
+        Click(screen, canvas, Item.MixTest);
+        Assert.Equal(new SoundTestRequest("adlib", Game, null, "amiga", "adlib", "D:/Amiga", true), test.Asked);
+
+        var changes = model.Changes();
+        Assert.Equal(["sound.amigaFiles", "sound.amigaOriginalOnly", "sound.effects"], changes.Keys.Order());
+        var saved = SettingsFile.Parse(SettingsFileEdits.Set(SettingsFile.Template, changes)).Settings;
+        var start = StartSettings.Resolve(CommandLine.Parse([]), _ => null, saved);
+        Assert.Equal(("card", "amiga", "D:/Amiga", true), (start.MusicCard, start.EffectsCard, start.AmigaFiles, start.AmigaOriginalOnly));
+    }
+
+    [Fact]
+    public void AFolderWithOnlyTheSoundBanksIsTakenAsTheAmigaFolderToo()
+    {
+        var (screen, model, _) = Open(Context(amiga: (chosen, _) => new AmigaStatus(chosen ?? "C:/Program/amiga/files", false, null, ["thememusic.dat"], chosen == "D:/Banks", [])));
+        screen.Handle(new PathDropped("D:/Banks"));
+        Assert.Equal("D:/Banks", model.AmigaFiles);
     }
 
     [Fact]
@@ -173,7 +215,7 @@ public sealed class AmigaMusicSettingTests
         var settings = new GameSettings { GameFolder = Game, MusicCard = "amiga", AmigaFiles = "D:/a very long folder name/" + new string('x', 200) };
         var (screen, _, canvas) = Open(Context(amiga: Files, settings: settings));
         Click(screen, canvas, Item.TabAdvanced);
-        foreach (var item in new[] { Item.Music, Item.AmigaFiles, Item.AmigaOriginalOnly })
+        foreach (var item in new[] { Item.Music, Item.Effects, Item.AmigaFiles, Item.AmigaOriginalOnly })
         {
             var area = screen.Area(item);
             screen.Handle(new PointerMoved(area.X + 2, area.Y + 2));

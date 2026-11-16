@@ -85,18 +85,21 @@ internal interface ISoundTest
 /// <summary>
 /// What the sound test plays on: the sound card ("adlib", "mt32" ...), the game folder (its drivers) and the ROM folder;
 /// for the test of the mix (D-620) also the effects' card, the music then playing on <paramref name="Card"/>. With the Amiga
-/// music (<paramref name="Card"/> "amiga", D-640) also the sound card (which plays when the Amiga files are missing), the
-/// Amiga files' folder and whether the music plays only where the Amiga had it.
+/// music (<paramref name="Card"/> "amiga", D-640) or effects (<paramref name="EffectsCard"/> "amiga", D-641) also the sound card
+/// (which plays when the Amiga files are missing), the Amiga files' folder and whether they play only where the Amiga had them.
 /// </summary>
 internal sealed record SoundTestRequest(string Card, string GameFolder, string? RomFolder, string? EffectsCard = null,
     string? SoundCard = null, string? AmigaFolder = null, bool AmigaOriginalOnly = false);
 
-/// <summary>The Amiga music files in a folder (D-640).</summary>
-/// <param name="Folder">The folder the files are looked in (the default one when none is set).</param>
+/// <summary>The Amiga music files (D-640) and sound banks (D-641) in a folder.</summary>
+/// <param name="Folder">The folder the music files are looked in (the default one when none is set).</param>
 /// <param name="Found">All three files (thememusic.dat, finalmusic.dat, spy6music.dat) are there.</param>
 /// <param name="Source">Where the folder was found ("beside the program") when the player did not choose it; null when chosen, or the default.</param>
 /// <param name="Missing">The files the folder lacks (null or empty when it holds all).</param>
-internal sealed record AmigaStatus(string Folder, bool Found, string? Source = null, IReadOnlyList<string>? Missing = null);
+/// <param name="EffectsFound">All five sound banks (gamesnd.dat, tacsnd.dat, codesnd.dat, bugsnd.dat, chasesnd.dat) are there.</param>
+/// <param name="EffectsMissing">The banks that are not there (null or empty when all five are).</param>
+internal sealed record AmigaStatus(string Folder, bool Found, string? Source = null, IReadOnlyList<string>? Missing = null,
+    bool EffectsFound = false, IReadOnlyList<string>? EffectsMissing = null);
 
 /// <summary>The Roland ROMs in a folder.</summary>
 /// <param name="Folder">The folder looked in (the default one when none is set).</param>

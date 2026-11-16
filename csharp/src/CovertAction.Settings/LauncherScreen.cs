@@ -427,7 +427,7 @@ internal sealed class LauncherScreen
         else
         {
             var request = new SoundTestRequest(music, _model.GameFolderChecked, _model.Mt32Roms, effects);
-            _context.SoundTest?.Play(_model.AmigaMusic
+            _context.SoundTest?.Play(_model.AmigaMusic || _model.AmigaEffects
                 ? request with { SoundCard = _model.SoundCard, AmigaFolder = _model.AmigaFiles, AmigaOriginalOnly = _model.AmigaOriginalOnly }
                 : request);
         }
@@ -485,9 +485,9 @@ internal sealed class LauncherScreen
                 break;
             case Item.AmigaFiles or Item.AmigaChange:
                 _model.AmigaFiles = folder;
-                if (_model.Amiga is { Found: false } amiga)
+                if (_model.Amiga is { Found: false, EffectsFound: false } amiga)
                 {
-                    _message = $"No Amiga music files in {folder}: {AmigaMissing(amiga)}.";
+                    _message = $"No Amiga files in {folder}: {AmigaMissing(amiga)}; {AmigaEffectsMissing(amiga)}.";
                 }
                 break;
         }
@@ -510,7 +510,7 @@ internal sealed class LauncherScreen
         {
             SetFolder(Item.Roms, folder);
         }
-        else if (_context.DescribeAmiga?.Invoke(folder, null) is { Found: true } || _focus is Item.AmigaFiles or Item.AmigaChange)
+        else if (_context.DescribeAmiga?.Invoke(folder, null) is { } found && (found.Found || found.EffectsFound) || _focus is Item.AmigaFiles or Item.AmigaChange)
         {
             SetFolder(Item.AmigaFiles, folder);
         }
@@ -520,7 +520,7 @@ internal sealed class LauncherScreen
         }
         else
         {
-            _message = $"{folder} holds none of Covert Action, MT-32 ROM files or Amiga music files.";
+            _message = $"{folder} holds none of Covert Action, MT-32 ROM files or Amiga files.";
         }
     }
 
@@ -855,7 +855,7 @@ internal sealed class LauncherScreen
             y = Section("Roland MT-32", y);
             y = Folder(y, "ROM folder", _model.Roms.Folder, Item.Roms, Item.RomsChange);
             y = Status(y, RomStatusLine());
-            y = Section("Amiga music", y);
+            y = Section("Amiga music and effects", y);
             y = Folder(y, "Amiga files", _model.Amiga?.Folder ?? _model.AmigaFiles ?? AmigaDefaultFolder, Item.AmigaFiles, Item.AmigaChange);
             y = Status(y, AmigaStatusLine());
             y = Select(y, "Only where the Amiga had it", _model.AmigaOriginalOnly ? "Yes" : "No", Item.AmigaOriginalOnly);
@@ -865,7 +865,7 @@ internal sealed class LauncherScreen
             y = Select(y, "Arrow keys walk", _model.ArrowKeysWalk ? "Yes" : "No", Item.ArrowKeysWalk);
             var mixTest = _context.SoundTest is { } mixSound ? (mixSound.Playing ? "Stop" : "Test mix") : null;
             y = Select(y, "Music on", LauncherModel.Label(LauncherModel.MusicChoices, _model.MusicCard), Item.Music, mixTest, Item.MixTest);
-            y = Select(y, "Effects on", LauncherModel.Label(LauncherModel.PartCards, _model.EffectsCard), Item.Effects);
+            y = Select(y, "Effects on", LauncherModel.Label(LauncherModel.EffectsChoices, _model.EffectsCard), Item.Effects);
             y = Status(y, MixStatus());
             y = Select(y, "Mouse in the menus", _model.Mouse ? "Yes" : "No", Item.Mouse);
             y = Status(y, ("Not in the original: point and click to choose, right click is Esc.", Note));
@@ -1001,27 +1001,43 @@ internal sealed class LauncherScreen
         string Card(string part) => part == "card"
             ? LauncherModel.Label(LauncherModel.SoundCards, _model.SoundCard)
             : LauncherModel.Label(LauncherModel.MusicChoices, part);
-        return ($"Music: {Card(_model.MusicCard)}; effects: {Card(_model.EffectsCard)}; mixed ({(_model.AmigaMusic ? "D-640" : "D-620")}).", Note);
+        var amiga = _model.AmigaMusic ? _model.AmigaEffects ? "D-640, D-641" : "D-640" : _model.AmigaEffects ? "D-641" : "D-620";
+        return ($"Music: {Card(_model.MusicCard)}; effects: {Card(_model.EffectsCard)}; mixed ({amiga}).", Note);
     }
 
     /// <summary>The folder shown for the Amiga files when the host cannot look: the one the files are put in.</summary>
     private static string AmigaDefaultFolder => Path.Combine(AppContext.BaseDirectory, "amiga", "files");
 
-    /// <summary>The line under the Amiga files' folder: found (and where), or what is missing and what plays instead (D-640).</summary>
+    /// <summary>
+    /// The line under the Amiga files' folder: the music files and the sound banks found (and where), or what is missing and what
+    /// plays instead when the Amiga music or effects are chosen without them (D-640, D-641).
+    /// </summary>
     private (string Text, uint Colour) AmigaStatusLine()
     {
         if (_model.Amiga is not { } amiga)
         {
-            return ("Your Amiga music files: thememusic.dat, finalmusic.dat and spy6music.dat from the Amiga disk 1.", Note);
+            return ("Your Amiga files: the music from disk 1, the sound effects (*snd.dat) from disks 2 and 3.", Note);
         }
         var where = amiga.Source is { } source ? $" ({source})" : "";
-        if (amiga.Found)
+        var wanted = _model.AmigaMusic || _model.AmigaEffects;
+        if (amiga.Found && amiga.EffectsFound)
         {
-            return ($"Amiga music files found{where}.", _model.AmigaMusic ? Good : Note);
+            return ($"Amiga music and sound effect files found{where}.", wanted ? Good : Note);
         }
-        var chosen = _model.AmigaMusic ? " The sound card's music plays instead." : "";
-        return ($"No Amiga music files there ({AmigaMissing(amiga)}).{chosen}", _model.AmigaMusic ? Bad : Note);
+        var instead = (_model.AmigaMusic && !amiga.Found ? " The sound card's music plays instead." : "")
+            + (_model.AmigaEffects && !amiga.EffectsFound ? " The sound card's effects play instead." : "");
+        var bad = (_model.AmigaMusic && !amiga.Found) || (_model.AmigaEffects && !amiga.EffectsFound);
+        var text = (amiga.Found, amiga.EffectsFound) switch
+        {
+            (true, false) => $"Amiga music files found{where}; no sound effect files ({AmigaEffectsMissing(amiga)}).",
+            (false, true) => $"Amiga sound effect files found{where}; no music files ({AmigaMissing(amiga)}).",
+            _ => $"No Amiga files there (music: {AmigaMissing(amiga)}; sound effects: {AmigaEffectsMissing(amiga)}).",
+        };
+        return (text + instead, bad ? Bad : Note);
     }
+
+    private static string AmigaEffectsMissing(AmigaStatus amiga) =>
+        amiga.EffectsMissing is { Count: > 0 } missing ? string.Join(", ", missing) + " missing" : "gamesnd.dat missing";
 
     private static string AmigaMissing(AmigaStatus amiga) =>
         amiga.Missing is { Count: > 0 } missing ? string.Join(", ", missing) + " missing" : "thememusic.dat missing";
@@ -1059,12 +1075,12 @@ internal sealed class LauncherScreen
             Item.KeyRepeat => "PC keyboard: a held key repeats as on the PC of 1990 (after half a second, 10.9 times a second), so the agent stops when you let go. Windows: your Windows keyboard's delay and rate (faster: keys can pile up in a building)." + fixedNote,
             Item.ArrowKeysWalk => "Yes: in a building raid the grey arrow keys (and Home, End, PgUp, PgDn) walk the agent like the number keypad, and Shift with an arrow lunges. No (the default, as the original): the keypad walks and the grey arrows lunge. Divergence D-610; no other part of the game is changed." + fixedNote,
             Item.Music => "The tunes: the theme, the selection screens' tune, the vacations. The sound card (the default): it plays the music and the effects, as the original. A card here plays the tunes while the effects play on the card below, mixed (divergence D-620). Amiga: the Amiga version's music, from your own Amiga files (divergence D-640); without them the sound card plays." + fixedNote,
-            Item.AmigaFiles or Item.AmigaChange => "The folder with your Amiga music files: thememusic.dat, finalmusic.dat and spy6music.dat from the Amiga version's disk 1 (the folder itself, or a disk1 folder in it). None come with the program. For the Amiga choice of the music above. Default: amiga/files beside the program, or beside the game." + fixedNote,
-            Item.AmigaOriginalOnly => "Yes: the Amiga music plays only where the Amiga game had music, the title, the menus and FINAL; the selection screens' and the vacations' tunes stay silent, as the Amiga's equipment and car screens are. No (the default): they play the Amiga's tunes too." + fixedNote,
-            Item.Effects => "The card the sound effects play on: the aeroplane, the cars, doors, shots, the gunfire, the workbench, the teleprinter. The sound card (the default) plays them, or the card here does while the music plays on the card above (divergence D-620). None: the effects are not played." + fixedNote,
+            Item.AmigaFiles or Item.AmigaChange => "The folder with your Amiga files, for the Amiga choices of the music and the effects below: the music (thememusic.dat, finalmusic.dat and spy6music.dat from the Amiga version's disk 1) and the sound effects (gamesnd.dat, tacsnd.dat, codesnd.dat and bugsnd.dat from disk 2, chasesnd.dat from disk 3). Give the folder with the disk folders (disk1, disk2, disk3) in it, or a folder with the files. None come with the program. Default: amiga/files beside the program, or beside the game." + fixedNote,
+            Item.AmigaOriginalOnly => "Yes: the Amiga music and effects play only where the Amiga game had them. Music: the title, the menus and FINAL; the selection screens' and the vacations' tunes stay silent. Effects: the sounds the Amiga game has no twin for (the raid's gunfire, the car's engines, ...) stay silent. No (the default): the sound card plays those, and the music plays the Amiga's tunes there too." + fixedNote,
+            Item.Effects => "The card the sound effects play on: the aeroplane, the cars, doors, shots, the gunfire, the workbench, the teleprinter. The sound card (the default) plays them, or the card here does while the music plays on the card above (divergence D-620). None: the effects are not played. Amiga: the Amiga version's effects from your own Amiga files where it has them, the sound card's elsewhere (divergence D-641); without the files the sound card plays." + fixedNote,
             Item.MixTest => "Plays the theme on the music's card and a shot, the Uzi and a door on the effects' card, for a few seconds, through your game's own sound drivers.",
             Item.Mouse => "Not in the original. Yes: the mouse works in the menus, the lists and on the flight map: point at a choice to highlight it, left click to take it, right click for Esc; a click also answers \"press a key\". The keys work as before. No: no mouse, as the original (the default)." + fixedNote,
-            Item.TabGeneral or Item.TabAdvanced => "General: the game, the display, the sound card, the controls and the saves. Advanced: the MT-32 ROMs, the Amiga music files, the keyboard and the player options (not in the original, all off by default). Ctrl+Tab goes to the other tab.",
+            Item.TabGeneral or Item.TabAdvanced => "General: the game, the display, the sound card, the controls and the saves. Advanced: the MT-32 ROMs, the Amiga files, the keyboard and the player options (not in the original, all off by default). Ctrl+Tab goes to the other tab.",
             Item.Save => _context.SettingsPath is { } path ? $"Saves the settings into {path} and closes. Esc and the window's close button save too." : "Closes (no settings file can be written here: the changes are lost).",
             Item.Play => _model.CanPlay ? "Saves the settings and starts the game." : "Choose the folder of your copy of the game first.",
             _ => "",

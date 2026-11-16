@@ -54,6 +54,9 @@ internal sealed class LauncherModel
     /// <summary>The choices for the music: the cards of <see cref="PartCards"/>, and the Amiga version's music from the player's own Amiga files (D-640).</summary>
     public static readonly IReadOnlyList<(string Value, string Label)> MusicChoices = [.. PartCards, ("amiga", "Amiga (your own Amiga disks)")];
 
+    /// <summary>The choices for the sound effects: the same, the Amiga version's effects from the player's own Amiga files (D-641).</summary>
+    public static readonly IReadOnlyList<(string Value, string Label)> EffectsChoices = MusicChoices;
+
     private static readonly int[] WindowScales = [2, 3, 4, 5, 6];
 
     private readonly LauncherContext _context;
@@ -148,7 +151,7 @@ internal sealed class LauncherModel
     /// <summary>One of <see cref="MusicChoices"/>' values: the card the tunes play on, or "amiga".</summary>
     public string MusicCard { get; set; }
 
-    /// <summary>One of <see cref="PartCards"/>' values: the card the sound effects play on.</summary>
+    /// <summary>One of <see cref="EffectsChoices"/>' values: the card the sound effects play on, or "amiga".</summary>
     public string EffectsCard { get; set; }
 
     /// <summary>Whether the music and the effects play on two cards (either is set to a card of its own, D-620).</summary>
@@ -157,10 +160,13 @@ internal sealed class LauncherModel
     /// <summary>The Amiga version's music is chosen for the music (D-640).</summary>
     public bool AmigaMusic => MusicCard == "amiga";
 
-    /// <summary>The Amiga music plays only where the Amiga game had music (D-640).</summary>
+    /// <summary>The Amiga version's sound effects are chosen for the effects (D-641).</summary>
+    public bool AmigaEffects => EffectsCard == "amiga";
+
+    /// <summary>The Amiga music and effects play only where the Amiga game had them (D-640, D-641).</summary>
     public bool AmigaOriginalOnly { get; set; }
 
-    /// <summary>The folder with the Amiga music files, as chosen; null: found beside the program or the game.</summary>
+    /// <summary>The folder with the Amiga files, the music's and the effects', as chosen; null: found beside the program or the game.</summary>
     public string? AmigaFiles
     {
         get => _amigaFiles;
@@ -233,7 +239,7 @@ internal sealed class LauncherModel
 
     public void CycleMusicCard(int step) => MusicCard = Step(MusicChoices, MusicCard, step);
 
-    public void CycleEffectsCard(int step) => EffectsCard = Step(PartCards, EffectsCard, step);
+    public void CycleEffectsCard(int step) => EffectsCard = Step(EffectsChoices, EffectsCard, step);
 
     private static string Step(IReadOnlyList<(string Value, string Label)> choices, string current, int step)
     {

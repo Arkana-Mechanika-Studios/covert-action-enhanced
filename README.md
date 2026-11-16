@@ -93,6 +93,9 @@ Not in the original, each off by default, on the launcher's Advanced tab ([the s
 * **The Amiga version's music** ([D-640](csharp/docs/faithfulness/DIVERGENCES.md), [how it plays](csharp/docs/AMIGA-MUSIC.md)):
   the tunes of the Amiga version, played from the Amiga music files you own (none come with the program), in place of the
   sound card's music while the effects stay on the card.
+* **The Amiga version's sound effects** ([D-641](csharp/docs/faithfulness/DIVERGENCES.md), [the table](csharp/docs/AMIGA-EFFECTS.md)):
+  the shots, doors, camera, aeroplane, chips and the rest of the Amiga version's effects, played from the Amiga sound
+  files you own where the Amiga game has the same sound, the sound card's effects elsewhere (or silence, if you prefer).
 
 ## How it is made faithful
 

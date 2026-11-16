@@ -75,13 +75,16 @@ internal sealed class GameSettings
     /// <summary>One of <see cref="MusicChoices"/>: the card the tunes play on, or "amiga".</summary>
     public string? MusicCard { get; set; }
 
-    /// <summary>The folder with the player's Amiga music files (sound.amigaFiles); null: found beside the program or the game (D-640).</summary>
+    /// <summary>The folder with the player's Amiga files, the music's and the sound effects' (sound.amigaFiles); null: found beside the program or the game (D-640, D-641).</summary>
     public string? AmigaFiles { get; set; }
 
-    /// <summary>The Amiga music plays only where the Amiga game had music (sound.amigaOriginalOnly, D-640).</summary>
+    /// <summary>The Amiga music and effects play only where the Amiga game had them (sound.amigaOriginalOnly, D-640, D-641).</summary>
     public bool? AmigaOriginalOnly { get; set; }
 
-    /// <summary>One of <see cref="PartCards"/>: the card the sound effects play on.</summary>
+    /// <summary>The choices for the sound effects: the same as for the music (D-641): the cards, and "amiga", the Amiga version's effects from the player's own Amiga files.</summary>
+    public static readonly IReadOnlyList<string> EffectsChoices = MusicChoices;
+
+    /// <summary>One of <see cref="EffectsChoices"/>: the card the sound effects play on, or "amiga".</summary>
     public string? EffectsCard { get; set; }
 
     /// <summary>The mouse in the menus, lists and maps (input.mouse; not in the original, off by default).</summary>
@@ -90,7 +93,7 @@ internal sealed class GameSettings
     /// <summary>A copy (a change to it leaves this one as it is).</summary>
     public GameSettings Copy() => (GameSettings)MemberwiseClone();
 
-    /// <summary>The music's letter for the Amiga version's music (D-640): not a sound card of the set-up; the launcher's <c>SoundDriverChoice.AmigaMusic</c> is the same letter.</summary>
+    /// <summary>The letter for the Amiga version's music (D-640) and sound effects (D-641): not a sound card of the set-up; the launcher's <c>SoundDriverChoice.AmigaMusic</c> is the same letter.</summary>
     public const char AmigaMusicLetter = 'G';
 
     /// <summary>The sound driver's letter of a sound card (the set-up's letters: N, I, T, A, R); the AdLib's for any other.</summary>

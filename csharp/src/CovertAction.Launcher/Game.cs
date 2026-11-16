@@ -1,3 +1,4 @@
+using CovertAction.Audio.Amiga;
 using CovertAction.Content;
 using CovertAction.Core;
 using CovertAction.Core.Campaign;
@@ -295,21 +296,28 @@ public sealed class Game
         switch (shared.NextModule)
         {
             case FollowCar or VariantChase or Followed or PracticeChase:
+                _sound.AmigaBank = AmigaBank.Chase;
                 PlayChase(shared);
                 break;
             case DecodeMessage or Cryptography:
+                _sound.AmigaBank = AmigaBank.Code;
                 PlayCrypto(shared);
                 break;
             case MenusFresh or MenusBack or MenusAfterCase:
+                // the Amiga game plays no sound effect in the menus part (FINAL)
+                _sound.AmigaBank = null;
                 PlayMenus(shared);
                 break;
             case Campaign:
+                _sound.AmigaBank = AmigaBank.Game;
                 PlayCampaign(shared);
                 break;
             case BreakInRaid or EscapeRaid or JailbreakRaid or AmbushRaid or PracticeRaid:
+                _sound.AmigaBank = AmigaBank.Tac;
                 PlayRaid(shared);
                 break;
             case Wiretap or CarTracerTap or PracticeWiretap:
+                _sound.AmigaBank = AmigaBank.Bug;
                 PlayElectronics(shared);
                 break;
             default:

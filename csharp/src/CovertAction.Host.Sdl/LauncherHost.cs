@@ -96,24 +96,29 @@ internal static class LauncherHost
     }
 
     /// <summary>
-    /// What the Amiga files' folder holds (D-640): the folder the player chose (the folder itself, or its disk1 folder), or when
-    /// none is chosen the one <see cref="AmigaFolderSearch"/> finds beside the program or the game, else the default folder.
+    /// What the Amiga files' folder holds (D-640, D-641): the folder the player chose (the folder itself, or its disk1 folder for the
+    /// music, its disk2 folder for the sound banks), or when none is chosen the ones <see cref="AmigaFolderSearch"/> finds beside the
+    /// program or the game, else the default folder.
     /// </summary>
     internal static AmigaStatus DescribeAmiga(string? chosen, string? gameFolder)
     {
         string? source = null;
         string folder;
+        string? banks;
         if (string.IsNullOrWhiteSpace(chosen))
         {
             var found = AmigaFolderSearch.Automatic(gameFolder);
             (folder, source) = found is { } place ? (place.Folder, place.Source) : (AmigaFolderSearch.DefaultFolder, null);
+            banks = AmigaFolderSearch.AutomaticBanks(gameFolder)?.Folder;
         }
         else
         {
             folder = AmigaFolderSearch.Resolve(chosen) ?? chosen;
+            banks = AmigaFolderSearch.ResolveBanks(chosen);
         }
         var missing = AmigaFolderSearch.Missing(folder);
-        return new AmigaStatus(folder, missing.Count == 0, source, missing);
+        var missingBanks = AmigaFolderSearch.MissingBanks(banks);
+        return new AmigaStatus(folder, missing.Count == 0, source, missing, missingBanks.Count == 0, missingBanks);
     }
 
     /// <summary>A picture of the player's game in its own colours (the graphics driver's), or null when it cannot be read.</summary>

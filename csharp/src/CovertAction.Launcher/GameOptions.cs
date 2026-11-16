@@ -13,9 +13,9 @@ namespace CovertAction.Launcher;
 /// </param>
 /// <param name="ArrowKeysWalk">In a building raid the grey arrow keys walk like the keypad's digits and Shift with them lunges (D-610); off: the original's keys.</param>
 /// <param name="MusicLetter">The driver the tunes play on (N, I, T, A, R) when the music and the effects play on two cards (D-620); null: the sound card's.</param>
-/// <param name="EffectsLetter">The driver the sound effects play on (D-620); null: the sound card's. Both null (the default): one card plays all, as the original.</param>
-/// <param name="AmigaFolder">With <see cref="MusicLetter"/> 'G' (the Amiga version's music, D-640): the folder with the player's Amiga music files; null: found beside the program or the game.</param>
-/// <param name="AmigaOnlyWhereOriginal">The Amiga music plays only where the Amiga game had music: the selection screens' and the vacations' tunes (commands 39 to 43) play nothing (D-640).</param>
+/// <param name="EffectsLetter">The driver the sound effects play on (D-620), or 'G' for the Amiga version's sound effects (D-641); null: the sound card's. Both null (the default): one card plays all, as the original.</param>
+/// <param name="AmigaFolder">With <see cref="MusicLetter"/> or <see cref="EffectsLetter"/> 'G' (the Amiga version's music and sound effects, D-640, D-641): the folder with the player's Amiga files; null: found beside the program or the game.</param>
+/// <param name="AmigaOnlyWhereOriginal">The Amiga music and effects play only where the Amiga game had them: the selection screens' and the vacations' tunes (commands 39 to 43) and the effects without an Amiga twin play nothing (D-640, D-641).</param>
 /// <param name="Mouse">
 /// The mouse in the menus, lists and maps (the settings' input.mouse, off by default): the game gets a mouse driver on
 /// the host's pointer, when the host has one; off (or without a pointer), the PC has no mouse, as the original assumes
