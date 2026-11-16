@@ -54,7 +54,8 @@ Proven function by function by the oracle, not yet in a recorded whole session (
   the prisoner escaped), 1532 checkpoints, all agree; two C# bugs fixed in the raid (the plot object's guards, tile 63).
   The jail break foiled (the agent wins the raid): item 15, 2 sessions, 593 checkpoints, all agree.
 - [x] Campaign wire taps at levels 1 and 3 (level 2 is done): `docs/SESSION-PROOF.md` item 10, 8 sessions from a new
-  case at each level to the tap and back to GAME, all agree; one C# bug fixed (BUG's clue report source, `coded_flag`).
+  case at each level to the tap and back to GAME, all agree; one C# bug fixed (BUG's clue report source, `coded_flag`). Each
+  board solved too (every phone cut off, no alarm): item 16, 4 sessions, 904 checkpoints, all agree.
 - [x] An ambush won: TAC/street-ambush-won (the five attackers shot, "You have eliminated all of your enemies.") and
   its return GAME/ambush-won-return (the attackers' building found), 417 checkpoints, all agree (SESSION-PROOF.md
   item 11).
