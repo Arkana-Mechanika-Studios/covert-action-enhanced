@@ -37,3 +37,8 @@ CovertAction.Core.Shared.TextBufferTable.Insert,"an operation of the list the li
 CovertAction.Core.Shared.TextBufferTable.Remove,"an operation of the list the library's text routines take the placeholder values through (the original's table of pointers to fixed buffers; adding and removing are not supported)"
 CovertAction.Core.Shared.TextBufferTable.RemoveAt,"an operation of the list the library's text routines take the placeholder values through (the original's table of pointers to fixed buffers; adding and removing are not supported)"
 CovertAction.Presentation.Intro.HardwareSetup.ShowTitle,"the set-up screen without its questions (D-600, D-603): the title and the last words of hardware_setup_menu, two seconds, and the launcher's settings as the answers"
+CovertAction.Presentation.Electronics.ElectronicsWorkbench.SlotAt,"the mouse's hit test at the workbench, a player option (D-634): the slot whose 32 by 32 pixel cell holds a pixel"
+CovertAction.Presentation.Library.LibraryInput.ReadPointerHold,"the mouse in the building raid, a player option (D-636): whether the left button is held and where the pointer is"
+CovertAction.Presentation.Library.LibraryInput.ReadPointerRightPress,"the mouse in the building raid, a player option (D-636): whether the right button was pressed"
+CovertAction.Presentation.Library.PointerHit.Cell,"the mouse's hit test, a player option (D-634, D-635): the cell of a grid under a pixel"
+CovertAction.Presentation.Library.PointerHit.Direction8,"the mouse in the building raid, a player option (D-636): the keypad direction nearest the vector from the agent to the pointer"
