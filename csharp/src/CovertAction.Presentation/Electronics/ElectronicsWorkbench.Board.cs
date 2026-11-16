@@ -1,6 +1,7 @@
 using CovertAction.Core.Electronics;
 using CovertAction.Core.Shared;
 using CovertAction.Msc;
+using CovertAction.Presentation.Library;
 
 namespace CovertAction.Presentation.Electronics;
 
@@ -139,6 +140,12 @@ public sealed partial class ElectronicsWorkbench
             }
             HandleKey(key);
         }
+        else if (Input.PointerOn)
+        {
+            // DIVERGENCE: D-634 with the mouse option on, the pointer on a slot moves the cursor there; a left click on one
+            // swaps the chip (Return), a right click gives up (Esc).
+            HandlePointer(Input.ReadPointer(SlotAt));
+        }
         Output.WaitVsync(joystickMoved ? joystickFrames : keyFrames);
     }
 
@@ -193,6 +200,40 @@ public sealed partial class ElectronicsWorkbench
             case Keys.AltP:
                 Pause();
                 break;
+        }
+    }
+
+    /// <summary>The slots the pointer can take: chips are 32 pixels apart, a slot's cell is the 32 by 32 pixels around its picture.</summary>
+    private static readonly HitArea SlotGrid = new(SlotPosition(0, 0).X - 8, SlotPosition(0, 0).Y - 8, 32, 32);
+
+    /// <summary>The mouse's hit test: the slot (row * 6 + column) under a screen pixel, -1 for none.</summary>
+    public static int SlotAt(int x, int y)
+        => PointerHit.Cell(x, y, SlotGrid, LastCursorCol + 1, LastCursorRow + 1) is { } cell ? cell.Row * (LastCursorCol + 1) + cell.Column : -1;
+
+    /// <summary>What a mouse action does: the keys it stands for (a move onto a slot moves the cursor, a click on a slot swaps, a right click is Esc).</summary>
+    private void HandlePointer(PointerEvent pointed)
+    {
+        switch (pointed.Action)
+        {
+            case PointerAction.Cancel:
+                HandleKey(Keys.Esc);
+                break;
+            case PointerAction.Point or PointerAction.Accept when pointed.Choice >= 0:
+                MoveCursorTo(pointed.Choice % (LastCursorCol + 1), pointed.Choice / (LastCursorCol + 1));
+                if (pointed.Action == PointerAction.Accept)
+                {
+                    HandleKey(Keys.Return);
+                }
+                break;
+        }
+    }
+
+    /// <summary>Puts the cursor on a slot, as the cursor keys would reach it.</summary>
+    private void MoveCursorTo(int col, int row)
+    {
+        if (col != state.CursorCol || row != state.CursorRow)
+        {
+            MoveCursor(col - state.CursorCol, row - state.CursorRow);
         }
     }
 

@@ -1,7 +1,7 @@
 # Mouse support: how it could be added
 
-Study of 14 November 2026; **phases 0, 1 and 2 implemented on 15 November 2026** (section 6): the mouse works in the
-menus, the lists and on the flight map as a player option, off by default. Phases 3 to 5 are still planned. Question: the original's shared library carries int 33h mouse
+Study of 14 November 2026; **phases 0, 1 and 2 implemented on 15 November 2026, phases 3 and 4 (without the car chase) in version 1.2** (section 6): the mouse works in the
+menus, the lists, on the flight map, at the workbench and the workstation and in the building raid as a player option, off by default. Phase 5 and the car chase are not done. Question: the original's shared library carries int 33h mouse
 routines that no program calls (`LibraryInput.cs` "DORMANT", `docs/cut-content.md` CC-15). Could the rewrite offer
 a mouse, how much of it is the original's own code, and what does it cost?
 
@@ -240,10 +240,22 @@ Esc), the copy-protection faces (click = Return; right click = Esc, which picks 
 same hand-off block as by the keys; a right click is Esc (same block and picture); the campaign's walk (city screen,
 flight map by its list and by the city's dot, hotel, quit) ends in the same block as by the keys.
 
+**Phase 3 and the raid (version 1.2; D-634 to D-636).**
+
+* Electronics workbench: each chip slot is a 32 by 32 pixel cell (`PointerHit.Cell`, `ElectronicsWorkbench.SlotAt`); pointing moves the board cursor
+  (`MoveCursor` by the difference, so the slot is drawn as the keys draw it); a left click moves and presses Return; a right click is Esc. The pointer is read
+  only in a step where no key and no joystick move waits, so the matched `PuzzleInputStep` is unchanged with the option off.
+* Cryptography workstation: a click on a letter of the message (cell 6 by 16 from (44, 16), 42 across; the cipher letter is the one `DrawCipherText` draws) or on a
+  row of the letter column gives the key of that cipher letter. The original screen has no cursor, so pointing alone does nothing; typing the replacement
+  (and the blink wait, which ends at a key) stays on the keyboard. A right click is Esc.
+* Building raid: while the left button is held, `UpdatePlayer` takes the direction 1..8 nearest the vector from the agent (his sprite's centre on the screen) to the pointer
+  (`PointerHit.Direction8`) as the joystick's direction code, when no key waits and the joystick gave nothing; the right button is the joystick's first button (Space
+  with a guard in the room, else F1). The raid starts with `BeginPointer`, which forgets older presses.
+* Not done: the car chase (decided), the equipment screen and boxes inside these parts already follow D-631/D-632.
+
 **Left (planned, not in this version):**
 
-* Phase 3, the workstations: cryptography (click a letter or a text cell) and electronics (click a slot).
-* Phase 4, the real-time parts: the raid's walking and the car chase's steering (needs game design; a sub-setting).
+* Phase 4, the car chase's steering (decided against for now; the raid's walking is done).
 * Phase 5, the set-up screen (click a choice line = its digit; `PictureLayout.TextCell` is ready) and the code-name
   field.
 * Unchanged on purpose: text entry (row 7, keyboard only), the Alt-letter toggles (row 14), the animation skips and

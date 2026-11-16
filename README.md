@@ -81,8 +81,11 @@ folder and the keyboard's repeat. They are kept in `covertaction.settings.json`;
 
 Not in the original, each off by default, on the launcher's Advanced tab ([the settings](csharp/docs/SETTINGS.md)):
 
-* **The mouse in the menus, lists and on the flight map** ([D-630](csharp/docs/faithfulness/DIVERGENCES.md)): pointing
-  at a choice highlights it, a left click takes it, a right click is Esc.
+* **The mouse** ([D-630 to D-636](csharp/docs/faithfulness/DIVERGENCES.md)): in the menus, lists and on the flight map,
+  pointing at a choice highlights it, a left click takes it, a right click is Esc. At the electronics workbench it moves
+  the cursor to a chip's slot and a click swaps the chip; at the cryptography workstation a click on a letter of the
+  message selects it (the replacement is typed); in a building raid the agent walks towards the pointer while the left
+  button is held and a right click is the fire button. Not in the car chase.
 * **Arrow keys that walk in a building raid** ([D-610](csharp/docs/faithfulness/DIVERGENCES-INTRO.md)): the grey arrow keys
   walk the agent as the keypad does, and Shift with an arrow lunges.
 * **Music and sound effects on different sound cards** ([D-620](csharp/docs/faithfulness/DIVERGENCES-INTRO.md)), for example
@@ -118,8 +121,7 @@ data), and [cut content](docs/cut-content.md) found in the original's code and d
 
 * Only the MCGA picture. In this game the EGA, VGA and Tandy choices show the same 16 colours as the MCGA; the CGA's
   four-colour picture is not offered ([D-600](csharp/docs/faithfulness/DIVERGENCES-INTRO.md)).
-* The mouse works in the menus, lists and on the flight map, not in the action parts (the raid, the car chase, the
-  workbench and the workstation).
+* The mouse works everywhere but the car chase (a player option, off by default).
 * The joystick is tried with a real gamepad (16 November 2026: the menus and a raid play as expected), but how a real
   stick's position turns into the game's readings is still a model ([U-12](csharp/docs/faithfulness/UNCERTAIN.md)).
 * A damaged save (cut short or the wrong size) is listed as empty instead of loading into a broken campaign

@@ -39,6 +39,42 @@ public static class PointerHit
         return row < rows ? row : -1;
     }
 
+    /// <summary>The cell of a grid of equal cells under a pixel.</summary>
+    /// <param name="x">The pixel across.</param>
+    /// <param name="y">The pixel down.</param>
+    /// <param name="grid">The grid's rectangle: its first cell's top left corner and the cell's width and height.</param>
+    /// <param name="columns">How many cells across.</param>
+    /// <param name="rows">How many cells down.</param>
+    /// <returns>The cell's column and row (0 = the first); null for a pixel outside the grid.</returns>
+    public static (int Column, int Row)? Cell(int x, int y, HitArea grid, int columns, int rows)
+    {
+        if (grid.Width <= 0 || grid.Height <= 0 || x < grid.X || y < grid.Y)
+        {
+            return null;
+        }
+        int column = (x - grid.X) / grid.Width, row = (y - grid.Y) / grid.Height;
+        return column < columns && row < rows ? (column, row) : null;
+    }
+
+    /// <summary>
+    /// The keypad direction (of the eight) nearest the vector from one point to another: 1 up, then clockwise (2 up-right,
+    /// 3 right, 4 down-right, 5 down, 6 down-left, 7 left, 8 up-left), the numbering of the raid's facings and of the
+    /// joystick's directions. Each direction owns the 45 degrees around it.
+    /// </summary>
+    /// <param name="dx">The vector's part across (positive to the right).</param>
+    /// <param name="dy">The vector's part down (positive down the screen).</param>
+    /// <returns>1..8; 0 when the vector is empty (the pointer is on the point).</returns>
+    public static int Direction8(int dx, int dy)
+    {
+        if (dx == 0 && dy == 0)
+        {
+            return 0;
+        }
+        var degrees = Math.Atan2(dx, -dy) * 180 / Math.PI;
+        var sector = (int)Math.Round(degrees / 45, MidpointRounding.AwayFromZero);
+        return ((sector % 8 + 8) % 8) + 1;
+    }
+
     /// <summary>The first of some rectangles that holds a pixel.</summary>
     /// <param name="x">The pixel across.</param>
     /// <param name="y">The pixel down.</param>

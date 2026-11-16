@@ -258,6 +258,8 @@ public sealed partial class BuildingRaid
         world.Graphics.SetColorMaps(state.CgaMapGame, state.CgaMapGame);
         // the keypad moves the agent: Num Lock on
         world.Input.SetNumLock(true);
+        // DIVERGENCE: D-636 the mouse (an option) starts clean: the presses made before the raid are forgotten.
+        Input.BeginPointer();
         // DIVERGENCE: D-501 the original asks the video BIOS for the cursor's position here (INT 10h function 3) and uses no answer.
     }
 

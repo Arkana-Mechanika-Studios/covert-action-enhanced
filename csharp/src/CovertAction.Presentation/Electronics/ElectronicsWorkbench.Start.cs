@@ -82,6 +82,7 @@ public sealed partial class ElectronicsWorkbench
         state.RandomSeed = LibraryRandom.SeedRandom(state.Random, world.Timer);
         BuildCircuitBoard();
         Input.FlushInput();
+        Input.BeginPointer();
         do
         {
             PuzzleInputStep();

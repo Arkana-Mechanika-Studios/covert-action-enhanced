@@ -1,6 +1,7 @@
 using CovertAction.Core.Raid;
 using CovertAction.Core.Shared;
 using CovertAction.Msc;
+using CovertAction.Presentation.Library;
 
 namespace CovertAction.Presentation.Raid;
 
@@ -283,6 +284,11 @@ public sealed partial class BuildingRaid
             DrawStatusPanel();
         }
         var joystickKey = ReadJoystickKey();
+        // DIVERGENCE: D-636 with the mouse option on, the held left button and the right button act as the joystick does.
+        if (joystickKey == -1 && Input.PointerOn)
+        {
+            joystickKey = ReadMouseKey();
+        }
         if (!(world.Input.NoKeyWaiting() && joystickKey == -1 || state.LungeTimer != 0 || state.ThrowTimer != 0))
         {
             int key;
@@ -377,6 +383,42 @@ public sealed partial class BuildingRaid
         }
         return key;
     }
+
+    /// <summary>
+    /// The mouse's key of the frame, in the joystick's form (a facing 1..8 as the joystick's direction, Space or F1 for its
+    /// first button), only when no key waits: the agent walks towards the pointer while the left button is held, and a
+    /// right click is the joystick's first button (Space when a guard is in the room, else F1, the arrest).
+    /// </summary>
+    /// <returns>The key, or -1 to let the keyboard decide.</returns>
+    private int ReadMouseKey()
+    {
+        var fire = Input.ReadPointerRightPress();
+        if (!world.Input.NoKeyWaiting())
+        {
+            return -1;
+        }
+        if (fire)
+        {
+            if (state.GuardInRoom)
+            {
+                return KeySpace;
+            }
+            Input.FlushInput();
+            return KeyF1;
+        }
+        var (held, x, y) = Input.ReadPointerHold();
+        if (!held)
+        {
+            return -1;
+        }
+        var room = state.Rm[state.InRoom];
+        var (agentX, agentY) = AgentOnScreen(room.X, room.Y);
+        var direction = PointerHit.Direction8(x - agentX, y - agentY);
+        return direction == 0 ? -1 : direction;
+    }
+
+    /// <summary>Where the agent is on the screen (the centre of his picture, as <see cref="DrawActors"/> places it).</summary>
+    private (int X, int Y) AgentOnScreen(int roomX, int roomY) => (C16.Int(state.Px - (roomX << 4) + state.BaseX), C16.Int(state.Py - (roomY << 4) + state.BaseY));
 
     /// <summary>Acts on the key of the frame (update_player).</summary>
     private void ActOnKey(int key, int joystickKey)

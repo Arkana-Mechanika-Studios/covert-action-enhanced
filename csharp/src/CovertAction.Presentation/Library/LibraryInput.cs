@@ -276,6 +276,26 @@ public sealed class LibraryInput(ILibraryState state, Boundaries world)
         _ => -1,
     };
 
+    /// <summary>
+    /// Whether the left button is held down, and where the pointer is (pixels of the screen): the building raid walks the
+    /// agent towards it while it is held.
+    /// </summary>
+    /// <remarks>New code (D-636). Without the mouse option: not held, and no call of the mouse driver.</remarks>
+    public (bool Held, int X, int Y) ReadPointerHold()
+    {
+        if (!PointerOn)
+        {
+            return (false, 0, 0);
+        }
+        var status = world.Mouse.GetStatus();
+        var (x, y) = PointerPixel(status);
+        return ((status.Buttons & 1) != 0, x, y);
+    }
+
+    /// <summary>Whether the right button was pressed since the last look (the presses are taken).</summary>
+    /// <remarks>New code (D-636). Without the mouse option: false, and no call of the mouse driver.</remarks>
+    public bool ReadPointerRightPress() => PointerOn && world.Mouse.ButtonPresses(1).Count > 0;
+
     /// <summary>The screen pixel of the mouse driver's position.</summary>
     private static (int X, int Y) PointerPixel(Platform.MouseStatus status) => (status.X / MouseUnitsPerPixel, status.Y);
 

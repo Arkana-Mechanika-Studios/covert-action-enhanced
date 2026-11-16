@@ -5,6 +5,10 @@ using CovertAction.Host.Headless;
 using CovertAction.Persistence;
 using CovertAction.Persistence.Layout;
 using CovertAction.Platform;
+using CovertAction.Core.Final;
+using CovertAction.Presentation;
+using CovertAction.Presentation.Electronics;
+using CovertAction.Presentation.Library;
 
 namespace CovertAction.Launcher.Tests;
 
@@ -203,6 +207,136 @@ public sealed class MouseOptionTests
         game = new Game(folder, host, null, new GameOptions(Mouse: mouse));
         game.RunPart(shared);
         return (shared, Block(shared));
+    }
+
+    // ---- the electronics workbench, the cryptography workstation, the building raid (D-634 to D-636) ----
+
+    /// <summary>The workbench's slots: the 32 by 32 pixels around each chip's picture (the first at 40, 8), six across and five down; nothing beside the board.</summary>
+    [Fact]
+    public void TheWorkbenchsSlotsAreHitByTheirChipsCells()
+    {
+        Assert.Equal(0, ElectronicsWorkbench.SlotAt(40, 8));
+        Assert.Equal(0, ElectronicsWorkbench.SlotAt(32, 0));
+        Assert.Equal(0, ElectronicsWorkbench.SlotAt(63, 31));
+        Assert.Equal(1, ElectronicsWorkbench.SlotAt(64, 8));
+        Assert.Equal(6, ElectronicsWorkbench.SlotAt(40, 40));
+        Assert.Equal(29, ElectronicsWorkbench.SlotAt(32 + 5 * 32 + 10, 4 * 32 + 10));
+        Assert.Equal(-1, ElectronicsWorkbench.SlotAt(31, 8));
+        Assert.Equal(-1, ElectronicsWorkbench.SlotAt(40, 160));
+        Assert.Equal(-1, ElectronicsWorkbench.SlotAt(224, 8));
+    }
+
+    /// <summary>The grid hit test (the workstation's message cells): a cell's column and row, or nothing outside.</summary>
+    [Fact]
+    public void AGridCellIsFoundByItsPixel()
+    {
+        var grid = new HitArea(44, 16, 6, 16);
+        Assert.Equal((0, 0), PointerHit.Cell(44, 16, grid, 42, 11));
+        Assert.Equal((0, 0), PointerHit.Cell(49, 31, grid, 42, 11));
+        Assert.Equal((1, 0), PointerHit.Cell(50, 16, grid, 42, 11));
+        Assert.Equal((41, 10), PointerHit.Cell(44 + 41 * 6 + 5, 16 + 10 * 16 + 15, grid, 42, 11));
+        Assert.Null(PointerHit.Cell(43, 16, grid, 42, 11));
+        Assert.Null(PointerHit.Cell(44, 15, grid, 42, 11));
+        Assert.Null(PointerHit.Cell(44 + 42 * 6, 16, grid, 42, 11));
+        Assert.Null(PointerHit.Cell(44, 16 + 11 * 16, grid, 42, 11));
+    }
+
+    /// <summary>The raid's walk: the keypad direction (1 up, clockwise) nearest the vector to the pointer; none on the agent.</summary>
+    [Theory]
+    [InlineData(0, 0, 0)]
+    [InlineData(0, -10, 1)]
+    [InlineData(10, -10, 2)]
+    [InlineData(10, 0, 3)]
+    [InlineData(10, 10, 4)]
+    [InlineData(0, 10, 5)]
+    [InlineData(-10, 10, 6)]
+    [InlineData(-10, 0, 7)]
+    [InlineData(-10, -10, 8)]
+    [InlineData(1, -100, 1)]
+    [InlineData(-1, -100, 1)]
+    [InlineData(100, -30, 3)]
+    [InlineData(100, -50, 2)]
+    [InlineData(-30, 100, 5)]
+    [InlineData(-100, 30, 7)]
+    [InlineData(1, 0, 3)]
+    public void TheRaidWalksInTheNearestOfTheEightDirections(int dx, int dy, int expected)
+        => Assert.Equal(expected, PointerHit.Direction8(dx, dy));
+
+    /// <summary>Without the option the three parts' reads of the mouse ask the driver nothing; with it they read the held button, the place and the right click.</summary>
+    [Fact]
+    public void TheNewReadsMakeNoMouseCallWithoutTheOption()
+    {
+        var (off, on) = (new CountingMouse(false), new CountingMouse(true));
+        var offInput = Input(off);
+        Assert.Equal((false, 0, 0), offInput.ReadPointerHold());
+        Assert.False(offInput.ReadPointerRightPress());
+        Assert.Equal(PointerEvent.Nothing, offInput.ReadPointer((_, _) => 0));
+        offInput.BeginPointer();
+        Assert.Equal(0, off.Calls);
+
+        var onInput = Input(on);
+        on.Status = new MouseStatus(1, 200, 50);
+        Assert.Equal((true, 100, 50), onInput.ReadPointerHold());
+        on.Status = new MouseStatus(0, 200, 50);
+        Assert.False(onInput.ReadPointerHold().Held);
+        Assert.False(onInput.ReadPointerRightPress());
+        on.RightPresses = 1;
+        Assert.True(onInput.ReadPointerRightPress());
+        Assert.True(on.Calls > 0);
+    }
+
+    private static LibraryInput Input(IMouseDriver mouse)
+    {
+        // only the mouse driver is used by the reads under test
+        var world = new Boundaries(null!, null!, null!, mouse, null!, null!);
+        return new LibraryInput(new FinalState(), world);
+    }
+
+    /// <summary>A mouse driver that counts the calls it gets.</summary>
+    private sealed class CountingMouse(bool installed) : IMouseDriver
+    {
+        public int Calls { get; private set; }
+
+        public MouseStatus Status { get; set; }
+
+        public int RightPresses { get; set; }
+
+        public bool Installed => installed;
+
+        public void Reset() => Calls++;
+
+        public void ShowCursor() => Calls++;
+
+        public void HideCursor() => Calls++;
+
+        public MouseStatus GetStatus()
+        {
+            Calls++;
+            return Status;
+        }
+
+        public void SetPosition(int x, int y) => Calls++;
+
+        public MouseButtonEvents ButtonPresses(int button)
+        {
+            Calls++;
+            if (button == 1 && RightPresses > 0)
+            {
+                RightPresses--;
+                return new MouseButtonEvents(2, 1, 0, 0);
+            }
+            return default;
+        }
+
+        public MouseButtonEvents ButtonReleases(int button)
+        {
+            Calls++;
+            return default;
+        }
+
+        public void SetHorizontalRange(int minimum, int maximum) => Calls++;
+
+        public void SetVerticalRange(int minimum, int maximum) => Calls++;
     }
 
     // ---- helpers ----

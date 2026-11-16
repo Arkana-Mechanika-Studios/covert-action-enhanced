@@ -112,6 +112,7 @@ public sealed class CryptoWorkstation
         _state.RandomSeed = LibraryRandom.SeedRandom(_state.Random, _world.Timer);
         CryptoRules.SetupCipher(_state, _shared);
         DrawCryptoScreen();
+        Input.BeginPointer();
         do
         {
             CryptoKeyStep();
@@ -479,6 +480,12 @@ public sealed class CryptoWorkstation
             DrawTimer();
             if (!_world.Input.Kbhit())
             {
+                // DIVERGENCE: D-635 with the mouse option on, a left click on a letter of the message or of the column selects
+                // that cipher letter (its key), a right click is Esc.
+                if (Input.PointerOn && PointerKey() is var pointerKey and not -1)
+                {
+                    return pointerKey;
+                }
                 continue;
             }
             var key = Input.ReadKey();
@@ -489,6 +496,43 @@ public sealed class CryptoWorkstation
                 return key;
             }
         }
+    }
+
+    /// <summary>What a mouse action stands for: the key of the cipher letter clicked, Esc for a right click, -1 for nothing. Pointing alone does nothing (the screen has no cursor).</summary>
+    private int PointerKey()
+    {
+        var pointed = Input.ReadPointer(CipherAt);
+        return pointed.Action switch
+        {
+            PointerAction.Accept when pointed.Choice >= 0 => 'a' + pointed.Choice,
+            PointerAction.Cancel => Keys.Esc,
+            _ => -1,
+        };
+    }
+
+    /// <summary>The mouse's hit test: the cipher letter (0 = A) of the message's letter or of the letter column's row under a screen pixel, -1 for none.</summary>
+    private int CipherAt(int x, int y)
+    {
+        var cell = PointerHit.Cell(x, y, new HitArea(TextLeft, TextTop, CellWidth, TextLineHeight), TextColumns, MaxMessageLength / TextColumns);
+        if (cell is { } at)
+        {
+            var index = at.Row * TextColumns + at.Column;
+            return CipherOfMessageCell(index);
+        }
+        var row = PointerHit.Row(x, y, new HitArea(LetterColumnX, ColumnTop, CellWidth, ColumnRowHeight), ColumnRowHeight, _state.AlphabetLen);
+        return row;
+    }
+
+    /// <summary>The cipher letter shown in a cell of the message (0 = A), -1 for a cell with none.</summary>
+    private int CipherOfMessageCell(int index)
+    {
+        var message = _state.MessageText;
+        if (index >= message.Length || !IsTableCharacter(message[index]))
+        {
+            return -1;
+        }
+        var cipher = _state.CipherAlphabet[message[index] - 'A'] - 'A';
+        return cipher >= 0 && cipher < _state.AlphabetLen ? cipher : -1;
     }
 
     /// <summary>The player chose a cipher letter: waits for the plain letter and notes it as the guess; any other key clears the guess.</summary>
