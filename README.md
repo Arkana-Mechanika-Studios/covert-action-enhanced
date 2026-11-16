@@ -4,7 +4,7 @@ A rewrite of *Sid Meier's Covert Action* (MicroProse, 1990, DOS) as a native Win
 original's own code, part by part, so that it plays as the original did. You need your own copy of the game: none of its
 files come with this project, and your copy is never changed.
 
-**Status: version 1.1.5.** The whole game runs, from the set-up screen to the end of a career: the menus, the
+**Status: version 1.2.** The whole game runs, from the set-up screen to the end of a career: the menus, the
 briefings, the campaign, the building raids, the electronics workbench, the car chase, the cryptography workstation,
 saving and loading, the joystick and all four of the original's sound cards. Version 1.0 is the faithful version and
 stays the reference (its `release/1.0` branch and the tag `v1.0`; what it had to meet is in
