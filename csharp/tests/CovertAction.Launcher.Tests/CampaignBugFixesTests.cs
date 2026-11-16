@@ -65,7 +65,7 @@ public sealed class CampaignBugFixesTests(ITestOutputHelper output) : IDisposabl
     {
         var tables = new CampaignTables();
         CrimeFileCodec.Load(game.Read($"CRIME{crime}.DTA"), tables);
-        var state = new CampaignState { Behaviour = behaviour, NEVENT = (short)tables.Events.Count, NACTIVITY = (short)tables.Cast.Count, NextSyn = 6, ChronTime = 1, Nperson = CampaignState.PersonCount };
+        var state = new CampaignState { Behaviour = behaviour, TheCrime = (short)crime, NEVENT = (short)tables.Events.Count, NACTIVITY = (short)tables.Cast.Count, NextSyn = 6, ChronTime = 1, Nperson = CampaignState.PersonCount };
         for (var member = 0; member < tables.Cast.Count; member++)
         {
             state.Ac[member].CopyFrom(tables.Cast[member]);
@@ -547,5 +547,186 @@ public sealed class CampaignBugFixesTests(ITestOutputHelper output) : IDisposabl
         var game = GameFiles();
         var skills = TrainedSkills(game, On, 0, 0, 1, 2);
         Assert.Equal([2, 1, 1, 0], skills);
+    }
+
+    // ---- CA-58: the lay-out of a new case that never ends ----
+
+    /// <summary>The hardest-level case the briefing lays out, as the menus part does it, on the shipped world: false when the lay-out has not finished after <paramref name="attempts"/> attempts.</summary>
+    private bool LaysOut(GameFolder game, OriginalBehaviour behaviour, int seed, int crime, int world, int bigOrg, int bigLoc, int attempts = 20000)
+    {
+        var state = FinalData(game);
+        var files = new GameFolderFiles(game);
+        _files.Add(files);
+        var menus = new Headquarters(state, new SharedState(), new Boundaries(null!, null!, null!, null!, null!, files), behaviour);
+        menus.LoadWorldFile(world);
+        state.Pl.Crime = (short)crime;
+        state.Pl.BigOrg = (short)bigOrg;
+        state.Pl.BigLoc = (short)bigLoc;
+        state.Pl.BigIndex = (byte)state.Org[bigOrg].Clues;
+        state.Diff = 3;
+        state.InCity = 1;
+        state.AtLoc = 1;
+        state.TheCrime = state.Pl.Crime;
+        menus.LoadCrimeFile(state.TheCrime);
+        state.Random.Srand(seed);
+        try
+        {
+            CaseSetup.LayOutCase(state, behaviour, attempts);
+            return true;
+        }
+        catch (InvalidOperationException)
+        {
+            return false;
+        }
+    }
+
+    /// <summary>Seeds that hang the original on crime 6, world 0, MasterMind of organisation 6 in city 5, hardest level (found by trying seeds 1 to 300).</summary>
+    private static readonly int[] Ca58HangingSeeds = [19, 62, 81, 100];
+
+    [SkippableFact]
+    public void Ca58ACaseOfCrimeSixOnWorldZeroCanNeverBeLaidOut()
+    {
+        var game = GameFiles();
+        // the original goes on drawing attempts for ever: after 20000 (a thousand times what a case ever needs) the test stops it
+        foreach (var seed in Ca58HangingSeeds)
+        {
+            Assert.False(LaysOut(game, Off, seed, 6, 0, 6, 5), $"seed {seed} was laid out");
+        }
+    }
+
+    [SkippableFact]
+    public void Ca58WithTheFixTheSameSeedsAreLaidOutAndSoAreOthers()
+    {
+        var game = GameFiles();
+        foreach (var seed in Ca58HangingSeeds.Concat(Enumerable.Range(1, 10)))
+        {
+            Assert.True(LaysOut(game, On, seed, 6, 0, 6, 5), $"seed {seed}");
+        }
+    }
+
+    // ---- CA-60: CRIME10 event 20 ----
+
+    [SkippableFact]
+    public void Ca60TheMastermindsMeetingNamesTheExtractorWhereItsPairIsTheTravelAgents()
+    {
+        var game = GameFiles();
+        var state = Crime10(game, Off);
+        // event 19 (member 5) and event 20 (member 6, status 0x0804) share message id 11; member 4 has no event of that id
+        Assert.Equal((5, 0x0804), (state.Ev[19].Act, state.Ev[20].Status & 0xfff0 | state.Ev[20].Status & 0xf));
+        Assert.Equal(4, PlotRules.PartnerMemberOf(state, 20));
+        Assert.DoesNotContain(Enumerable.Range(0, state.NEVENT), e => state.Ev[e].Act == 4 && state.Ev[e].Synch == state.Ev[20].Synch);
+        Assert.Equal(-1, PlotRules.EventReady(Crime10(game, Off, readyForTheMeeting: true), 20).Result);
+    }
+
+    [SkippableFact]
+    public void Ca60WithTheFixTheMeetingIsPairedWithTheTravelAgent()
+    {
+        var game = GameFiles();
+        Assert.Equal(5, PlotRules.PartnerMemberOf(Crime10(game, On), 20));
+        Assert.Equal(19, PlotRules.EventReady(Crime10(game, On, readyForTheMeeting: true), 20).Result);
+        Assert.Equal(300, Happened(game, 10, 20, On));
+        Assert.Equal(300, Happened(game, 10, 19, On));
+    }
+
+    [SkippableFact]
+    public void Ca60NoOtherEventOfAnyCrimeFileChangesItsPartner()
+    {
+        var game = GameFiles();
+        var only = new OriginalBehaviour { FixCrime10MeetingPartner = true };
+        for (var crime = 0; crime < 13; crime++)
+        {
+            var original = CrimeEvents(game, crime, new OriginalBehaviour());
+            var fixedState = CrimeEvents(game, crime, only);
+            for (var q = 0; q < original.NEVENT; q++)
+            {
+                if ((original.Ev[q].Status & 0xfff) != 0 && (crime, q) != (10, 20))
+                {
+                    Assert.Equal(PlotRules.PartnerMemberOf(original, q), PlotRules.PartnerMemberOf(fixedState, q));
+                }
+            }
+        }
+    }
+
+    private static CampaignState CrimeEvents(GameFolder game, int crime, OriginalBehaviour behaviour)
+    {
+        var tables = new CampaignTables();
+        CrimeFileCodec.Load(game.Read($"CRIME{crime}.DTA"), tables);
+        var state = new CampaignState { Behaviour = behaviour, TheCrime = (short)crime, NEVENT = (short)tables.Events.Count, NACTIVITY = (short)tables.Cast.Count };
+        for (var q = 0; q < tables.Events.Count; q++)
+        {
+            state.Ev[q].CopyFrom(tables.Events[q]);
+            state.Ev[q].Chron = CastRules.ChronPending;
+        }
+        for (var member = 0; member < tables.Cast.Count; member++)
+        {
+            state.Ac[member].CopyFrom(tables.Cast[member]);
+            state.Ac[member].Who = (short)member;
+            state.Ps[member].Face = 1;
+        }
+        return state;
+    }
+
+    /// <summary>CRIME10's events as a campaign holds them; with <paramref name="readyForTheMeeting"/> every event of members 0..5 but the Travel Agent's event 19 is already done.</summary>
+    private static CampaignState Crime10(GameFolder game, OriginalBehaviour behaviour, bool readyForTheMeeting = false)
+    {
+        var state = CrimeEvents(game, 10, behaviour);
+        state.NextSyn = 6;
+        if (readyForTheMeeting)
+        {
+            for (var q = 0; q < state.NEVENT; q++)
+            {
+                if (q != 19 && q != 20)
+                {
+                    state.Ev[q].Chron = 1;
+                }
+            }
+        }
+        return state;
+    }
+
+    // ---- CA-65: a new agent after a practice mission ----
+
+    private int[] NewAgentsSkills(GameFolder game, OriginalBehaviour behaviour, bool afterPractice)
+    {
+        const int down = 0x5000, enter = 0x1c0d, up = 0x4800;
+        var state = FinalData(game);
+        var shared = new SharedState();
+        // the gender, the code name (left empty), the level (second entry), then ratings 2, 1, 1, 0
+        List<int> keys = [enter, enter, down, enter];
+        foreach (var choice in new[] { 0, 0, 1, 2 })
+        {
+            keys.AddRange(Enumerable.Repeat(down, choice));
+            keys.Add(enter);
+            keys.AddRange(Enumerable.Repeat(up, choice));
+        }
+        var headquarters = new Headquarters(state, shared, FilesOnly(game, input: new AlternatingKeys([.. keys])), behaviour);
+        if (afterPractice)
+        {
+            headquarters.StartPracticeModule(0);
+            Assert.Equal(0x555, state.Skills);
+        }
+        headquarters.ChooseGender();
+        return [.. Enumerable.Range(0, 4).Select(skill => state.Skills >> 2 * skill & 3)];
+    }
+
+    [SkippableFact]
+    public void Ca65ANewAgentCreatedAfterAPracticeMissionGetsHisRatingsAddedToGood()
+    {
+        var game = GameFiles();
+        var fresh = NewAgentsSkills(game, Off, false);
+        var after = NewAgentsSkills(game, Off, true);
+        output.WriteLine($"CA-65: skills of a new agent: fresh {string.Join(",", fresh)}, after a practice mission {string.Join(",", after)} (option off)");
+        // the same choices: the ratings 2, 1, 1, 0 (the first one's 2 is lowered to 1 by CA-42, which is not the subject here), each one Good higher after a practice mission
+        Assert.Equal([1, 1, 1, 0], fresh);
+        Assert.Equal([2, 2, 2, 1], after);
+    }
+
+    [SkippableFact]
+    public void Ca65WithTheFixTheNewAgentHasTheRatingsHeChose()
+    {
+        var game = GameFiles();
+        var fresh = NewAgentsSkills(game, On, false);
+        Assert.Equal([2, 1, 1, 0], fresh);
+        Assert.Equal(fresh, NewAgentsSkills(game, On, true));
     }
 }

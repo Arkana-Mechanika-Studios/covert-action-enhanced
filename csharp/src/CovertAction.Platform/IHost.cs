@@ -60,6 +60,17 @@ public interface IInput
     IPointer? Pointer => null;
 
     /// <summary>
+    /// Sets how a held key repeats: the PC's power-on setting (500 ms, then 10.9 a second) or the one the building raid
+    /// means to set (250 ms, then 15 a second, INT 16h function 3). The raid asks for the second only with the player's
+    /// option of CA-63.
+    /// </summary>
+    /// <param name="raidRate">True for the faster setting, false for the PC's.</param>
+    /// <remarks>New code (D-650). Without its own: nothing changes.</remarks>
+    void SetTypematic(bool raidRate)
+    {
+    }
+
+    /// <summary>
     /// The joystick as the game port shows it right now: its buttons and its two timers' counts. The game reads it
     /// in tight loops (waiting for a button to be let go), so a host gives the controller's present state here
     /// without waiting for <see cref="Pump"/>.

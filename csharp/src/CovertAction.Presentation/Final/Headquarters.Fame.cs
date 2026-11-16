@@ -42,10 +42,13 @@ public sealed partial class Headquarters
 
     /// <summary>Writes the Hall of Fame to its file, when the file may be written.</summary>
     // orig: FINAL 0100:4d1d write_fame_file (src/c/final/final_0100_4d1d.c) matched; tests: FinalOracleTests
+    // BUG: CA-64 a missing FAME.DTA is never made, so no score is saved; reproduced as coded unless OriginalBehaviour.FixMissingFameFile.
     public void WriteFameFile()
     {
         var files = _world.Files;
-        if (files.Access(_state.FameFileNames[TestedForWriting], MayWrite) == NotAccessible)
+        // DIVERGENCE: D-650 a player's option: CA-64, a file that is not there at all is made (in the saves folder) and written
+        var missing = _behaviour.FixMissingFameFile && files.Access(_state.FameFileNames[TestedForReading], MayRead) == NotAccessible;
+        if (files.Access(_state.FameFileNames[TestedForWriting], MayWrite) == NotAccessible && !missing)
         {
             return;
         }

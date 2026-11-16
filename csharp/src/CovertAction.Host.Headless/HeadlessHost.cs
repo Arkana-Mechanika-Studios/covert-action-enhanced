@@ -43,6 +43,12 @@ public sealed class HeadlessHost(IEnumerable<int> keys, long unixSeconds = 0) : 
     /// </summary>
     public PointerLatch Mouse { get; } = new();
 
+    /// <summary>The keyboard repeat settings the game asked for (<see cref="IInput.SetTypematic"/>), in order: true the building raid's, false the PC's.</summary>
+    public List<bool> TypematicSettings { get; } = [];
+
+    /// <inheritdoc/>
+    void IInput.SetTypematic(bool raidRate) => TypematicSettings.Add(raidRate);
+
     /// <inheritdoc/>
     IPointer? IInput.Pointer => _watchedMouse ??= new WatchedPointer(this);
 

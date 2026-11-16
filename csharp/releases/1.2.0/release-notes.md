@@ -24,7 +24,11 @@ plays exactly as 1.0 and the original.
   rank, not the first capture's (CA-41); Delete in the name field takes out one character, not two (CA-43); in a car
   chase F2 with a building you do not know yet no longer stops the game (CA-4); the wiretap puzzle's last evaluation
   at the end of the time always draws the terminals (CA-40); the Tandy driver ignores a second pause with no resume
-  (CA-55; the game never does this). A game saved with the option on loads without it and in the original. The
+  (CA-55; the game never does this); a desk or couch no longer has its other half drawn over a wall (CA-59);
+  "Stasi" is found in the file room (CA-61); an electronics board nobody can win is drawn again (CA-62); a held
+  key in a raid repeats as the raid meant to set it, 250 ms then 15 a second, so walking at the fast speed does not
+  stop between steps (CA-63); a Hall of Fame file that is missing is made in the saves folder, so scores are
+  saved (CA-64). A game saved with the option on loads without it and in the original. The
   second option, **Also fix campaign-logic bugs** (`fixes.campaignBugs`, independent of the first), fixes the bugs
   that change events, scores, layouts or the career, each confirmed by a test on the game's own data: CRIME1's "Stole
   Blueprints" bulletin is no longer cancelled (CA-12); the receive events of CRIME2 and CRIME8 that name their own actor
@@ -33,7 +37,10 @@ plays exactly as 1.0 and the original.
   with their own partner (CA-32); cast members are seen leaving a city (CA-35); new persons get a face of their own and
   start unalerted (CA-36); the training ratings shown are the ones kept (CA-42); the apartment scene searches the new
   plot after a new case is chosen (CA-44); a case rated 255 or 511 no longer gets overwritten in the career (CA-46); coming back
-  from the cryptography workstation no longer costs extra hours left over from the last raid or car chase (CA-7). A
+  from the cryptography workstation no longer costs extra hours left over from the last raid or car chase (CA-7); a new
+  case can no longer hang while it is laid out (CA-58); the Mastermind's meeting of CRIME10 is with the Travel Agent,
+  as its pair, not the Extractor (CA-60); a new agent made after a practice mission has the skills he chose, not
+  those added to Good (CA-65). A
   game saved with it loads without it and in the original; the files keep their format. It changes the story: a case
   does not play as in the original.
 - **Everything of 1.1.5, 1.1 and 1.0.** The mouse in the menus and the action parts, arrow keys that walk in a raid,

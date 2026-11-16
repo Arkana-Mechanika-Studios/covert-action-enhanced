@@ -32,16 +32,30 @@ public sealed partial class ElectronicsWorkbench
         ReadWiresFromPicture();
         CircuitRules.LayOutWires(state);
         CircuitRules.ResetSignals(state);
+        // BUG: CA-62 the original never checks that a board can be won; reproduced as coded unless OriginalBehaviour.FixUnsolvableCircuitBoard
         do
         {
-            CircuitRules.PlaceRandomChips(state);
-            BugStatusMessage(false);
+            do
+            {
+                CircuitRules.PlaceRandomChips(state);
+                BugStatusMessage(false);
+            }
+            while (!CircuitRules.AssignTerminals(state));
+            CircuitRules.RevealChips(state);
+            CircuitRules.LockChips(state);
+            if (!behaviour.FixUnsolvableCircuitBoard)
+            {
+                break;
+            }
+            // DIVERGENCE: D-650 a player's option: CA-62, the chips are drawn again until a bounded search finds a win
+            state.CarriedChip = CircuitRules.RandomChipType(state);
         }
-        while (!CircuitRules.AssignTerminals(state));
-        CircuitRules.RevealChips(state);
-        CircuitRules.LockChips(state);
+        while (!CircuitSolver.CanBeWon(state));
         DrawBoardChips();
-        state.CarriedChip = CircuitRules.RandomChipType(state);
+        if (!behaviour.FixUnsolvableCircuitBoard)
+        {
+            state.CarriedChip = CircuitRules.RandomChipType(state);
+        }
         CircuitRules.ResetSignals(state);
         BugStatusMessage(true);
         state.CursorCol = StartCol;

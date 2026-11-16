@@ -47,6 +47,18 @@ internal sealed class SdlHost : IHost, IVideo, IInput, IClock, IDisposable
     /// </summary>
     private const double TypematicDelay = 500, TypematicInterval = 1000 / 10.9;
 
+    /// <summary>The setting the building raid means to make (INT 16h, AX=0305h, BX=0008h: 250 ms, 15 a second), used with the player's option of CA-63.</summary>
+    private const double RaidTypematicDelay = 250, RaidTypematicInterval = 1000 / 15.0;
+
+    private double _typematicDelay = TypematicDelay, _typematicInterval = TypematicInterval;
+
+    /// <inheritdoc/>
+    public void SetTypematic(bool raidRate)
+    {
+        _typematicDelay = raidRate ? RaidTypematicDelay : TypematicDelay;
+        _typematicInterval = raidRate ? RaidTypematicInterval : TypematicInterval;
+    }
+
     private readonly bool _systemRepeat;
 
     /// <summary>The mouse over the picture, with the player's mouse option on; null without it (the original's PC has no mouse).</summary>
@@ -233,7 +245,7 @@ internal sealed class SdlHost : IHost, IVideo, IInput, IClock, IDisposable
                     // the last key pressed is the one that repeats, as on a PC (a Shift pressed after a letter stops it)
                     _heldScancode = key == HostKeys.None ? -1 : e.Keyboard.Scancode;
                     _heldKey = key;
-                    _nextRepeat = PreciseMilliseconds + TypematicDelay;
+                    _nextRepeat = PreciseMilliseconds + _typematicDelay;
                     if (key != HostKeys.None)
                     {
                         Type(key, e.Keyboard.Timestamp);
@@ -272,10 +284,10 @@ internal sealed class SdlHost : IHost, IVideo, IInput, IClock, IDisposable
         {
             // one repeat for a pause of the game longer than the interval: the keyboard's repeats are not caught up
             var now = PreciseMilliseconds;
-            _nextRepeat += TypematicInterval;
+            _nextRepeat += _typematicInterval;
             if (_nextRepeat <= now)
             {
-                _nextRepeat = now + TypematicInterval;
+                _nextRepeat = now + _typematicInterval;
             }
             Type(_heldKey, 0);
         }

@@ -215,7 +215,9 @@ public sealed partial class BuildingRaid
         for (var org = FirstSearchableOrg; org < CampaignTables.WorldSize; org++)
         {
             txt.Text = state.Org[org].Name;
-            if (!UpperCaseHolds(wanted))
+            // BUG: CA-61 only the display name is searched, and "Stassi" does not hold "STASI"; the short key is searched too unless the original's search is kept
+            // DIVERGENCE: D-650 a player's option: CA-61, the organisation's short key also matches
+            if (!UpperCaseHolds(wanted) && !(behaviour.FixFileRoomShortKey && OrgKeyHolds(state.Org[org].Sname, wanted)))
             {
                 continue;
             }
@@ -319,6 +321,9 @@ public sealed partial class BuildingRaid
         txt.Text = UpperCase(txt.Text);
         return txt.Text.Contains(wanted, StringComparison.Ordinal);
     }
+
+    /// <summary>Whether an organisation's short key, in capitals, holds the text searched for (the player's option of CA-61).</summary>
+    private static bool OrgKeyHolds(string key, string wanted) => UpperCase(key).Contains(wanted, StringComparison.Ordinal);
 
     /// <summary>A text in capitals as the C library's <c>strupr</c> makes it: only the letters a to z change.</summary>
     private static string UpperCase(string text) =>

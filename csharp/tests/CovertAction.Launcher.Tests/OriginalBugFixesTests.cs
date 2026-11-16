@@ -1,4 +1,10 @@
 using System.Reflection;
+using CovertAction.Host.Headless;
+using Xunit.Abstractions;
+using CovertAction.Presentation.Raid;
+using CovertAction.Persistence.Dgroup;
+using CovertAction.Persistence;
+using CovertAction.Core.Raid;
 using Xunit;
 using CovertAction.Core;
 using CovertAction.Core.Campaign;
@@ -28,7 +34,13 @@ public sealed class OriginalBugFixesTests : IDisposable
     private readonly string _folder = Path.Combine(Path.GetTempPath(), "covert-bugfix-" + Guid.NewGuid().ToString("N"));
     private readonly List<GameFolderFiles> _files = [];
 
-    public OriginalBugFixesTests() => Directory.CreateDirectory(_folder);
+    private readonly ITestOutputHelper output;
+
+    public OriginalBugFixesTests(ITestOutputHelper output)
+    {
+        this.output = output;
+        Directory.CreateDirectory(_folder);
+    }
 
     public void Dispose()
     {
@@ -294,5 +306,228 @@ public sealed class OriginalBugFixesTests : IDisposable
     {
         Assert.Equal(10, PhonesReported(On, 1));
         Assert.Equal(10, PhonesReported(On, 2));
+    }
+
+    // ---- CA-59: a wide piece of furniture over a wall ----
+
+    private static RaidState TacState(GameFolder game)
+    {
+        var state = new RaidState();
+        TacDgroup.Layout.Load(Executable.Read(game.Read("TAC.EXE")).DataSegment(), state);
+        return state;
+    }
+
+    /// <summary>The cells of a furnished building where a wide piece's half stands on what was a wall or a corner before the furnishing.</summary>
+    private static int WideHalvesOverWalls(GameFolder game, OriginalBehaviour behaviour, int seed, out int widePieces)
+    {
+        var state = TacState(game);
+        Array.Fill(state.CellMap, RaidState.CellEmpty);
+        state.Random.Srand(seed);
+        do
+        {
+            state.Nroom = 0;
+            BuildingRules.InitBuildingGrid(state);
+            BuildingRules.AddWallSegments(state);
+        }
+        while (!BuildingRules.LabelRooms(state) || !BuildingRules.ConnectRooms(state, behaviour));
+        var before = (byte[])state.CellMap.Clone();
+        for (var room = 1; room <= state.Nroom; room++)
+        {
+            BuildingRules.FurnishRoom(state, room, behaviour);
+        }
+        var over = 0;
+        widePieces = 0;
+        for (var cell = 0; cell < before.Length; cell++)
+        {
+            var tile = state.CellMap[cell];
+            if (tile >= 12 && tile < state.Ob.Length && (state.Ob[tile].Bits & TileFlags.Wide) != 0)
+            {
+                widePieces++;
+                over += before[cell] != RaidState.CellEmpty ? 1 : 0;
+            }
+        }
+        return over;
+    }
+
+    [SkippableFact]
+    public void Ca59TheOtherHalfOfADeskOrCouchIsWrittenOverAWall()
+    {
+        var game = GameFiles();
+        var over = Enumerable.Range(1, 60).Sum(seed => WideHalvesOverWalls(game, Off, seed, out _));
+        Assert.True(over > 0, "no wide half over a wall in 60 buildings");
+    }
+
+    [SkippableFact]
+    public void Ca59WithTheFixNoWideHalfLandsOnAWallAndPiecesAreStillPlaced()
+    {
+        var game = GameFiles();
+        var pieces = 0;
+        for (var seed = 1; seed <= 60; seed++)
+        {
+            Assert.Equal(0, WideHalvesOverWalls(game, On, seed, out var wide));
+            pieces += wide;
+        }
+        Assert.True(pieces > 0);
+    }
+
+    // ---- CA-61: "Stasi" in the file room ----
+
+    private static bool SearchOrgsFinds(OriginalBehaviour behaviour, string wanted)
+    {
+        var game = GameFiles();
+        var state = new RaidState();
+        state.Org[2].Sname = "Stasi";
+        state.Org[2].Name = "Stassi";
+        var graphics = new McgaGraphicsDriver(new FontSet(game.Read("FONTS.CV")), new byte[3 * McgaDriverFile.Colours]);
+        var world = new Boundaries(graphics, new SilentSoundDriver(), new ReturnAfterFlush(), new NoMouseDriver(), null!, null!);
+        var raid = new BuildingRaid(state, new SharedState(), world, behaviour);
+        return (bool)typeof(BuildingRaid).GetMethod("SearchOrgs", BindingFlags.NonPublic | BindingFlags.Instance)!.Invoke(raid, [wanted])!;
+    }
+
+    [SkippableFact]
+    public void Ca61TheCorrectSpellingOfStasiFindsNothingInTheFileRoom()
+    {
+        Assert.False(SearchOrgsFinds(Off, "STASI"));
+        Assert.True(SearchOrgsFinds(Off, "STASS"));
+    }
+
+    [SkippableFact]
+    public void Ca61WithTheFixTheShortKeyIsSearchedToo()
+    {
+        Assert.True(SearchOrgsFinds(On, "STASI"));
+        Assert.True(SearchOrgsFinds(On, "STASS"));
+        Assert.False(SearchOrgsFinds(On, "STASX"));
+    }
+
+    // ---- CA-64: a missing FAME.DTA ----
+
+    private (string Saves, string Players) FameFolders()
+    {
+        var players = Path.Combine(_folder, "players");
+        Directory.CreateDirectory(players);
+        return (Path.Combine(_folder, "saves"), players);
+    }
+
+    private (Headquarters Hall, FinalState State) FameHall(OriginalBehaviour behaviour, string players, string saves, int score)
+    {
+        var files = new GameFolderFiles(new GameFolder(players), saves);
+        _files.Add(files);
+        var state = new FinalState();
+        Array.Fill(state.FameFileNames, "fame.dta");
+        state.FameTable[0].Score = (short)score;
+        return (new Headquarters(state, new SharedState(), new Boundaries(null!, null!, null!, null!, null!, files), behaviour), state);
+    }
+
+    [Fact]
+    public void Ca64WithoutAFameFileNoScoreIsSaved()
+    {
+        var (saves, players) = FameFolders();
+        FameHall(Off, players, saves, 77).Hall.WriteFameFile();
+        Assert.False(File.Exists(Path.Combine(saves, "FAME.DTA")));
+        Assert.Empty(Directory.GetFiles(players));
+    }
+
+    [Fact]
+    public void Ca64WithTheFixTheFileIsMadeInTheSavesFolderAndReadBack()
+    {
+        var (saves, players) = FameFolders();
+        FameHall(On, players, saves, 77).Hall.WriteFameFile();
+        Assert.True(new FileInfo(Path.Combine(saves, "FAME.DTA")).Length > 0);
+        Assert.Empty(Directory.GetFiles(players));
+        var (hall, state) = FameHall(On, players, saves, 0);
+        hall.ReadFameFile();
+        Assert.Equal(77, state.FameTable[0].Score);
+    }
+
+    [Fact]
+    public void Ca64AnEmptyFameFileOfThePlayersFolderIsSavedToAsBefore()
+    {
+        var (saves, players) = FameFolders();
+        File.WriteAllBytes(Path.Combine(players, "FAME.DTA"), []);
+        // the game reads the Hall of Fame first, which takes the player's file into the saves folder
+        void Save(OriginalBehaviour behaviour)
+        {
+            var (hall, state) = FameHall(behaviour, players, saves, 0);
+            hall.ReadFameFile();
+            state.FameTable[0].Score = 5;
+            hall.WriteFameFile();
+        }
+        Save(Off);
+        var length = new FileInfo(Path.Combine(saves, "FAME.DTA")).Length;
+        File.Delete(Path.Combine(saves, "FAME.DTA"));
+        Save(On);
+        Assert.Equal(length, new FileInfo(Path.Combine(saves, "FAME.DTA")).Length);
+        Assert.Equal(0, new FileInfo(Path.Combine(players, "FAME.DTA")).Length);
+    }
+
+    // ---- CA-62: a board that cannot be won ----
+
+    /// <summary>A freshly built wiretap board of difficulty <paramref name="level"/>, as the electronics part builds it.</summary>
+    private static ElectronicsState BuiltBoard(GameFolder game, OriginalBehaviour behaviour, int level, int seed)
+    {
+        var state = new ElectronicsState();
+        BugDgroup.Layout.Load(Executable.Read(game.Read("BUG.EXE")).DataSegment(), state);
+        state.Mode = ElectronicsMode.PhoneTaps;
+        state.Status = Options.Practice;
+        state.Diff = (short)level;
+        state.TimeLeft = 100;
+        state.Random.Srand(seed);
+        var graphics = new McgaGraphicsDriver(new FontSet(game.Read("FONTS.CV")), new byte[3 * McgaDriverFile.Colours]);
+        var world = new Boundaries(graphics, new SilentSoundDriver(), new ReturnAfterFlush(), new NoMouseDriver(), null!, null!);
+        new ElectronicsWorkbench(state, new SharedState(), world, behaviour).BuildCircuitBoard();
+        return state;
+    }
+
+    [SkippableFact]
+    public void Ca62TheGeneratorBuildsBoardsTheBoundedSearchCannotWin()
+    {
+        var game = GameFiles();
+        var hopeless = new List<int>();
+        for (var seed = 1; seed <= 1500; seed++)
+        {
+            if (!CircuitSolver.CanBeWon(BuiltBoard(game, Off, 0, seed)))
+            {
+                hopeless.Add(seed);
+            }
+        }
+        // the search is bounded, so a board it gives up on is not proven lost; the proven ones are in the register (CA-62)
+        output.WriteLine($"TALLY CA-62: {hopeless.Count} of 1500 level-0 boards not won by the bounded search (option off): {string.Join(",", hopeless)}");
+        Assert.NotEmpty(hopeless);
+    }
+
+    [SkippableTheory]
+    [InlineData(0)]
+    [InlineData(1)]
+    [InlineData(2)]
+    [InlineData(3)]
+    public void Ca62WithTheFixEveryBoardCanBeWon(int level)
+    {
+        var game = GameFiles();
+        for (var seed = 1; seed <= 300; seed++)
+        {
+            Assert.True(CircuitSolver.CanBeWon(BuiltBoard(game, On, level, seed)), $"level {level} seed {seed}");
+        }
+    }
+
+    // ---- CA-63: the keyboard repeat of the building raid ----
+
+    private static List<bool> TypematicOfARaid(bool fix)
+    {
+        var host = new HeadlessHost(Enumerable.Repeat(HeadlessHost.NoKeyYet, 30), unixSeconds: 600_000_000);
+        new Game(GameFiles(), host, null, new GameOptions(FixOriginalBugs: fix)).PlayRaidPractice(0);
+        return host.TypematicSettings;
+    }
+
+    [SkippableFact]
+    public void Ca63TheRaidKeepsThePcsKeyboardRepeat()
+    {
+        // the original's tac_init sends the setting to INT 10h: the host's repeat is never changed
+        Assert.DoesNotContain(true, TypematicOfARaid(false));
+    }
+
+    [SkippableFact]
+    public void Ca63WithTheFixTheRaidAsksForItsIntendedRepeatAndGivesItBack()
+    {
+        Assert.Equal([true, false], TypematicOfARaid(true));
     }
 }

@@ -239,7 +239,7 @@ public sealed partial class Headquarters
         var world = _state.Pl.World;
         LoadCrimeFile(_state.TheCrime);
         LoadWorldFile(world);
-        CaseSetup.LayOutCase(_state);
+        CaseSetup.LayOutCase(_state, _behaviour);
         BriefingIntroText(world);
         CaseSetup.LinkOrganisations(_state);
         CaseSetup.AddRedHerrings(_state);

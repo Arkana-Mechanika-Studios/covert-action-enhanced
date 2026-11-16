@@ -194,6 +194,12 @@ public static class PlotRules
     {
         var happening = state.Ev[eventIndex];
         var named = happening.Status & 0xff;
+        // BUG: CA-60 CRIME10's event 20 names member 4 (the Extractor) where its pair, event 19, is member 5's (the Travel Agent)
+        // DIVERGENCE: D-650 a player's option: CA-60, the partner of that event is read as member 5
+        if (state.Behaviour.FixCrime10MeetingPartner && IsCrime10Event20(state, eventIndex))
+        {
+            return state.Ev[19].Act;
+        }
         if (!state.Behaviour.FixReceiveEventNamingItsOwnActor || named != happening.Act)
         {
             return named;
@@ -207,6 +213,24 @@ public static class PlotRules
             }
         }
         return named;
+    }
+
+    /// <summary>
+    /// Whether event <paramref name="eventIndex"/> is the one of CRIME10.DTA whose partner byte is wrong (CA-60): the
+    /// Mastermind's "Met with", status 0x0804, message id 11, which the data pairs with event 19 of another member, while
+    /// the member it names has no event of that id. Checked against the data, so another file is left alone.
+    /// </summary>
+    private static bool IsCrime10Event20(CampaignState state, int eventIndex)
+    {
+        const int crime = 10, meeting = 20, partnerEvent = 19, wrongPartner = 4;
+        if (state.TheCrime != crime || eventIndex != meeting || state.NEVENT <= meeting)
+        {
+            return false;
+        }
+        var happening = state.Ev[meeting];
+        var other = state.Ev[partnerEvent];
+        return (happening.Status & 0xff) == wrongPartner && other.Synch == happening.Synch && other.Act != happening.Act
+            && (other.Status & 0xff) == happening.Act && !Enumerable.Range(0, state.NEVENT).Any(e => state.Ev[e].Act == wrongPartner && state.Ev[e].Synch == happening.Synch);
     }
 
     /// <summary>

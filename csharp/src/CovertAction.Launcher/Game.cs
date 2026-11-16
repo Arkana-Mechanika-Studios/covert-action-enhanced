@@ -372,6 +372,9 @@ public sealed class Game
         TacDgroup.Layout.Load(Executable.Read(_folder.Read(RaidProgram)).DataSegment(), state);
         // DIVERGENCE: D-610 the player option "arrow keys walk" applies to the building raid only
         _keyboard.ArrowKeysWalk = _options.ArrowKeysWalk;
+        // BUG: CA-63 TAC's tac_init sets the keyboard's repeat through INT 10h, so the PC's 500 ms stays; reproduced as coded unless OriginalBehaviour.FixRaidKeyRepeat
+        // DIVERGENCE: D-650 a player's option: CA-63, the raid's intended 250 ms and 15 a second while the raid runs
+        _host.Input.SetTypematic(_behaviour.FixRaidKeyRepeat);
         try
         {
             new BuildingRaid(state, shared, _world, _behaviour).TacInit();
@@ -387,6 +390,7 @@ public sealed class Game
         finally
         {
             _keyboard.ArrowKeysWalk = false;
+            _host.Input.SetTypematic(false);
         }
     }
 

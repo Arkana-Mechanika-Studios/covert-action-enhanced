@@ -103,10 +103,14 @@ Not in the original, each off by default, on the launcher's Advanced tab ([the s
   original's bugs that do not change the story are fixed: a clue that read "is information requires security clearance",
   the key that skips an animation staying in the keyboard buffer, the chief's comment after every capture being the
   first one's, the Delete key of the name field taking out two characters, a car chase that stops when you press F2 with
-  a building not yet known. A second option, **Also fix campaign-logic bugs**, is for the bugs that change the story: events that never
+  a building not yet known, a desk drawn over a wall, "Stasi" not found in the file room, an electronics board that cannot be
+  won, the pause in walking at the fast speed of a raid and a missing Hall of Fame file that kept scores from being saved.
+  A second option, **Also fix campaign-logic bugs**, is for the bugs that change the story: events that never
   happened (the "blueprints missing" bulletin, two receive events), the "prevented crime" ending of one crime, extra
   doors in big buildings, cast members never seen leaving a city, duplicate faces, the training ratings, the apartment
-  scene, a career record that overwrites a case and the hours charged after code-breaking. With both off the game is the original, bug for bug.
+  scene, a career record that overwrites a case, the hours charged after code-breaking, a new case that could hang
+  while it was laid out, the Mastermind's meeting of one crime and the skills of an agent made after a practice mission.
+  With both off the game is the original, bug for bug.
 
 ## How it is made faithful
 

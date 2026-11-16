@@ -353,8 +353,12 @@ public static class CaseSetup
     /// the plot's organisations on is chosen again (the organisations' map cells keep moving each time).
     /// </summary>
     /// <param name="state">The world, the cast and the case's variables.</param>
+    /// <param name="behaviour">Which of the original's bugs to reproduce (CA-58); the original's own when left out.</param>
+    /// <param name="attemptLimit">The attempts after which the lay-out gives up with an exception (a test's way to see the original's endless loop); none when left out.</param>
+    /// <exception cref="InvalidOperationException">More attempts than <paramref name="attemptLimit"/> were made.</exception>
     /// <remarks>The first part of <c>setup_new_case</c> (FINAL 0100:3f4c), up to the briefing; registered as new code.</remarks>
-    public static void LayOutCase(FinalState state)
+    // BUG: CA-58 the organisations' moves are never undone between attempts and the loop has no end; reproduced as coded unless OriginalBehaviour.FixCaseLayOutDrift.
+    public static void LayOutCase(FinalState state, OriginalBehaviour? behaviour = null, int attemptLimit = int.MaxValue)
     {
         foreach (var clue in state.Cl)
         {
@@ -372,8 +376,21 @@ public static class CaseSetup
         // the agent's own side never has a Double Agent
         state.Doubles &= ~(1 << OwnSide);
 
-        while (true)
+        // DIVERGENCE: D-650 a player's option: CA-58, the organisations' positions as the world file gave them, put back before every attempt
+        var positions = behaviour?.FixCaseLayOutDrift == true ? state.Org.Select(organisation => organisation.Climate).ToArray() : null;
+        for (var attempt = 1; ; attempt++)
         {
+            if (attempt > attemptLimit)
+            {
+                throw new InvalidOperationException($"the case is not laid out after {attemptLimit} attempts");
+            }
+            if (positions is not null)
+            {
+                for (var org = 0; org < positions.Length; org++)
+                {
+                    state.Org[org].Climate = positions[org];
+                }
+            }
             ClearPersons(state);
             var tries = ChoosePlotOrgsAndCities(state);
             if (tries >= MaxTries)

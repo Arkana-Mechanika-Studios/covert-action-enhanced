@@ -46,3 +46,4 @@ CovertAction.Core.OriginalBehaviour.ForPlayer,"the bug-fix options of the launch
 CovertAction.Core.Campaign.PlotRules.PartnerMemberOf,"the campaign-logic option (D-650, CA-13): the cast member a receive event that names its own actor is paired with"
 CovertAction.Core.Shared.LibraryTexts.EntriesBeforeEventText,"the campaign-logic option (D-650, CA-12): how many entries under a message tag the bulletin of an announced event passes over"
 CovertAction.Presentation.Game.HeadquartersScreens.DecodeVisitCharge,"the CIA building's charge after the cryptography workstation, as a function of its own so the player's option of CA-7 (D-650) is one test; the original computes it inline"
+CovertAction.Core.Electronics.CircuitSolver.CanBeWon,"the player's option of CA-62 (D-650): a bounded search for a winning series of swaps on a new electronics board, so that an unwinnable board is drawn again; the original never checks"

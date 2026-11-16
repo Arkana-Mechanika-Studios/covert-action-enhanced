@@ -580,9 +580,11 @@ public static class BuildingRules
     /// </summary>
     /// <param name="state">The building, the campaign's persons and plot objects, and the random generator.</param>
     /// <param name="room">The room, 1..<see cref="RaidState.Nroom"/>.</param>
+    /// <param name="behaviour">Which of the original's bugs to reproduce (CA-59); the original's own when left out.</param>
     // orig: TAC 00e8:4f8d furnish_room (src/c/tac/tac_00e8_4f8d.c) matched; tests: BuildingRulesTests, TacOracleTests
     // BUG: CA-8 no room type allowed in no kind of building (bed room, kitchen) is ever chosen; reproduced as coded.
-    public static void FurnishRoom(RaidState state, int room)
+    // BUG: CA-59 the other half of a wide piece is written over whatever is beside it, a wall too; reproduced as coded unless OriginalBehaviour.FixWideFurnitureOverWall.
+    public static void FurnishRoom(RaidState state, int room, OriginalBehaviour? behaviour = null)
     {
         var record = state.Rm[room];
         if ((record.Status & RoomStatus.Removed) != 0)
@@ -611,18 +613,18 @@ public static class BuildingRules
             while ((tile == -1 || (state.Ob[tile].Where & 1 << type) == 0) && ++tries < PieceTries);
             if (tries < PieceTries)
             {
-                state.CellMap[RaidState.Cell(x, y)] = (byte)tile;
-                if ((state.Ob[tile].Bits & TileFlags.Wide) != 0)
+                var wide = (state.Ob[tile].Bits & TileFlags.Wide) != 0;
+                // a wide piece's other half: the odd tile of a pair is the right-hand half
+                var otherX = (tile & 1) != 0 ? x - 1 : x + 1;
+                // DIVERGENCE: D-650 a player's option: CA-59, a wide piece whose other half would land on a wall is left out
+                if (wide && behaviour?.FixWideFurnitureOverWall == true && state.CellMap[RaidState.Cell(otherX, y)] != RaidState.CellEmpty)
                 {
-                    // a wide piece's other half: the odd tile of a pair is the right-hand half
-                    if ((tile & 1) != 0)
-                    {
-                        state.CellMap[RaidState.Cell(x - 1, y)] = (byte)(tile - 1);
-                    }
-                    else
-                    {
-                        state.CellMap[RaidState.Cell(x + 1, y)] = (byte)(tile + 1);
-                    }
+                    continue;
+                }
+                state.CellMap[RaidState.Cell(x, y)] = (byte)tile;
+                if (wide)
+                {
+                    state.CellMap[RaidState.Cell(otherX, y)] = (byte)((tile & 1) != 0 ? tile - 1 : tile + 1);
                 }
             }
         }

@@ -124,7 +124,7 @@ public sealed partial class BuildingRaid(RaidState state, SharedState shared, Bo
 
         for (var room = 1; room <= state.Nroom; room++)
         {
-            BuildingRules.FurnishRoom(state, room);
+            BuildingRules.FurnishRoom(state, room, behaviour);
         }
         // C: the loops stop one short of the last column and row: the corner cell (39, 31) keeps its tile
         for (var x = 0; x < RaidState.MapW - 1; x++)

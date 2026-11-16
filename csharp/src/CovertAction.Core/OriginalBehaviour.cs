@@ -60,6 +60,11 @@ public sealed class OriginalBehaviour
             FixTandySecondPause = safe,
             FixPuzzleTimeOutEvaluation = safe,
             FixChaseEntryAtUnknownLocation = safe,
+            FixWideFurnitureOverWall = safe,
+            FixFileRoomShortKey = safe,
+            FixUnsolvableCircuitBoard = safe,
+            FixRaidKeyRepeat = safe,
+            FixMissingFameFile = safe,
             FixAnnouncedEventCancelledBySharedMessageId = campaign,
             FixReceiveEventNamingItsOwnActor = campaign,
             FixCrimeEndingBelowFivePoints = campaign,
@@ -71,6 +76,9 @@ public sealed class OriginalBehaviour
             FixApartmentSceneStalePlot = campaign,
             FixCareerRecordEndSearch = campaign,
             FixDecodeVisitLeftoverCharge = campaign,
+            FixCaseLayOutDrift = campaign,
+            FixCrime10MeetingPartner = campaign,
+            FixSkillsKeptFromPractice = campaign,
         };
     }
 
@@ -246,4 +254,59 @@ public sealed class OriginalBehaviour
     /// the original's.
     /// </summary>
     public bool FixDecodeVisitLeftoverCharge { get; init; }
+
+    /// <summary>
+    /// CA-59: the other half of a wide piece of furniture (a desk, a couch) is written beside the piece without looking
+    /// at what is there, so it can replace a wall cell of the room. On: such a piece is left out when its other half
+    /// would not land on a free cell. Off: the original's.
+    /// </summary>
+    public bool FixWideFurnitureOverWall { get; init; }
+
+    /// <summary>
+    /// CA-61: the file room's search tests only the organisation's display name, and "Stasi" is spelled "Stassi" there,
+    /// so the correct spelling finds nothing. On: the organisation's short key ("Stasi") is searched as well. Off: the
+    /// original's.
+    /// </summary>
+    public bool FixFileRoomShortKey { get; init; }
+
+    /// <summary>
+    /// CA-62: the electronics board generator never checks that a board can be won; a rare one has no winning
+    /// arrangement. On: the chips are drawn again until a bounded search finds a win (<c>CircuitSolver</c>). Off: the
+    /// original's draw.
+    /// </summary>
+    public bool FixUnsolvableCircuitBoard { get; init; }
+
+    /// <summary>
+    /// CA-63: the building raid sets the keyboard's repeat (250 ms, 15 a second) through the wrong interrupt, so the PC's
+    /// 500 ms delay stays and a held key at the faster game speeds walks, stops and walks on. On: the host applies the
+    /// intended repeat while the raid runs. Off: the original's.
+    /// </summary>
+    public bool FixRaidKeyRepeat { get; init; }
+
+    /// <summary>
+    /// CA-64: the Hall of Fame's file is written only if it exists already, so without a FAME.DTA no score is ever saved.
+    /// On: a file that is not there at all is made, in the saves folder (never in the player's game folder), and written.
+    /// Off: the original's.
+    /// </summary>
+    public bool FixMissingFameFile { get; init; }
+
+    /// <summary>
+    /// CA-58: the lay-out of a new case moves the eastern organisations on the map at every attempt and never moves them
+    /// back, so after a few failed attempts they can have drifted where the plot's conditions cannot be met and the game
+    /// hangs. On: the organisations' positions are restored before each attempt. Off: the original's.
+    /// </summary>
+    public bool FixCaseLayOutDrift { get; init; }
+
+    /// <summary>
+    /// CA-60: CRIME10's event 20 (the Mastermind's meeting) names member 4, the Extractor, as its partner, but is paired
+    /// with the Travel Agent's event 19 (member 5). On: its partner is read as member 5. Off: the original's.
+    /// </summary>
+    public bool FixCrime10MeetingPartner { get; init; }
+
+    /// <summary>
+    /// CA-65: a new agent's training adds the ratings to the skills word without clearing it, so after a practice mission
+    /// in the same session (which leaves every skill Good) the ratings come out raised, with a carry into the next skill.
+    /// On: the four skill ratings are cleared before the training. Off: the original's.
+    /// </summary>
+    public bool FixSkillsKeptFromPractice { get; init; }
 }

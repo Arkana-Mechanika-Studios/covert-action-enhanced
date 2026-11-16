@@ -40,10 +40,17 @@ public sealed partial class Headquarters
     // orig: FINAL 0100:0c70 training_menu (src/c/final/final_0100_0c70.c) matched; tests: FinalOracleTests
     public int TrainingMenu(int practice)
     {
+        const short skillRatingBits = 0xff;
         const int menuX = 0x5c, menuY = 0x19, screenColour = 5, settleFrames = 0x3c;
         const short allGood = 0x55, trainedFlags = 0x500;
         var ratings = new int[FinalState.SkillCount];
         var spent = 0;
+        // BUG: CA-65 the new agent's ratings are added to the skills word as it is, which after a practice mission holds every skill Good
+        // DIVERGENCE: D-650 a player's option: CA-65, the four skill ratings start from nothing
+        if (practice == 0 && _behaviour.FixSkillsKeptFromPractice)
+        {
+            _state.Skills &= ~skillRatingBits;
+        }
         Pictures.LoadPictureSwapped(_state.TrainingPicture, PicturePage);
         _world.Graphics.CopyRect(_state.RpBack, 0, 0, ScreenWidth, ScreenHeight, _state.Rp1, 0, 0);
         _world.Graphics.SetColorMaps(_state.ColorMapA, _state.ColorMapB);
