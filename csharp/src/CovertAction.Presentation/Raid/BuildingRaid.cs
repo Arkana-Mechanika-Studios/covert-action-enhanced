@@ -118,7 +118,7 @@ public sealed partial class BuildingRaid(RaidState state, SharedState shared, Bo
                     BuildingRules.AddWallSegments(state);
                 }
             }
-            while (!BuildingRules.LabelRooms(state) || !BuildingRules.ConnectRooms(state));
+            while (!BuildingRules.LabelRooms(state) || !BuildingRules.ConnectRooms(state, behaviour));
         }
         while (state.Nroom - BuildingRules.PruneRooms(state) < MinimumRooms);
 

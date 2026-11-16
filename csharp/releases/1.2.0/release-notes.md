@@ -25,8 +25,16 @@ plays exactly as 1.0 and the original.
   chase F2 with a building you do not know yet no longer stops the game (CA-4); the wiretap puzzle's last evaluation
   at the end of the time always draws the terminals (CA-40); the Tandy driver ignores a second pause with no resume
   (CA-55; the game never does this). A game saved with the option on loads without it and in the original. The
-  second option, **Also fix campaign-logic bugs** (`fixes.campaignBugs`), is there for the bugs that change events,
-  scores or layouts; it fixes nothing yet.
+  second option, **Also fix campaign-logic bugs** (`fixes.campaignBugs`, independent of the first), fixes the bugs
+  that change events, scores, layouts or the career, each confirmed by a test on the game's own data: CRIME1's "Stole
+  Blueprints" bulletin is no longer cancelled (CA-12); the receive events of CRIME2 and CRIME8 that name their own actor
+  answer their sender (CA-13); CRIME12 ends as "crime carried out" when its last event happened, not always as
+  "prevented" (CA-15); big buildings no longer get two doors between the same rooms (CA-28); intercepted messages pair
+  with their own partner (CA-32); cast members are seen leaving a city (CA-35); new persons get a face of their own and
+  start unalerted (CA-36); the training ratings shown are the ones kept (CA-42); the apartment scene searches the new
+  plot after a new case is chosen (CA-44); a case rated 255 or 511 no longer gets overwritten in the career (CA-46). A
+  game saved with it loads without it and in the original; the files keep their format. It changes the story: a case
+  does not play as in the original.
 - **Everything of 1.1.5, 1.1 and 1.0.** The mouse in the menus and the action parts, arrow keys that walk in a raid,
   music and effects on different sound cards, and the whole faithful game.
 
@@ -55,7 +63,9 @@ D-640 to D-642, D-650).
   cryptography workstation's effect is a probable match.
 - The mouse works everywhere but the car chase. The joystick's readings of a real stick are still a model (U-12).
 - The bug fixes: with "Fix the original's bugs" off the game keeps the original's bugs, also the car chase stop of CA-4
-  (the original reads a leftover value there; the rewrite stops with an error). The campaign-logic option fixes nothing
-  yet. CA-6 (the original's 12000-byte hand-off block is too small for two crimes at the hardest level) does not occur
+  (the original reads a leftover value there; the rewrite stops with an error). The campaign-logic option leaves CA-7 (the time
+  charged after decoding in the CIA building comes from a byte an earlier part left; what it should charge is not
+  readable) and CA-14 (two senders of one message id: the data reads as alternatives) as the original has them; CA-36
+  is fixed in the plot engine's copy only, not in the library's copy the electronics workbench and the debriefing use. CA-6 (the original's 12000-byte hand-off block is too small for two crimes at the hardest level) does not occur
   in this game, which does not keep that block; what the original does there was not tested.
 - Windows only (64-bit).

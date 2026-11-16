@@ -533,7 +533,7 @@ public sealed class PlotEngine(CampaignState state, SharedState shared, Boundari
         else
         {
             state.Txt.Text += state.Bulletins.To;
-            city = state.Ps[state.Ac[state.Ev[happening].Status & PartnerMember].Who].Loc;
+            city = state.Ps[state.Ac[PlotRules.PartnerMemberOf(state, happening)].Who].Loc;
         }
         state.Txt.Text += state.Ct[city].Name;
         state.Active[city]++;
@@ -565,7 +565,7 @@ public sealed class PlotEngine(CampaignState state, SharedState shared, Boundari
                 state.Txt.Text = words.DoubleAgent;
                 partner.Clues |= OrgKnown | CityKnown;
                 // C: a shift of a 16-bit int by the low byte of the status
-                partner.Rknown |= C16.Shl(1, (sbyte)ev.Status);
+                partner.Rknown |= C16.Shl(1, (sbyte)PlotRules.PartnerMemberOf(state, happening));
             }
             else
             {

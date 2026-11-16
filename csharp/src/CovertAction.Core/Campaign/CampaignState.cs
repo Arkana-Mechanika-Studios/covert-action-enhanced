@@ -191,6 +191,12 @@ public sealed partial class CampaignState : ILibraryState, ILibraryTextState, IL
     /// <summary>GAME DS:8ed0 ChronTime (MicroProse's name): the plot steps taken so far (-1 before the first).</summary>
     public short ChronTime { get; set; }
 
+    /// <summary>
+    /// Which of the original's bugs the campaign's rules reproduce (the plot engine, the message texts): set by the part
+    /// when it starts, the original's own when left alone. Not part of a saved campaign.
+    /// </summary>
+    public OriginalBehaviour Behaviour { get; set; } = OriginalBehaviour.Faithful;
+
     /// <summary>GAME DS:97a2 NACTIVITY (MicroProse's name): the cast members of the case.</summary>
     public short NACTIVITY { get; set; }
 

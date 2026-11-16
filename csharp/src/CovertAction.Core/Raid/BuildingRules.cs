@@ -72,8 +72,9 @@ public static class BuildingRules
     /// the whole upper half of the mask.
     /// </remarks>
     // C: 1 << n is an int: 0 for n of 16 and above, and 0x8000 widens to 0xffff8000
-    // BUG: CA-28 the bit of rooms 16 to 23 and of room 15; reproduced as coded.
-    public static int RoomBit(int room) => C16.Shl(1, room);
+    // BUG: CA-28 the bit of rooms 16 to 23 and of room 15; reproduced as coded unless OriginalBehaviour.FixBigBuildingDoorBits.
+    public static int RoomBit(int room, OriginalBehaviour? behaviour = null) =>
+        behaviour?.FixBigBuildingDoorBits == true ? 1 << room : C16.Shl(1, room);
 
     /// <summary>
     /// Puts a wall on side <paramref name="side"/> of cell (<paramref name="x"/>, <paramref name="y"/>): the side's bit in
@@ -302,10 +303,11 @@ public static class BuildingRules
     /// new door, or at 96 doors.
     /// </remarks>
     /// <param name="state">The building and the random generator.</param>
+    /// <param name="behaviour">Which of the original's bugs to reproduce (CA-28); the original's own when left out.</param>
     /// <returns>Whether all rooms were joined (otherwise the generator starts again).</returns>
     // orig: TAC 00e8:4931 connect_rooms (src/c/tac/tac_00e8_4931.c) matched; tests: BuildingRulesTests, TacOracleTests
     // BUG: CA-28 rooms 16 to 23 have no door bit and room 15's bit is the upper half of the mask (RoomBit); reproduced as coded.
-    public static bool ConnectRooms(RaidState state)
+    public static bool ConnectRooms(RaidState state, OriginalBehaviour? behaviour = null)
     {
         for (var room = 0; room < RaidState.MaxRooms; room++)
         {
@@ -344,7 +346,7 @@ public static class BuildingRules
                 }
                 fits = true;
                 behind = state.RoomAtCell[RaidState.Cell(state.Mve4X[side] + x, state.Mve4Y[side] + y)];
-                if ((room.Doors & RoomBit(behind)) == 0)
+                if ((room.Doors & RoomBit(behind, behaviour)) == 0)
                 {
                     var crossing = (side & 1) != 0 ? NorthSouthWalls : EastWestWalls;
                     for (var step = -1; step <= 1; step++)
@@ -368,7 +370,7 @@ public static class BuildingRules
             }
             while (++tries < Tries && !fits);
 
-            if ((state.Rm[current].Doors & RoomBit(behind)) == 0 && tries < Tries)
+            if ((state.Rm[current].Doors & RoomBit(behind, behaviour)) == 0 && tries < Tries)
             {
                 PutDoor(state, current, behind, x, y, side);
                 tries = 0;
@@ -376,8 +378,8 @@ public static class BuildingRules
                 {
                     reached++;
                 }
-                state.Rm[current].Doors |= RoomBit(behind);
-                state.Rm[behind].Doors |= RoomBit(current);
+                state.Rm[current].Doors |= RoomBit(behind, behaviour);
+                state.Rm[behind].Doors |= RoomBit(current, behaviour);
                 if (waitForVisited && (state.Rm[behind].Status & RoomStatus.Visited) != 0)
                 {
                     waitForVisited = false;

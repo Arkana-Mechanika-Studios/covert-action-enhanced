@@ -38,7 +38,8 @@ public sealed partial class Headquarters
         values[SenderOrgValue] = _state.Org[actor.Org].Name;
         values[SenderCityValue] = _state.Ct[actor.Loc].Name;
         LibraryTexts.LoadMessageText(_state.MessageTag, _state.MessageTemplate, _state.TheCrime, a >= 0 ? _state.Ev[a].Synch : a);
-        Text.ReadTextWithVars(_state.TextFileName, _state.MessageTag.Text);
+        // BUG: CA-12 (OriginalBehaviour.FixAnnouncedEventCancelledBySharedMessageId) the bulletin's own entry under a tag a pair also uses
+        Text.ReadTextWithVars(_state.TextFileName, _state.MessageTag.Text, a >= 0 ? LibraryTexts.EntriesBeforeEventText(_state.Ev, _state.NEVENT, a, _behaviour) : 0);
     }
 
     /// <summary>
@@ -207,6 +208,17 @@ public sealed partial class Headquarters
         NextCard(card);
     }
 
+    /// <summary>The points of the plot's best event.</summary>
+    private int BestEventPoints()
+    {
+        var best = 0;
+        for (var q = 0; q < _state.NEVENT; q++)
+        {
+            best = Math.Max(best, (int)_state.Ev[q].VP);
+        }
+        return best;
+    }
+
     /// <summary>The card of an object of the plot that changed hands: 50 points possible, earned when the agent confiscated it.</summary>
     private void ShowObjectCard(ReportCard card, int item)
     {
@@ -245,7 +257,9 @@ public sealed partial class Headquarters
         var txt = _state.Txt;
         var happening = _state.Ev[eventNo];
         Screens.DrawPanel(card.X, card.Y);
-        if (happening.VP >= crimeCarriedOut)
+        // BUG: CA-15 no event of CRIME12 is worth 5, so its case never counts as carried out;
+        // OriginalBehaviour.FixCrimeEndingBelowFivePoints counts the plot's best event when it is worth less
+        if (happening.VP >= (_behaviour.FixCrimeEndingBelowFivePoints ? Math.Min(crimeCarriedOut, BestEventPoints()) : crimeCarriedOut))
         {
             _state.CaseFlags |= FinalState.CaseFlagCrimeHappened;
         }

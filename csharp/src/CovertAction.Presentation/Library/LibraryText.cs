@@ -49,10 +49,11 @@ public sealed class LibraryText(ILibraryState state, ILibraryTextState text, Bou
     /// <param name="tokens">The placeholders to fill in.</param>
     /// <param name="replacements">The value of each placeholder.</param>
     /// <param name="count">How many placeholders there are.</param>
+    /// <param name="skipEarlier">How many earlier entries under the same tag to pass over; the original reads the first (0).</param>
     /// <returns>Whether the file has the tag.</returns>
     /// <exception cref="MemoryOverrunException">The text does not fit the text buffer, or a line its buffer: the original writes past them.</exception>
     // orig: BUG 00e8:3b43 read_cleared_text (src/c/bug/bug_00e8_3b43.c) matched; also FINAL 0100:750d, GAME 00f7:7b99, TAC 00e8:a3c7; tests: LibraryTextOracleTests
-    public bool ReadClearedText(string fileName, string tag, IReadOnlyList<string> tokens, IReadOnlyList<string> replacements, int count)
+    public bool ReadClearedText(string fileName, string tag, IReadOnlyList<string> tokens, IReadOnlyList<string> replacements, int count, int skipEarlier = 0)
     {
         var file = TextStream.Open(world.Files, fileName);
         if (file is null)
@@ -64,9 +65,16 @@ public sealed class LibraryText(ILibraryState state, ILibraryTextState text, Bou
         }
         var line = "";
         int scanned;
+        var toSkip = skipEarlier;
         do
         {
             scanned = file.ScanLine(ref line);
+            if (toSkip > 0 && scanned != TextStream.EndOfFile && IsTagLine(line, tag))
+            {
+                // the entries filed under a tag the file uses twice: the earlier ones are passed over (CA-12)
+                toSkip--;
+                line = "";
+            }
         }
         while (!IsTagLine(line, tag) && scanned != TextStream.EndOfFile);
         bool found;
@@ -134,11 +142,12 @@ public sealed class LibraryText(ILibraryState state, ILibraryTextState text, Bou
     /// </summary>
     /// <param name="fileName">The file's DOS name.</param>
     /// <param name="tag">The tag, with its '*'.</param>
+    /// <param name="skipEarlier">How many earlier entries under the same tag to pass over; the original reads the first (0).</param>
     /// <returns>Whether the file has the tag (the menus part reads the pages of a debriefing until one is missing).</returns>
     // orig: BUG 00e8:3b26 read_text_with_vars (src/c/bug/bug_00e8_3b26.c) matched; also GAME 00f7:7b7c, TAC 00e8:a3aa, FINAL 0100:74f0; tests: LibraryTextOracleTests
     // C: the original ends without a return statement; its callers read what the reader left in AX, the reader's answer
-    public bool ReadTextWithVars(string fileName, string tag) =>
-        ReadClearedText(fileName, tag, text.VariableNames, [.. text.VariableValues], ILibraryTextState.MessageVariables);
+    public bool ReadTextWithVars(string fileName, string tag, int skipEarlier = 0) =>
+        ReadClearedText(fileName, tag, text.VariableNames, [.. text.VariableValues], ILibraryTextState.MessageVariables, skipEarlier);
 
     /// <summary>
     /// Appends one of several variants of an entry to the text buffer: a random number below

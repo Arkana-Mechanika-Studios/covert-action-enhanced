@@ -90,7 +90,8 @@ public sealed partial class Headquarters
         // all four were chosen) and lowers it from Good to Average, after it was shown. With nothing spent the index is
         // 4, one past the table: the original reads a word of its stack there, which holds no 2 (the other locals hold
         // 0, -1, 4, 40 and 100), so nothing changes.
-        if (left < FinalState.SkillCount && ratings[left] == 2)
+        // (CA-42, OriginalBehaviour.FixTrainingRatingLowered: the ratings shown are kept)
+        if (!_behaviour.FixTrainingRatingLowered && left < FinalState.SkillCount && ratings[left] == 2)
         {
             ratings[left] = 1;
         }

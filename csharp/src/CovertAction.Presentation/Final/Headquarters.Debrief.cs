@@ -262,12 +262,19 @@ public sealed partial class Headquarters
         var records = career.History;
         // the first byte of 0xff is taken for the end of the record (C:, see DebriefWrapup)
         state.CareerWritePos = -1;
-        for (var at = 0; at < CareerSearchLimit; at++)
+        // BUG: CA-46 a rating whose low byte is 0xff is taken for the end mark; OriginalBehaviour.FixCareerRecordEndSearch walks the records
+        var step = 1;
+        for (var at = 0; at < CareerSearchLimit; at += step)
         {
             if (records[at] == EndOfCareerRecords)
             {
                 state.CareerWritePos = (short)at;
                 break;
+            }
+            if (_behaviour.FixCareerRecordEndSearch)
+            {
+                // a record is four bytes, five when the MasterMind was arrested (the second byte tells)
+                step = (records[at + 1] & MastermindArrested) != 0 ? 5 : 4;
             }
         }
         if (state.CareerWritePos != -1)

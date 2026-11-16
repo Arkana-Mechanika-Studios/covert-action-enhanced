@@ -256,15 +256,18 @@ public static class CampaignTexts
             var sender = state.Ps[message.Who];
             int other = message.Who2;
             var receiver = state.Ps[other];
-            // BUG: CA-32 a message without a pair is paired with message -1 (the end of city 15's record), and of two pairs sent in the same minute the later's first message pairs with the earlier's second
-            var pair = -1;
-            if (MessageTime(state, msg + 1) == message.Time)
+            // BUG: CA-32 a message without a pair is paired with message -1 (the end of city 15's record), and of two pairs sent in the same minute the later's first message pairs with the earlier's second; OriginalBehaviour.FixLoneMessagePairing
+            var pair = state.Behaviour.FixLoneMessagePairing ? PairOf(state, msg) : -1;
+            if (!state.Behaviour.FixLoneMessagePairing)
             {
-                pair = msg + 1;
-            }
-            if (MessageTime(state, msg - 1) == message.Time)
-            {
-                pair = msg - 1;
+                if (MessageTime(state, msg + 1) == message.Time)
+                {
+                    pair = msg + 1;
+                }
+                if (MessageTime(state, msg - 1) == message.Time)
+                {
+                    pair = msg - 1;
+                }
             }
             if ((message.Clues & MessageNameKnown) != 0)
             {
@@ -329,6 +332,33 @@ public static class CampaignTexts
     // first: the end of city 15's record and the count of persons. Its minute is city 15's police figure, its
     // knowledge bits are city 15's sighting counter, its second city is the high byte of the count of persons.
 
+    /// <summary>The "pair" of a message that has none (see <see cref="PairOf"/>).</summary>
+    private const int NoPair = -2;
+
+    /// <summary>
+    /// The message that is the other half of a message's pair: the neighbour in the log, of the same minute, that names the same two
+    /// people the other way round (the sender's message names the receiver as the other party and the receiver's the sender);
+    /// the one before wins as in the original. <see cref="NoPair"/> when there is none.
+    /// </summary>
+    private static int PairOf(CampaignState state, int msg)
+    {
+        var message = state.Sn[msg];
+        var pair = NoPair;
+        foreach (var neighbour in new[] { msg + 1, msg - 1 })
+        {
+            if (neighbour < 0 || neighbour >= state.NextSyn)
+            {
+                continue;
+            }
+            var other = state.Sn[neighbour];
+            if (other.Time == message.Time && other.Type == message.Type && other.Who == message.Who2 && other.Who2 == message.Who)
+            {
+                pair = neighbour;
+            }
+        }
+        return pair;
+    }
+
     /// <summary>The minute of a message; for -1 (in front of the log) city 15's police figure, as the original reads it.</summary>
     private static short MessageTime(CampaignState state, int msg) =>
         // C: sn[-1].time is the word at GAME DS:7cb6, ct[15].police
@@ -337,11 +367,15 @@ public static class CampaignTexts
     /// <summary>The knowledge bits of a message; for -1 city 15's sighting counter, as the original reads and writes it.</summary>
     private static short MessageClues(CampaignState state, int msg) =>
         // C: sn[-1].clues is the word at GAME DS:7cba, ct[15].clued
-        msg == -1 ? state.Ct[CampaignState.WorldSize - 1].Clued : state.Sn[msg].Clues;
+        msg == NoPair ? (short)0 : msg == -1 ? state.Ct[CampaignState.WorldSize - 1].Clued : state.Sn[msg].Clues;
 
     /// <summary>Adds knowledge bits to a message; for -1 to city 15's sighting counter, as the original writes it.</summary>
     private static void AddMessageClues(CampaignState state, int msg, int bits)
     {
+        if (msg == NoPair)
+        {
+            return;
+        }
         if (msg == -1)
         {
             state.Ct[CampaignState.WorldSize - 1].Clued |= (short)bits;

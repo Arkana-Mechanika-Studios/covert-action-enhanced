@@ -40,29 +40,37 @@ public sealed class OriginalBehaviour
     /// this is <see cref="Player"/>, so the game then plays as release 1.0.
     /// </summary>
     /// <param name="fixOriginalBugs">The safe group: texts, keys, a crash and a sound driver's slip; none changes the story.</param>
-    /// <param name="fixCampaignBugs">The campaign-logic group (events, scores, layouts); no fix is in it yet, the flags will join here.</param>
+    /// <param name="fixCampaignBugs">The campaign-logic group (events, scores, layouts, the career record); independent of the first option.</param>
     public static OriginalBehaviour ForPlayer(bool fixOriginalBugs, bool fixCampaignBugs)
     {
         // DIVERGENCE: D-650 a player's option: the original's bugs, fixed when the player asks for it
-        // the campaign-logic flags are added to the object below as they come
-        _ = fixCampaignBugs;
-        return fixOriginalBugs
-            ? new()
-            {
-                FixRaidGuardCountInCityCounter = true,
-                FixChaseGameSpeedWriteBack = true,
-                FixChaseGearUpSound = true,
-                FixTextReaderPastEndOfFile = true,
-                FixReportClockAtMidnight = true,
-                FixClueTagTrailingBlank = true,
-                FixAnimationSkipKeyLeftInBuffer = true,
-                FixCaptureCommentVariant = true,
-                FixNameFieldDelete = true,
-                FixTandySecondPause = true,
-                FixPuzzleTimeOutEvaluation = true,
-                FixChaseEntryAtUnknownLocation = true,
-            }
-            : Player;
+        var safe = fixOriginalBugs;
+        var campaign = fixCampaignBugs;
+        return new()
+        {
+            FixRaidGuardCountInCityCounter = true,
+            FixChaseGameSpeedWriteBack = true,
+            FixChaseGearUpSound = true,
+            FixTextReaderPastEndOfFile = true,
+            FixReportClockAtMidnight = true,
+            FixClueTagTrailingBlank = safe,
+            FixAnimationSkipKeyLeftInBuffer = safe,
+            FixCaptureCommentVariant = safe,
+            FixNameFieldDelete = safe,
+            FixTandySecondPause = safe,
+            FixPuzzleTimeOutEvaluation = safe,
+            FixChaseEntryAtUnknownLocation = safe,
+            FixAnnouncedEventCancelledBySharedMessageId = campaign,
+            FixReceiveEventNamingItsOwnActor = campaign,
+            FixCrimeEndingBelowFivePoints = campaign,
+            FixBigBuildingDoorBits = campaign,
+            FixLoneMessagePairing = campaign,
+            FixDepartureLookup = campaign,
+            FixNewPersonFaceAndState = campaign,
+            FixTrainingRatingLowered = campaign,
+            FixApartmentSceneStalePlot = campaign,
+            FixCareerRecordEndSearch = campaign,
+        };
     }
 
     /// <summary>
@@ -152,4 +160,80 @@ public sealed class OriginalBehaviour
     /// reached. Off: the original's read.
     /// </summary>
     public bool FixChaseEntryAtUnknownLocation { get; init; }
+
+    /// <summary>
+    /// CA-12: when a pair of events (a message sent and received, a meeting) is scheduled, the original cancels every
+    /// other event with the pair's message id, including an event of a single member that has no partner and only
+    /// shares the number: CRIME1's "Stole Blueprints" (id 2, the MasterMind's message to the Organizer's) never
+    /// happens, and its bulletin is never shown. On: only events that themselves have a partner are cancelled, and
+    /// the bulletin of such an event reads its own text of the file where the number is used twice. Off: the original's.
+    /// </summary>
+    public bool FixAnnouncedEventCancelledBySharedMessageId { get; init; }
+
+    /// <summary>
+    /// CA-13: two receiving events of the data (CRIME2 "Financed operation", CRIME8 "Driver") name their own actor as
+    /// the sender, so when one is picked before the real sender it is paired with itself and both events are cancelled.
+    /// On: such an event answers the event of the same message id that sends to its actor. Off: the original's.
+    /// </summary>
+    public bool FixReceiveEventNamingItsOwnActor { get; init; }
+
+    /// <summary>
+    /// CA-15: the case counts as "crime carried out" only when an event worth 5 or more points happened, and none of
+    /// CRIME12's is (its best is "Made Product", 4), so such a case always ends as "crime prevented" and its variant is
+    /// never marked played. On: a crime whose best event is worth less than 5 is carried out when that event happened.
+    /// Off: the original's.
+    /// </summary>
+    public bool FixCrimeEndingBelowFivePoints { get; init; }
+
+    /// <summary>
+    /// CA-28: a room's bit in the doors mask of a building is built in 16 bits, so rooms 16 to 23 have none (they never
+    /// count as joined and get extra doors) and room 15's is the whole upper half. On: the bit is 1 shifted by the
+    /// room's number in 32 bits. Off: the original's.
+    /// </summary>
+    public bool FixBigBuildingDoorBits { get; init; }
+
+    /// <summary>
+    /// CA-32: a message of the log whose pair is not in the log at the same minute is paired with "message -1", which is
+    /// the end of city 15's record, and the two messages of a pair are mixed up with a second pair of the same minute.
+    /// On: the pair is the neighbouring message of the same minute that names the same two people the other way round,
+    /// and a message with none has no pair. Off: the original's.
+    /// </summary>
+    public bool FixLoneMessagePairing { get; init; }
+
+    /// <summary>
+    /// CA-35: the plot step's "seen leaving a city" looks the destination's person up with no knowledge to add, which
+    /// finds no one, and tests "person -1", so no cast member is ever seen leaving. On: the destination's person is
+    /// looked up without the knowledge filter and a free place or a person unknown to the player qualifies. Off: the
+    /// original's.
+    /// </summary>
+    public bool FixDepartureLookup { get; init; }
+
+    /// <summary>
+    /// CA-36: the face-uniqueness test of a new person (GAME's find_or_create_person) is garbled and almost never holds,
+    /// and the new person keeps the alert and investigation score of the free record's previous occupant. On: the new
+    /// face differs in its low six bits from every other person's, and alert and investigation start at 0. Off: the
+    /// original's.
+    /// </summary>
+    public bool FixNewPersonFaceAndState { get; init; }
+
+    /// <summary>
+    /// CA-42: after the agent's training the original lowers the rating of one skill (the one behind the last raised) from
+    /// 2 to 1 after the ratings were shown, so the skill played is not the one shown. On: the shown ratings are kept.
+    /// Off: the original's.
+    /// </summary>
+    public bool FixTrainingRatingLowered { get; init; }
+
+    /// <summary>
+    /// CA-44: when no variant of the case's plot fits, the apartment scene chooses a new plot but goes on looking for
+    /// variants in the old one. On: it looks in the new plot. Off: the original's.
+    /// </summary>
+    public bool FixApartmentSceneStalePlot { get; init; }
+
+    /// <summary>
+    /// CA-46: the career record's free place is found as the first byte of 0xff, though a case's efficiency rating is
+    /// stored in two bytes, so a rating with a low byte of 255 is taken for the end of the record and the next case is
+    /// written over it. On: the free place is found record by record. The file's format does not change. Off: the
+    /// original's.
+    /// </summary>
+    public bool FixCareerRecordEndSearch { get; init; }
 }

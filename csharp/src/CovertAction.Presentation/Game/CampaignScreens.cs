@@ -43,6 +43,11 @@ public sealed class CampaignScreens
         Output = new LibraryOutput(state, world);
         Input = new LibraryInput(state, world);
         this.behaviour = behaviour ?? OriginalBehaviour.Faithful;
+        // the campaign's rules in Core (the plot, the message texts) read the same switches from the campaign
+        if (behaviour is not null)
+        {
+            state.Behaviour = behaviour;
+        }
         Text = new LibraryText(state, state, world, Output, state.Random, this.behaviour);
         Screens = new LibraryScreens(state, state, world, Output, Input, Text);
         Pictures = new LibraryPictures(world);
@@ -219,7 +224,9 @@ public sealed class CampaignScreens
         state.VariableValues[actorOrg] = state.Orgs[actor.Org].Name;
         state.VariableValues[actorCity] = state.Ct[actor.Loc].Name;
         LibraryTexts.LoadMessageText(state.MessageTag, state.MessageTemplate, state.TheCrime, happening >= 0 ? state.Ev[happening].Synch : happening);
-        Text.ReadTextWithVars(state.TextFileName, state.MessageTag.Text);
+        // BUG: CA-12 TEXT.DTA files CRIME1's bulletin "blueprints missing" under the tag of a message that a pair of events
+        // also uses; the reader takes the first, the pair's. OriginalBehaviour.FixAnnouncedEventCancelledBySharedMessageId
+        Text.ReadTextWithVars(state.TextFileName, state.MessageTag.Text, happening >= 0 ? LibraryTexts.EntriesBeforeEventText(state.Ev, state.NEVENT, happening, behaviour) : 0);
         state.Orgs[actor.Org].Clues |= 1;
     }
 

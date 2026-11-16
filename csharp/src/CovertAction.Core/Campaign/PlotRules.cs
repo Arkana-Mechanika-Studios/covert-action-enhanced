@@ -29,6 +29,9 @@ public static class PlotRules
     /// <summary>The player seized a plot object.</summary>
     public const int MessagePlotObjectSeized = 7;
 
+    /// <summary>The low six bits of a face word: the face that is shown.</summary>
+    private const int FaceBits = 0x3f;
+
     /// <summary><see cref="Person.Alert"/> of a person in hiding.</summary>
     public const short InHiding = -2;
 
@@ -76,7 +79,7 @@ public static class PlotRules
             message.Alert = state.Ps[actor].Alert;
             if ((happening.Status & PartnerBits) != 0)
             {
-                var partner = state.Ac[happening.Status & 0xff].Who;
+                var partner = state.Ac[PartnerMemberOf(state, arg)].Who;
                 message.Who2 = (sbyte)partner;
                 message.Loc2 = (sbyte)state.Ps[partner].Loc;
             }
@@ -132,7 +135,7 @@ public static class PlotRules
             }
             return new(readyAlone, emerged);
         }
-        var partnerMember = happening.Status & 0xff;
+        var partnerMember = PartnerMemberOf(state, q);
         var partner = state.Ac[partnerMember].Who;
         var partnerAlert = state.Ps[partner].Alert;
         var partnerOutOfPlay = partnerAlert < 0 && partnerAlert != Turned && (happening.Status & NoWaitForPartner) != 0;
@@ -175,6 +178,35 @@ public static class PlotRules
             emerged.Add(partner);
         }
         return new(answered, emerged);
+    }
+
+    /// <summary>
+    /// The cast member an event with a partner is paired with: the low byte of its status. Two receiving events of the
+    /// data (CRIME2's "Financed operation", CRIME8's "Driver") name their own actor there; with
+    /// <see cref="OriginalBehaviour.FixReceiveEventNamingItsOwnActor"/> such an event is paired with the sender of the
+    /// event of the same message id that sends to its actor.
+    /// </summary>
+    /// <param name="state">The campaign.</param>
+    /// <param name="eventIndex">The event.</param>
+    /// <returns>The partner's cast member.</returns>
+    // BUG: CA-13 a receive event naming its own actor is picked before its sender and pairs with itself; OriginalBehaviour.FixReceiveEventNamingItsOwnActor
+    public static int PartnerMemberOf(CampaignState state, int eventIndex)
+    {
+        var happening = state.Ev[eventIndex];
+        var named = happening.Status & 0xff;
+        if (!state.Behaviour.FixReceiveEventNamingItsOwnActor || named != happening.Act)
+        {
+            return named;
+        }
+        for (var other = 0; other < state.NEVENT; other++)
+        {
+            var sender = state.Ev[other];
+            if (sender.Synch == happening.Synch && sender.Act != happening.Act && (sender.Status & PartnerBits) != 0 && (sender.Status & 0xff) == happening.Act)
+            {
+                return sender.Act;
+            }
+        }
+        return named;
     }
 
     /// <summary>
@@ -234,6 +266,14 @@ public static class PlotRules
         person.Clues = (short)flags;
         person.Role = 0;
         person.Rknown = 0;
+        // BUG: CA-36 the record's previous occupant's alert and investigation score stay (the menus part's own
+        // find_or_create_person clears them); OriginalBehaviour.FixNewPersonFaceAndState
+        var distinctFaces = state.Behaviour.FixNewPersonFaceAndState;
+        if (distinctFaces)
+        {
+            person.Alert = 0;
+            person.Intel = 0;
+        }
         bool unique;
         do
         {
@@ -241,8 +281,12 @@ public static class PlotRules
             person.Face = (short)GameLibrary.RandomBelow(state.Random, 0x7fff);
             for (var other = 0; other < state.Nperson; other++)
             {
+                // BUG: CA-36 the test is "(other.face == 63) & new.face & 63" where "the same low six bits" is meant
                 // C: (face == 0x3f) is 0 or 1, and-ed with the low byte of the new face and with 0x3f
-                if (state.Ps[other].Face == 0x3f && (person.Face & 1) != 0 && other != slot)
+                var sameFace = distinctFaces
+                    ? state.Ps[other].Face != 0 && (state.Ps[other].Face & FaceBits) == (person.Face & FaceBits)
+                    : state.Ps[other].Face == 0x3f && (person.Face & 1) != 0;
+                if (sameFace && other != slot)
                 {
                     unique = false;
                 }
@@ -452,8 +496,12 @@ public static class PlotRules
         Happen(state, partnerEvent);
         for (var other = 0; other < state.NEVENT; other++)
         {
-            // BUG: CA-12 and CA-14: every other event with the pair's message id is cancelled
-            if (happening.Synch == state.Ev[other].Synch && other != chosen && other != answered)
+            // BUG: CA-12 and CA-14: every other event with the pair's message id is cancelled. CA-14 (two senders of
+            // one id to one receiver, of which one message is lost) is left as it is: the data reads as the
+            // designers' alternatives, either sender but not both. CA-12 (an announced event of one member that merely
+            // shares the number) is meant to stay: OriginalBehaviour.FixAnnouncedEventCancelledBySharedMessageId
+            if (happening.Synch == state.Ev[other].Synch && other != chosen && other != answered
+                && !(state.Behaviour.FixAnnouncedEventCancelledBySharedMessageId && (state.Ev[other].Status & PartnerBits) == 0))
             {
                 state.Ev[other].Chron = cancelled;
             }
@@ -517,18 +565,39 @@ public static class PlotRules
                 {
                     continue;
                 }
-                var local = FindOrCreatePerson(state, traveller.Org, city, 0, out _);
-                if (RoleOf(state, local) != 0 || CluesOf(state, local) != 0)
+                // BUG: CA-35 the lookup adds no knowledge, so it never returns a person and "person -1" is tested;
+                // OriginalBehaviour.FixDepartureLookup looks the person of the pair up as it is
+                var fixLookup = state.Behaviour.FixDepartureLookup;
+                var local = fixLookup ? PersonAt(state, traveller.Org, city) : FindOrCreatePerson(state, traveller.Org, city, 0, out _);
+                if (fixLookup
+                    ? local != -1 && (state.Ps[local].Role != 0 || state.Ps[local].Clues != 0)
+                    : RoleOf(state, local) != 0 || CluesOf(state, local) != 0)
                 {
                     continue;
                 }
                 // DORMANT: no city passes the test above with the program's own text in front of the persons table
                 fromCity = traveller.Loc;
-                CastRules.ReleasePerson(state, local);
+                if (local != -1 || !fixLookup)
+                {
+                    CastRules.ReleasePerson(state, local);
+                }
                 traveller.Loc = (short)city;
                 CastRules.ClearPersonKnowledge(state, person, KnownCity);
                 traveller.Alert = (short)(traveller.Alert / 2);
                 return person;
+            }
+        }
+        return -1;
+    }
+
+    /// <summary>The person of an organisation in a city whatever the player knows of them, or -1 when there is none.</summary>
+    private static int PersonAt(CampaignState state, int org, int city)
+    {
+        for (var index = 0; index < state.Nperson; index++)
+        {
+            if (state.Ps[index].Org == org && state.Ps[index].Loc == city)
+            {
+                return index;
             }
         }
         return -1;

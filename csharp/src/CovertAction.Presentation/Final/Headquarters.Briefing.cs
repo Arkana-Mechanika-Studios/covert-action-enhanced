@@ -138,10 +138,15 @@ public sealed partial class Headquarters
         const int plotDigits = 3, variantDigit = 5, pageDigit = 6;
         var career = _state.Pl;
         // C: the plot is taken once: after a new case is chosen below, the variants are still looked for in the old plot
+        // (CA-44, OriginalBehaviour.FixApartmentSceneStalePlot)
         var plot = _state.Plots[career.Type];
         int variant;
         while (true)
         {
+            if (_behaviour.FixApartmentSceneStalePlot)
+            {
+                plot = _state.Plots[career.Type];
+            }
             var tries = 0;
             bool fits;
             do

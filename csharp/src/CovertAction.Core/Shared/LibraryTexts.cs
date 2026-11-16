@@ -81,6 +81,33 @@ public static class LibraryTexts
         AddDigit(tag, MessageUnits, message % 10);
     }
 
+    /// <summary>
+    /// How many entries under an event's message tag the text reader passes over: 1 for an event without a partner (an
+    /// announced one) whose message id a pair of events also uses, else 0. TEXT.DTA files the pair's text first and the
+    /// bulletin's behind it (CRIME1, id 2: "Stole Blueprints").
+    /// </summary>
+    /// <param name="events">The plot's events.</param>
+    /// <param name="count">How many are in use.</param>
+    /// <param name="index">The event.</param>
+    /// <param name="behaviour">Whether CA-12 is fixed; otherwise the original's 0.</param>
+    // BUG: CA-12 the original reads the first entry under the tag for both; OriginalBehaviour.FixAnnouncedEventCancelledBySharedMessageId
+    public static int EntriesBeforeEventText(IReadOnlyList<Records.Event> events, int count, int index, OriginalBehaviour behaviour)
+    {
+        const int partnerBits = 0xfff;
+        if (!behaviour.FixAnnouncedEventCancelledBySharedMessageId || (events[index].Status & partnerBits) != 0)
+        {
+            return 0;
+        }
+        for (var other = 0; other < count; other++)
+        {
+            if (events[other].Synch == events[index].Synch && (events[other].Status & partnerBits) != 0)
+            {
+                return 1;
+            }
+        }
+        return 0;
+    }
+
     /// <summary>Adds a number to the character at a position of a text, keeping the low byte as the original's char does.</summary>
     private static void AddDigit(TextBuffer text, int position, int digit) => text[position] = (char)C16.UChar(text[position] + digit);
 
