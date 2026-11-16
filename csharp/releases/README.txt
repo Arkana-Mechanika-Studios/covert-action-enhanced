@@ -2,8 +2,8 @@ Covert Action (C# rewrite) - an unofficial fan project
 ======================================================
 
 A rewrite of Sid Meier's Covert Action (MicroProse, 1990) in C#, made from the original's own code,
-part by part, to play as it did. A work in progress: not yet a finished port (RELEASE_NOTES.md says
-what is in this version and what is not).
+part by part, to play as it did. The whole game plays; the player options, all off by default, add
+to it (RELEASE_NOTES.md says what is new in this version and what is not there yet).
 
 Covert Action (c) 1990 MicroProse Software, Inc. This program is not affiliated with, endorsed or
 supported by MicroProse or the game's rights holders.
@@ -19,6 +19,8 @@ What you need
 * For the Roland MT-32 sound card only: your own MT-32 (or CM-32L) ROM files, in MT32_ROMS (or
   where you already keep them: in or next to your game's folder, or in DOSBox Staging's mt32-roms
   folder; the launcher shows where they were found).
+* For the Amiga options only: the files of your own Amiga version's disks, in a folder you choose
+  on the launcher's Advanced tab.
 
 
 Getting started
@@ -45,7 +47,12 @@ CovertAction.exe starts). Its settings:
    General:  the game folder, the window size, fullscreen, the picture's scaling (pixel art,
              nearest, smooth), the sound card (with a sound test), the controls (keyboard and
              joystick, or keyboard only), the saved games' folder.
-   Advanced: the MT-32 ROM folder, the keyboard's repeat (the PC's, or Windows' own).
+   Advanced: the MT-32 ROM folder, the keyboard's repeat (the PC's, or Windows' own), and the
+             player options, all off by default: the mouse, arrow keys that walk in a raid,
+             music and effects on different sound cards, the Amiga version's music, effects
+             and pictures (with the folder of your Amiga files), and the fixes for the
+             original's bugs (two options: those that leave the story as it is, and those
+             that change it).
 Play saves them and starts the game; Save and quit (or Esc) saves them and closes. They are kept
 in covertaction.settings.json beside the program (or in %APPDATA%\CovertAction when this folder
 cannot be written); SETTINGS.md describes the file and the command-line options

@@ -8,8 +8,8 @@ files come with this project, and your copy is never changed.
 briefings, the campaign, the building raids, the electronics workbench, the car chase, the cryptography workstation,
 saving and loading, the joystick and all four of the original's sound cards. Version 1.0 is the faithful version and
 stays the reference (its `release/1.0` branch and the tag `v1.0`; what it had to meet is in
-[release 1.0](csharp/docs/RELEASE-1.0.md)). 1.1 adds [player options](#player-options), all off by default: with them off,
-it plays as 1.0 and the original. Its limits are in [Known limits](#known-limits).
+[release 1.0](csharp/docs/RELEASE-1.0.md)). Versions 1.1 to 1.2 add [player options](#player-options), all off by default: with them off,
+the game plays as 1.0 and the original. Its limits are in [Known limits](#known-limits).
 
 <table>
 <tr>
@@ -62,7 +62,7 @@ Screenshots of the rewrite running on the author's copy of the game.
 
 `CovertAction Launcher.exe` (or Shift held while the game starts) opens the settings: the game folder, the window
 size, fullscreen, the picture's scaling, the sound card (with a sound test), the controls, the saved games' folder, the MT-32 ROM
-folder and the keyboard's repeat. They are kept in `covertaction.settings.json`; see
+folder, the keyboard's repeat and, on its Advanced tab, the player options. They are kept in `covertaction.settings.json`; see
 [the settings](csharp/docs/SETTINGS.md).
 
 * **Sound:** PC speaker, AdLib, Tandy and Roland MT-32. The MT-32 is Munt's emulation and needs your own MT-32 (or
@@ -147,6 +147,9 @@ data), and [cut content](docs/cut-content.md) found in the original's code and d
   stick's position turns into the game's readings is still a model ([U-12](csharp/docs/faithfulness/UNCERTAIN.md)).
 * A damaged save (cut short or the wrong size) is listed as empty instead of loading into a broken campaign
   ([D-105](csharp/docs/faithfulness/DIVERGENCES-FINAL.md)).
+* The Amiga options need the Amiga version's own files; without them the PC's music, effects and pictures play.
+* The bug fixes are options, off by default: with them off the original's bugs stay, bug for bug
+  ([the register](docs/original-bugs.md)).
 * Windows only for now.
 
 ## Building from source
