@@ -120,8 +120,6 @@ data), and [cut content](docs/cut-content.md) found in the original's code and d
   four-colour picture is not offered ([D-600](csharp/docs/faithfulness/DIVERGENCES-INTRO.md)).
 * The mouse works in the menus, lists and on the flight map, not in the action parts (the raid, the car chase, the
   workbench and the workstation).
-* A few outcomes are proven function by function but not yet in a recorded session: a jailbreak foiled (the agent
-  winning the jailbreak raid) and a campaign wiretap solved above level 0.
 * The joystick is not yet tried with a real controller; how a real stick's position turns into the game's readings is
   a model ([U-12](csharp/docs/faithfulness/UNCERTAIN.md)).
 * A damaged save (cut short or the wrong size) is listed as empty instead of loading into a broken campaign
