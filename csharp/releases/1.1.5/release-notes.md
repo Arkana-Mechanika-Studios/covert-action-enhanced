@@ -29,6 +29,7 @@ csharp/docs/faithfulness/. With them on, the options above and those of 1.1 (D-6
 
 - The mouse works everywhere but the car chase, where the keyboard and the joystick play as in the original. At the
   workstation only the choice of a letter is by mouse; the replacement is typed.
-- The limits of 1.0 still hold: two outcomes are proven function by function only (a jailbreak foiled, a wiretap
-  solved above level 0); how a real stick's position becomes the game's readings is still a model (U-12).
+- The joystick is tried with a real gamepad, but how a real stick's position becomes the game's readings is still a
+  model (U-12). The two outcomes 1.0 and 1.1 had proven function by function only, a jailbreak foiled and a campaign
+  wiretap solved above level 0, are now also proven in recorded sessions against the original.
 - Windows only (64-bit).
