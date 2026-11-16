@@ -1,3 +1,4 @@
+using CovertAction.Core;
 using CovertAction.Core.Campaign;
 using CovertAction.Core.Shared;
 using CovertAction.Msc;
@@ -77,6 +78,16 @@ public sealed class HeadquartersScreens(CampaignState state, SharedState shared,
     private const int FloorBoxX = 8, SectionBoxX = 0x14, BoxY = 0x15, NoInformationBoxY = 0x29, ConfessionBoxY = 0x14;
 
     /// <summary>
+    /// The minutes the CIA building charges on the way back from the cryptography workstation: half an hour per unit
+    /// of the hand-off's second result. The workstation never writes that result, so the original charges whatever
+    /// the last building raid or car chase left there (CA-7); with <see cref="OriginalBehaviour.FixDecodeVisitLeftoverCharge"/>
+    /// nothing, the workstation's own minutes having been charged on entry.
+    /// </summary>
+    public static int DecodeVisitCharge(OriginalBehaviour behaviour, int result) =>
+        // DIVERGENCE: D-650 a player's option: CA-7, no charge from a leftover result
+        behaviour.FixDecodeVisitLeftoverCharge ? 0 : HalfHour * result;
+
+    /// <summary>
     /// The CIA building's menu, which a visit comes to after the arrival. When the part was entered back from a
     /// mission with a coded message waiting, the decoded message is shown first and the mission's half hours pass. Then
     /// the player picks a floor, over and over, until he leaves, a hand-off to another part is pending (a message to
@@ -92,7 +103,7 @@ public sealed class HeadquartersScreens(CampaignState state, SharedState shared,
                 dataFiles.CodedMessagesMenu();
                 screens.Messages.ShowMessageDecode(shared.Person);
             }
-            plot.PassTime(HalfHour * shared.Result);
+            plot.PassTime(DecodeVisitCharge(state.Behaviour, shared.Result));
             state.EntryMode = 0;
         }
         while (true)

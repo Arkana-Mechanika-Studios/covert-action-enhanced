@@ -237,6 +237,25 @@ public sealed class CampaignBugFixesTests(ITestOutputHelper output) : IDisposabl
         Assert.DoesNotContain("Rumors", Read(1), StringComparison.Ordinal);
     }
 
+    // CA-7
+
+    [Theory]
+    [InlineData(0, 0)]       // a decode before any raid or chase
+    [InlineData(2, 60)]      // after a raid that arrested its target
+    [InlineData(100, 3000)]  // after a car chase at full alert: fifty hours
+    public void Ca7TheVisitAfterTheWorkstationChargesTheLastRaidOrChaseResult(int leftover, int minutes) =>
+        Assert.Equal(minutes, HeadquartersScreens.DecodeVisitCharge(Off, leftover));
+
+    [Theory]
+    [InlineData(0)]
+    [InlineData(2)]
+    [InlineData(100)]
+    public void Ca7WithTheFixTheVisitChargesNothingFurther(int leftover)
+    {
+        Assert.Equal(0, HeadquartersScreens.DecodeVisitCharge(On, leftover));
+        Assert.False(OriginalBehaviour.ForPlayer(true, false).FixDecodeVisitLeftoverCharge);
+    }
+
     // ---- FINAL: CA-15, CA-42, CA-44, CA-46 ----
 
     private FinalState FinalData(GameFolder game)

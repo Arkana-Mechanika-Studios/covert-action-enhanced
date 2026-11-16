@@ -32,7 +32,8 @@ plays exactly as 1.0 and the original.
   "prevented" (CA-15); big buildings no longer get two doors between the same rooms (CA-28); intercepted messages pair
   with their own partner (CA-32); cast members are seen leaving a city (CA-35); new persons get a face of their own and
   start unalerted (CA-36); the training ratings shown are the ones kept (CA-42); the apartment scene searches the new
-  plot after a new case is chosen (CA-44); a case rated 255 or 511 no longer gets overwritten in the career (CA-46). A
+  plot after a new case is chosen (CA-44); a case rated 255 or 511 no longer gets overwritten in the career (CA-46); coming back
+  from the cryptography workstation no longer costs extra hours left over from the last raid or car chase (CA-7). A
   game saved with it loads without it and in the original; the files keep their format. It changes the story: a case
   does not play as in the original.
 - **Everything of 1.1.5, 1.1 and 1.0.** The mouse in the menus and the action parts, arrow keys that walk in a raid,
@@ -63,8 +64,7 @@ D-640 to D-642, D-650).
   cryptography workstation's effect is a probable match.
 - The mouse works everywhere but the car chase. The joystick's readings of a real stick are still a model (U-12).
 - The bug fixes: with "Fix the original's bugs" off the game keeps the original's bugs, also the car chase stop of CA-4
-  (the original reads a leftover value there; the rewrite stops with an error). The campaign-logic option leaves CA-7 (the time
-  charged after decoding in the CIA building comes from a byte an earlier part left; what it should charge is not
-  readable) and CA-14 (two senders of one message id: the data reads as alternatives) as the original has them. CA-6 (the original's 12000-byte hand-off block is too small for two crimes at the hardest level) does not occur
+  (the original reads a leftover value there; the rewrite stops with an error). The campaign-logic option leaves CA-14 (two senders
+  of one message id: the data reads as alternatives, one of the two) as the original has it. CA-6 (the original's 12000-byte hand-off block is too small for two crimes at the hardest level) does not occur
   in this game, which does not keep that block; what the original does there was not tested.
 - Windows only (64-bit).

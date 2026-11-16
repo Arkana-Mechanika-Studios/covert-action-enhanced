@@ -70,6 +70,7 @@ public sealed class OriginalBehaviour
             FixTrainingRatingLowered = campaign,
             FixApartmentSceneStalePlot = campaign,
             FixCareerRecordEndSearch = campaign,
+            FixDecodeVisitLeftoverCharge = campaign,
         };
     }
 
@@ -236,4 +237,13 @@ public sealed class OriginalBehaviour
     /// original's.
     /// </summary>
     public bool FixCareerRecordEndSearch { get; init; }
+
+    /// <summary>
+    /// CA-7: coming back from the cryptography workstation, the CIA building charges half an hour per unit of the
+    /// hand-off's second result, which the workstation never writes: the time comes from whatever the last building
+    /// raid or car chase left there (up to 50 hours after a chase). The workstation's own minutes are already charged
+    /// on entry, and the manual speaks only of the time spent at the workstation (p. 72). On: no further charge. Off:
+    /// the original's.
+    /// </summary>
+    public bool FixDecodeVisitLeftoverCharge { get; init; }
 }
