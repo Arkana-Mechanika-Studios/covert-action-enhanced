@@ -192,7 +192,7 @@ public sealed partial class Headquarters
         }
         state.Txt.Text = state.DebriefTexts[(int)DebriefText.InterrogationRevealed];
         ShowBriefingBox();
-        CampaignLibrary.FindOrCreatePerson(state.Ps, state.Nperson, state.Pl, state.Random, state.Pl.BigOrg, state.Pl.BigLoc, fact, true, AnnounceNewFacts);
+        CampaignLibrary.FindOrCreatePerson(state.Ps, state.Nperson, state.Pl, state.Random, state.Pl.BigOrg, state.Pl.BigLoc, fact, true, AnnounceNewFacts, _behaviour);
         state.Pl.Clues |= (short)fact;
     }
 

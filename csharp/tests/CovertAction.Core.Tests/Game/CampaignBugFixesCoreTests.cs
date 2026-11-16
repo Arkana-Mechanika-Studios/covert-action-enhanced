@@ -198,6 +198,46 @@ public sealed class CampaignBugFixesCoreTests
         }
     }
 
+    /// <summary>The library's copy (workbench, debriefing, raid): forty persons made on records that hold a last occupant's alert.</summary>
+    private static (int DuplicateFaces, int Stale) LibraryFaces(OriginalBehaviour behaviour, int seed)
+    {
+        var state = new CampaignState();
+        state.Pl.BigOrg = -1;
+        foreach (var slot in state.Ps)
+        {
+            slot.Alert = 50;
+            slot.Intel = 9;
+        }
+        state.Random.Srand(seed);
+        var persons = new List<int>();
+        for (var org = 1; org <= 4; org++)
+        {
+            for (var city = 0; city < 10; city++)
+            {
+                persons.Add(Shared.CampaignLibrary.FindOrCreatePerson(state.Ps, CampaignState.PersonCount, state.Pl, state.Random, org, city, 1, false, (_, _) => { }, behaviour));
+            }
+        }
+        var low = persons.Select(p => state.Ps[p].Face & 0x3f).ToList();
+        return (low.Count - low.Distinct().Count(), persons.Count(p => state.Ps[p].Alert != 0 || state.Ps[p].Intel != 0));
+    }
+
+    [Fact]
+    public void Ca36TheLibrarysCopyAlsoSharesFacesAndKeepsTheLastOccupantsAlert()
+    {
+        var (duplicates, stale) = LibraryFaces(Off, 1);
+        Assert.True(duplicates > 0);
+        Assert.Equal(40, stale);
+    }
+
+    [Fact]
+    public void Ca36WithTheFixTheLibrarysCopyMakesDistinctUnalertedPersons()
+    {
+        for (var seed = 1; seed <= 20; seed++)
+        {
+            Assert.Equal((0, 0), LibraryFaces(On, seed));
+        }
+    }
+
     // ---- CA-28 ----
 
     /// <summary>A building as the raid generates it (without the pruning): plans are drawn until one has its rooms joined.</summary>

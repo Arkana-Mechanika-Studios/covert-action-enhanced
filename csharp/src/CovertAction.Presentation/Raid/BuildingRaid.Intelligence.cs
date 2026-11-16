@@ -92,7 +92,7 @@ public sealed partial class BuildingRaid
             {
                 continue;
             }
-            CampaignLibrary.FindOrCreatePerson(state.Ps, state.Nperson, state.Pl, state.Random, personOrg, personCity, known, true, RevealPersonFacts);
+            CampaignLibrary.FindOrCreatePerson(state.Ps, state.Nperson, state.Pl, state.Random, personOrg, personCity, known, true, RevealPersonFacts, behaviour);
             learned++;
         }
         if (learned == 0 && announce != 0)
@@ -193,10 +193,10 @@ public sealed partial class BuildingRaid
             if ((happening.Status & MessageKinds) != 0 && (message.Clues & 0xe) != 0)
             {
                 var other = state.Ps[message.Who2];
-                CampaignLibrary.FindOrCreatePerson(state.Ps, state.Nperson, state.Pl, state.Random, other.Org, other.Loc, message.Clues & 6, false, RevealPersonFacts);
+                CampaignLibrary.FindOrCreatePerson(state.Ps, state.Nperson, state.Pl, state.Random, other.Org, other.Loc, message.Clues & 6, false, RevealPersonFacts, behaviour);
                 if (message.Loc2 == other.Loc)
                 {
-                    CampaignLibrary.FindOrCreatePerson(state.Ps, state.Nperson, state.Pl, state.Random, other.Org, other.Loc, message.Clues & 8, false, RevealPersonFacts);
+                    CampaignLibrary.FindOrCreatePerson(state.Ps, state.Nperson, state.Pl, state.Random, other.Org, other.Loc, message.Clues & 8, false, RevealPersonFacts, behaviour);
                 }
             }
         }

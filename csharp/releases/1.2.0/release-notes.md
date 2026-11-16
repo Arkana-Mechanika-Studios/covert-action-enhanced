@@ -65,7 +65,6 @@ D-640 to D-642, D-650).
 - The bug fixes: with "Fix the original's bugs" off the game keeps the original's bugs, also the car chase stop of CA-4
   (the original reads a leftover value there; the rewrite stops with an error). The campaign-logic option leaves CA-7 (the time
   charged after decoding in the CIA building comes from a byte an earlier part left; what it should charge is not
-  readable) and CA-14 (two senders of one message id: the data reads as alternatives) as the original has them; CA-36
-  is fixed in the plot engine's copy only, not in the library's copy the electronics workbench and the debriefing use. CA-6 (the original's 12000-byte hand-off block is too small for two crimes at the hardest level) does not occur
+  readable) and CA-14 (two senders of one message id: the data reads as alternatives) as the original has them. CA-6 (the original's 12000-byte hand-off block is too small for two crimes at the hardest level) does not occur
   in this game, which does not keep that block; what the original does there was not tested.
 - Windows only (64-bit).

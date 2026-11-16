@@ -84,7 +84,7 @@ public sealed partial class ElectronicsWorkbench
             {
                 continue;
             }
-            CampaignLibrary.FindOrCreatePerson(state.Ps, state.Nperson, state.Pl, state.Random, org, city, (short)bits, true, RevealPersonFacts);
+            CampaignLibrary.FindOrCreatePerson(state.Ps, state.Nperson, state.Pl, state.Random, org, city, (short)bits, true, RevealPersonFacts, behaviour);
             learned++;
         }
         if (learned == 0 && showText != 0)
@@ -209,11 +209,11 @@ public sealed partial class ElectronicsWorkbench
             {
                 var receiver = state.Ps[message.Who2];
                 CampaignLibrary.FindOrCreatePerson(state.Ps, state.Nperson, state.Pl, state.Random, receiver.Org, receiver.Loc,
-                    message.Clues & (short)(MessageFacts.Receiver | MessageFacts.ReceiverOrg), false, RevealPersonFacts);
+                    message.Clues & (short)(MessageFacts.Receiver | MessageFacts.ReceiverOrg), false, RevealPersonFacts, behaviour);
                 if (message.Loc2 == receiver.Loc)
                 {
                     CampaignLibrary.FindOrCreatePerson(state.Ps, state.Nperson, state.Pl, state.Random, receiver.Org, receiver.Loc,
-                        message.Clues & (short)MessageFacts.ReceiverCity, false, RevealPersonFacts);
+                        message.Clues & (short)MessageFacts.ReceiverCity, false, RevealPersonFacts, behaviour);
                 }
             }
         }

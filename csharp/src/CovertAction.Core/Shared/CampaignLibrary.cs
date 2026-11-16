@@ -121,11 +121,12 @@ public static class CampaignLibrary
     /// <param name="bits">The knowledge bits to add (<see cref="Person.Clues"/>).</param>
     /// <param name="show">Whether to tell the player what is new.</param>
     /// <param name="revealPersonFacts">The part's screen that tells it (the person, the bits known before).</param>
+    /// <param name="behaviour">Which of the original's bugs to reproduce (CA-36); the original's own when left out.</param>
     /// <returns>The person, or -1.</returns>
     // orig: BUG 00e8:2175 find_or_create_person (src/c/bug/bug_00e8_2175.c) matched; also TAC 00e8:89f9, FINAL 0100:5b3f; tests: LibraryTextOracleTests
     // Other code under the same name: GAME 00f7:4899; and FINAL 0100:5ff1, which is the library's quiet variant (docs/source-map/twin-names.csv).
     public static int FindOrCreatePerson(IReadOnlyList<Person> persons, int personCount, Plot plot, IRandomSource random,
-        int org, int city, int bits, bool show, Action<int, int> revealPersonFacts)
+        int org, int city, int bits, bool show, Action<int, int> revealPersonFacts, OriginalBehaviour? behaviour = null)
     {
         int person, before;
         for (person = 0; person < personCount; person++)
@@ -164,6 +165,13 @@ public static class CampaignLibrary
         made.Clues = (short)bits;
         made.Role = 0;
         made.Rknown = 0;
+        // BUG: CA-36 the face test is garbled and the record keeps its last occupant's alert and investigation score; OriginalBehaviour.FixNewPersonFaceAndState
+        var distinctFaces = behaviour?.FixNewPersonFaceAndState == true;
+        if (distinctFaces)
+        {
+            made.Alert = 0;
+            made.Intel = 0;
+        }
         bool unique;
         do
         {
@@ -171,7 +179,10 @@ public static class CampaignLibrary
             made.Face = (short)GameLibrary.RandomBelow(random, Faces);
             for (var other = 0; other < personCount; other++)
             {
-                if (((persons[other].Face == FaceLowBits ? 1 : 0) & made.Face & FaceLowBits) != 0 && person != other)
+                var same = distinctFaces
+                    ? persons[other].Face != 0 && (persons[other].Face & FaceLowBits) == (made.Face & FaceLowBits)
+                    : ((persons[other].Face == FaceLowBits ? 1 : 0) & made.Face & FaceLowBits) != 0;
+                if (same && person != other)
                 {
                     unique = false;
                 }
