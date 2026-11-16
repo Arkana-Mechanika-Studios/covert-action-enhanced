@@ -1,6 +1,6 @@
 # Mouse support: how it could be added
 
-Study of 14 November 2026; **phases 0, 1 and 2 implemented on 15 November 2026, phases 3 and 4 (without the car chase) in version 1.2** (section 6): the mouse works in the
+Study of 14 November 2026; **phases 0, 1 and 2 implemented on 15 November 2026, phases 3 and 4 (without the car chase) in version 1.1.5** (section 6): the mouse works in the
 menus, the lists, on the flight map, at the workbench and the workstation and in the building raid as a player option, off by default. Phase 5 and the car chase are not done. Question: the original's shared library carries int 33h mouse
 routines that no program calls (`LibraryInput.cs` "DORMANT", `docs/cut-content.md` CC-15). Could the rewrite offer
 a mouse, how much of it is the original's own code, and what does it cost?
@@ -240,7 +240,7 @@ Esc), the copy-protection faces (click = Return; right click = Esc, which picks 
 same hand-off block as by the keys; a right click is Esc (same block and picture); the campaign's walk (city screen,
 flight map by its list and by the city's dot, hotel, quit) ends in the same block as by the keys.
 
-**Phase 3 and the raid (version 1.2; D-634 to D-636).**
+**Phase 3 and the raid (version 1.1.5; D-634 to D-636).**
 
 * Electronics workbench: each chip slot is a 32 by 32 pixel cell (`PointerHit.Cell`, `ElectronicsWorkbench.SlotAt`); pointing moves the board cursor
   (`MoveCursor` by the difference, so the slot is drawn as the keys draw it); a left click moves and presses Return; a right click is Esc. The pointer is read

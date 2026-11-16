@@ -1,8 +1,8 @@
-# Covert Action (C# rewrite) 1.2
+# Covert Action (C# rewrite) 1.1.5
 
 The second round of improvements on top of 1.0, the faithful rewrite of Sid Meier's Covert Action (1990). It is an
 unofficial fan project that rebuilds the original from its own code, part by part. It reads your own copy of the game;
-none of the game's files come with it. Everything new is a player option, off by default: with the options off, 1.2
+none of the game's files come with it. Everything new is a player option, off by default: with the options off, 1.1.5
 plays exactly as 1.0 and the original.
 
 ## What's new
