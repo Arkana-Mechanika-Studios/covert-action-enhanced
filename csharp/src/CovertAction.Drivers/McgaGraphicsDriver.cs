@@ -66,6 +66,7 @@ public sealed class McgaGraphicsDriver : IGraphicsDriver
     {
         _fonts = fonts;
         _defaultColours = defaultColours;
+        PictureColours = new PictureColours(Palette);
         // The launcher gives the MCGA driver buffers for pages 1 and 2. Every other entry of the page table stays
         // what the driver file has there: the screen itself.
         var screen = new byte[PageSize];
@@ -79,6 +80,9 @@ public sealed class McgaGraphicsDriver : IGraphicsDriver
 
     /// <summary>The display's 256 colours: three bytes each (red, green, blue), 0..63 as the VGA takes them.</summary>
     public byte[] Palette { get; } = new byte[3 * 256];
+
+    /// <summary>The display colours 128 to 255, which pictures of the Amiga version take for their own colours (D-642); nothing of the game's own drawing touches them.</summary>
+    public PictureColours PictureColours { get; }
 
     /// <summary>The page fills and lines go to (set by <see cref="SelectPage"/>).</summary>
     public byte[] DrawPage { get; set; }
@@ -169,6 +173,8 @@ public sealed class McgaGraphicsDriver : IGraphicsDriver
         if ((argument & keepScreen) == 0)
         {
             Array.Clear(Pages[0]);
+            // DIVERGENCE: D-642 the colours the pictures of the Amiga version were given (from 128 up) begin anew with a cleared screen
+            PictureColours.Reset();
         }
     }
 

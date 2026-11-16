@@ -98,8 +98,13 @@ internal sealed record SoundTestRequest(string Card, string GameFolder, string? 
 /// <param name="Missing">The files the folder lacks (null or empty when it holds all).</param>
 /// <param name="EffectsFound">All five sound banks (gamesnd.dat, tacsnd.dat, codesnd.dat, bugsnd.dat, chasesnd.dat) are there.</param>
 /// <param name="EffectsMissing">The banks that are not there (null or empty when all five are).</param>
+/// <param name="PicturesFound">All the picture files the Amiga pictures option replaces the game's with are there (D-642).</param>
+/// <param name="PicturesMissing">The picture files that are not there (null or empty when all are); those pictures stay the game's.</param>
+/// <param name="PicturesCount">How many pictures the option replaces (the files the list names).</param>
+/// <param name="PicturesSource">Where the picture files' folder was found when the player did not choose it; null when chosen.</param>
 internal sealed record AmigaStatus(string Folder, bool Found, string? Source = null, IReadOnlyList<string>? Missing = null,
-    bool EffectsFound = false, IReadOnlyList<string>? EffectsMissing = null);
+    bool EffectsFound = false, IReadOnlyList<string>? EffectsMissing = null, bool PicturesFound = false, IReadOnlyList<string>? PicturesMissing = null,
+    int PicturesCount = 0, string? PicturesSource = null);
 
 /// <summary>The Roland ROMs in a folder.</summary>
 /// <param name="Folder">The folder looked in (the default one when none is set).</param>

@@ -161,6 +161,7 @@ internal static class SettingsFile
                     case "sound": Section(name, value, settings, Sound); break;
                     case "startup": Section(name, value, settings, Startup); break;
                     case "input": Section(name, value, settings, Input); break;
+                    case "graphics": Section(name, value, settings, Graphics); break;
                     default: Unknown(name); break;
                 }
             }
@@ -265,6 +266,16 @@ internal static class SettingsFile
                 case "keyRepeat": settings.KeyRepeat = OneOf(key, property.Value, GameSettings.KeyRepeats) ?? settings.KeyRepeat; break;
                 case "arrowKeysWalk": settings.ArrowKeysWalk = Boolean(key, property.Value) ?? settings.ArrowKeysWalk; break;
                 case "mouse": settings.Mouse = Boolean(key, property.Value) ?? settings.Mouse; break;
+                default: Unknown(key); break;
+            }
+        }
+
+        private void Graphics(string section, JsonProperty property, GameSettings settings)
+        {
+            var key = $"{section}.{property.Name}";
+            switch (property.Name)
+            {
+                case "amiga": settings.AmigaPictures = Boolean(key, property.Value) ?? settings.AmigaPictures; break;
                 default: Unknown(key); break;
             }
         }
@@ -390,6 +401,13 @@ internal static class SettingsFile
             // selection screens' and the vacations' tunes stay silent; effects: those the Amiga game does not play stay silent).
             // false: the sound card plays those.
             "amigaOriginalOnly": false
+          },
+
+          "graphics": {
+            // true: the Amiga version's pictures, read from your own Amiga files (the folder of sound.amigaFiles; the .pix
+            // files of the three disks), in place of the PC's where the Amiga version has the same picture on the same
+            // layout (D-642). false: the PC's pictures. Without the files the PC's pictures show.
+            "amiga": false
           },
 
           "input": {

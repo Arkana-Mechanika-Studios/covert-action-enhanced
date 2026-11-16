@@ -91,9 +91,28 @@ public static class AmigaFolderSearch
     /// for around that folder (<see cref="BankFile"/>): chasesnd.dat is on disk 3.
     /// </summary>
     /// <param name="folder">The folder.</param>
-    public static string? ResolveBanks(string folder)
+    public static string? ResolveBanks(string folder) => ResolveDisk(folder, GameBank, "disk2");
+
+    /// <summary>
+    /// The folder that holds faces.pix for a folder the player named or a place searched: as <see cref="ResolveBanks"/> for
+    /// the pictures' first file, with the <c>disk1</c> folder preferred. The other pictures are looked for around that folder
+    /// (<see cref="BankFile"/>): the cities and the maps are on disk 2.
+    /// </summary>
+    /// <param name="folder">The folder.</param>
+    public static string? ResolvePictures(string folder) => ResolveDisk(folder, "faces.pix", "disk1");
+
+    /// <summary>The folder with the pictures to use when none is chosen: the first place of <see cref="Candidates"/> that holds them, and where it was found; else null.</summary>
+    /// <param name="gameFolder">The game folder in use or found; null: none.</param>
+    public static (string Folder, string Source)? AutomaticPictures(string? gameFolder) => Find(gameFolder, AppContext.BaseDirectory, ResolvePictures);
+
+    /// <summary>The names of the pictures' files (of <see cref="AmigaPictureList"/>) that are not around a folder (none when it has all).</summary>
+    /// <param name="pictureFolder">A folder as <see cref="ResolvePictures"/> gives it; null: none was found, so all are missing.</param>
+    public static IReadOnlyList<string> MissingPictures(string? pictureFolder) =>
+        [.. AmigaPictureList.Entries.Select(entry => entry.File).Where(name => pictureFolder is null || BankFile(pictureFolder, name) is null)];
+
+    private static string? ResolveDisk(string folder, string marker, string preferred)
     {
-        if (Holding(folder, GameBank, "disk2") is { } holding)
+        if (Holding(folder, marker, preferred) is { } holding)
         {
             return holding;
         }
@@ -101,7 +120,7 @@ public static class AmigaFolderSearch
         {
             var trimmed = Path.TrimEndingDirectorySeparator(folder);
             return Path.GetFileName(trimmed).StartsWith("disk", StringComparison.OrdinalIgnoreCase) && Path.GetDirectoryName(trimmed) is { Length: > 0 } parent
-                ? Holding(parent, GameBank, "disk2")
+                ? Holding(parent, marker, preferred)
                 : null;
         }
         catch (ArgumentException)

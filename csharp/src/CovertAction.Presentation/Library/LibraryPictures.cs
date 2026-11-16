@@ -101,9 +101,11 @@ public sealed class LibraryPictures(Boundaries world)
             // first row (the picture decoder does, with no first table); the 256-colour driver has no use for it
             world.Graphics.SetColorMaps([], table);
         }
+        // DIVERGENCE: D-642 with the player's option of the Amiga version's pictures, a picture the option has a twin for is shown in its place (the game's own is read first: the files and the drivers see what they always saw).
+        var pixels = world.PictureReplacements?.Find(name, picture.Width, picture.Height)?.Pixels ?? picture.Pixels;
         for (var row = 0; row < picture.Height; row++)
         {
-            picture.Pixels.AsSpan(row * picture.Width, picture.Width).CopyTo(_lineBuffer);
+            pixels.AsSpan(row * picture.Width, picture.Width).CopyTo(_lineBuffer);
             world.Graphics.PutPicLine(_lineBuffer, page, row, 0, picture.Width);
         }
         CloseResource(handle);

@@ -14,12 +14,13 @@ namespace CovertAction.Launcher;
 /// <param name="ArrowKeysWalk">In a building raid the grey arrow keys walk like the keypad's digits and Shift with them lunges (D-610); off: the original's keys.</param>
 /// <param name="MusicLetter">The driver the tunes play on (N, I, T, A, R) when the music and the effects play on two cards (D-620); null: the sound card's.</param>
 /// <param name="EffectsLetter">The driver the sound effects play on (D-620), or 'G' for the Amiga version's sound effects (D-641); null: the sound card's. Both null (the default): one card plays all, as the original.</param>
-/// <param name="AmigaFolder">With <see cref="MusicLetter"/> or <see cref="EffectsLetter"/> 'G' (the Amiga version's music and sound effects, D-640, D-641): the folder with the player's Amiga files; null: found beside the program or the game.</param>
+/// <param name="AmigaFolder">With <see cref="MusicLetter"/> or <see cref="EffectsLetter"/> 'G' (the Amiga version's music and sound effects, D-640, D-641) or <paramref name="AmigaPictures"/>: the folder with the player's Amiga files; null: found beside the program or the game.</param>
 /// <param name="AmigaOnlyWhereOriginal">The Amiga music and effects play only where the Amiga game had them: the selection screens' and the vacations' tunes (commands 39 to 43) and the effects without an Amiga twin play nothing (D-640, D-641).</param>
+/// <param name="AmigaPictures">The game's pictures are replaced, where the Amiga version has the same one, by the Amiga version's, read from the player's own Amiga files in <paramref name="AmigaFolder"/> (D-642); off by default.</param>
 /// <param name="Mouse">
 /// The mouse in the menus, lists and maps (the settings' input.mouse, off by default): the game gets a mouse driver on
 /// the host's pointer, when the host has one; off (or without a pointer), the PC has no mouse, as the original assumes
 /// (docs/faithfulness/DIVERGENCES.md D-630).
 /// </param>
 public sealed record GameOptions(char SoundLetter = 'A', bool Joystick = true, string? Mt32RomFolder = null, bool AskSetUpQuestions = false,
-    bool ArrowKeysWalk = false, char? MusicLetter = null, char? EffectsLetter = null, bool Mouse = false, string? AmigaFolder = null, bool AmigaOnlyWhereOriginal = false);
+    bool ArrowKeysWalk = false, char? MusicLetter = null, char? EffectsLetter = null, bool Mouse = false, string? AmigaFolder = null, bool AmigaOnlyWhereOriginal = false, bool AmigaPictures = false);

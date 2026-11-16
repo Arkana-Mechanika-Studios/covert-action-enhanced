@@ -24,4 +24,9 @@
     <ProjectReference Include="..\..\src\CovertAction.Host.Headless\CovertAction.Host.Headless.csproj" />
   </ItemGroup>
 
+  <!-- the writer of the PNG files that the tools which look at the screen make -->
+  <ItemGroup>
+    <Compile Include="..\Shared\PngFile.cs" Link="Shared\PngFile.cs" />
+  </ItemGroup>
+
 </Project>

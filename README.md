@@ -96,6 +96,9 @@ Not in the original, each off by default, on the launcher's Advanced tab ([the s
 * **The Amiga version's sound effects** ([D-641](csharp/docs/faithfulness/DIVERGENCES.md), [the table](csharp/docs/AMIGA-EFFECTS.md)):
   the shots, doors, camera, aeroplane, chips and the rest of the Amiga version's effects, played from the Amiga sound
   files you own where the Amiga game has the same sound, the sound card's effects elsewhere (or silence, if you prefer).
+* **The Amiga version's pictures** ([D-642](csharp/docs/faithfulness/DIVERGENCES.md), [the list](csharp/docs/AMIGA-PICTURES.md)):
+  the faces, icons, maps, the hotel and most city pictures of the Amiga version, in its colours, read from the Amiga picture
+  files you own; a picture the Amiga redrew in another layout stays the PC's.
 
 ## How it is made faithful
 

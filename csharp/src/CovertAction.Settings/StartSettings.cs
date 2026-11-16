@@ -65,6 +65,9 @@ internal sealed record StartSettings
     /// <summary>The mouse in the menus, lists and maps (input.mouse; off by default, as the original has none).</summary>
     public bool Mouse { get; init; }
 
+    /// <summary>The Amiga version's pictures in place of the PC's where it has the same one (graphics.amiga, D-642; off by default).</summary>
+    public bool AmigaPictures { get; init; }
+
     /// <summary>
     /// The settings-file keys the command line or the environment sets for this run, with what sets them ("the command
     /// line (--scale)"): the launcher shows them but cannot change them.
@@ -144,6 +147,7 @@ internal sealed record StartSettings
             EffectsCard = file.EffectsCard ?? "card",
             AmigaFiles = file.AmigaFiles,
             AmigaOriginalOnly = file.AmigaOriginalOnly ?? false,
+            AmigaPictures = file.AmigaPictures ?? false,
             Mouse = mouse,
             FixedKeys = fixedKeys,
         };

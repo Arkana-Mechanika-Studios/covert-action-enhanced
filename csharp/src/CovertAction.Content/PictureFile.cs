@@ -88,9 +88,37 @@ public sealed class PictureFile
             header += ColourTableSize;
         }
         var codes = new LzwCodes(data[(header + 1)..].ToArray(), data[header]);
+        var pixels = DecodeRows(codes, width, height, twoToAByte: true);
+        return new PictureFile(width, height, pixels, fourColourTable, header + 1 + codes.BytesRead);
+    }
 
-        // two pixels to a byte, every row starting on a new byte
-        var rowBytes = (width + 1) / 2;
+    /// <summary>
+    /// Decodes the compressed rows of a picture whose head is not the PC's: the Amiga version's pictures carry the
+    /// same compressed stream (the byte of the largest code width, then the codes) after a head of their own, and
+    /// byte-swapped in 16-bit words (<see cref="AmigaPictureFile"/>).
+    /// </summary>
+    /// <param name="stream">The stream, from the byte with the largest code width.</param>
+    /// <param name="width">The picture's width in pixels.</param>
+    /// <param name="height">The picture's height in pixels.</param>
+    /// <param name="twoToAByte">The rows are packed two pixels to a byte (16 colours); otherwise one pixel to a byte, the value kept whole.</param>
+    /// <returns>One value per pixel, row by row from the top.</returns>
+    /// <exception cref="InvalidDataException">The stream is damaged or ends too early.</exception>
+    internal static byte[] DecodeStream(ReadOnlySpan<byte> stream, int width, int height, bool twoToAByte)
+    {
+        if (stream.Length < 2)
+        {
+            throw new InvalidDataException("a picture's stream starts with a code width and its codes");
+        }
+        return DecodeRows(new LzwCodes(stream[1..].ToArray(), stream[0]), width, height, twoToAByte);
+    }
+
+    /// <summary>
+    /// Runs the codes through the run-length decoding into the rows of the picture. With two pixels to a byte each row
+    /// starts on a new byte, the left pixel in the low half; with one pixel to a byte the byte is the pixel.
+    /// </summary>
+    private static byte[] DecodeRows(LzwCodes codes, int width, int height, bool twoToAByte)
+    {
+        var rowBytes = twoToAByte ? (width + 1) / 2 : width;
         var pixels = new byte[width * height];
         var bytes = new RunLengthBytes(codes);
         for (var packed = 0; packed < rowBytes * height; packed++)
@@ -101,14 +129,19 @@ public sealed class PictureFile
                 throw new InvalidDataException("the picture's data runs past its last row");
             }
             var row = packed / rowBytes;
-            var column = packed % rowBytes * 2;
+            var column = packed % rowBytes * (twoToAByte ? 2 : 1);
+            if (!twoToAByte)
+            {
+                pixels[row * width + column] = value;
+                continue;
+            }
             pixels[row * width + column] = (byte)(value & 0x0f);
             if (column + 1 < width)
             {
                 pixels[row * width + column + 1] = (byte)(value >> 4);
             }
         }
-        return new PictureFile(width, height, pixels, fourColourTable, header + 1 + codes.BytesRead);
+        return pixels;
     }
 
     /// <summary>

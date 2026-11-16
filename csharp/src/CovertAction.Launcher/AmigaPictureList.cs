@@ -1,0 +1,72 @@
+namespace CovertAction.Launcher;
+
+/// <summary>One picture of the game that the Amiga pictures option may replace (D-642).</summary>
+/// <param name="Name">The game's picture, as the game asks for its file ("faces.pic"; a city picture of the city archive by its name there).</param>
+/// <param name="File">The Amiga version's picture in the player's Amiga files ("faces.pix").</param>
+/// <param name="Reason">Why this picture may be replaced: what was checked, and how the game uses its pixels.</param>
+/// <param name="Crop">The Amiga's picture is a full-screen canvas with the picture at its top left; the part the size of the game's picture is used.</param>
+public sealed record AmigaPictureEntry(string Name, string File, string Reason, bool Crop = false);
+
+/// <summary>
+/// The pictures the Amiga pictures option replaces, one by one, each with the reason (D-642; new code, outside the game).
+/// A picture is on the list when the Amiga version's has the same layout as the PC's (the edges of the two coincide: a score
+/// of 0.95 or more of 1.00, from comparing every picture of the Amiga disks with its PC twin) so that every place the game
+/// draws on it, cuts from it or measures it is right, <b>and</b> the game's code does not read or recolour its pixels by
+/// the number of a colour of the PC (a highlight that recolours one colour of the picture, a colour compared with a pixel read
+/// back), <b>and</b> it was looked at on the screen with the option on. Everything else stays the PC's.
+/// </summary>
+/// <remarks>
+/// <para>
+/// Not on the list, and why: <c>ad</c>, <c>camera</c>, <c>gender</c>, <c>training</c>, <c>sneakin</c>, <c>wiretap</c>,
+/// <c>guysnew2</c> and <c>guysnew3</c> are redrawn (different art or layout: the game's rectangles would cut the wrong
+/// parts); <c>sprites</c> and <c>spritesf</c> are redrawn with 16 colours (the raid's guards, cell by cell not the same) and
+/// the game recolours their wall colour; <c>bugs</c> (the electronics workbench's pieces) differs in layout; the cities
+/// <c>geneva</c>, <c>helsinki</c>, <c>istanbul</c>, <c>khartoum</c>, <c>london</c>, <c>miami</c>, <c>rome</c> and <c>washingt</c>
+/// are redrawn on another layout (scores 0.51 to 0.78); <c>havana</c> and <c>kingston</c> have another size of thumbnail;
+/// <c>paris</c>, <c>moscow</c>, <c>berlin</c>, <c>amsterda</c>, <c>baghdad</c> and <c>riyadh</c> have the same layout (0.95 to
+/// 0.98) but the game's measure of the picture's width and height (<c>load_picture_measure</c>: along the first row and column up
+/// to the first colour 0) gives other numbers than for the PC's picture, so the game would cut it wrongly; <c>board</c> (the wiring puzzle reads the wires' colour back from the picture), <c>cars</c> (the car offer
+/// recolours the bodies by colour number), <c>equip1</c> and <c>equip1m</c> (the equipment screen's cursor recolours a colour
+/// of the picture); the Amiga-only pictures (<c>bchback</c>, <c>casback</c>, <c>lauback</c>, <c>offback</c>, <c>disk</c>,
+/// <c>setupscr</c>, <c>titlesnew</c>, <c>chase2</c>, <c>samerica</c>, <c>screen00</c>) have no place in the PC game; the
+/// animations (.pan) are another container and stay the PC's.
+/// </para>
+/// </remarks>
+public static class AmigaPictureList
+{
+    private const string Sheet = "the same sheet as the PC's, cell for cell (score 1.00); cut into the parts the game draws, index 0 is the see-through colour in both";
+    private const string Icons = "the same icons on the same grid (score 0.96); index 0 is the see-through colour in both";
+    private const string Map = "the same map, the cities' dots and menu drawn over it (score 1.00)";
+    private const string City = "the city's picture on the same layout (score at least 0.95): the picture at the top left of the canvas, colour 0 outside it, and the game's measure of its width and height (along the first row and the first column up to the first colour 0) gives the same numbers as for the PC's picture";
+    private const string Thumbnail = "the PC's thumbnail is the top left of the Amiga's full-screen canvas, the same picture (score at least 0.98 when cut to the PC's size)";
+
+    /// <summary>The city pictures of the same layout whose measure the game gets the same: 15 of the 29 whose PC picture fills the screen's size.</summary>
+    // declared before Entries: static fields are set in the order written
+    private static readonly string[] CityNames =
+    [
+        "vienna", "athens", "telaviv", "madrid", "belgrade", "budapest", "prague", "cairo", "amman", "beirut", "tripoli", "damascus", "tehran", "bogota", "nassau",
+    ];
+
+    /// <summary>The cities whose PC picture is a thumbnail the size of the picture: the Amiga's is that thumbnail at the top left of a full canvas.</summary>
+    private static readonly string[] ThumbnailNames = ["caracas", "losangel", "managua", "medellin", "mexicoci", "panama", "rio", "sanjuan"];
+
+    /// <summary>The pictures that may be replaced.</summary>
+    public static IReadOnlyList<AmigaPictureEntry> Entries { get; } =
+    [
+        new("faces.pic", "faces.pix", Sheet),
+        new("facesf.pic", "facesf.pix", Sheet),
+        new("icons.pic", "icons.pix", Icons),
+        new("europe.pic", "europe.pix", Map),
+        new("africa.pic", "africa.pix", Map),
+        new("central.pic", "central.pix", Map),
+        new("hotel.pic", "hotel.pix", "the hotel's lobby on the same layout (score 0.95), drawn on the screen with the menu over it; the menu's highlight recolours only the menu's own colours"),
+        new("equip2.pic", "equip2.pix", "the loose item pictures the raid's status panel cuts its icons from (score 0.99); the cells cut have colour 0 as their see-through colour in both pictures (the Amiga's light background lies outside them)"),
+        new("street.pic", "street.pix", "the car chase's windscreen views (score 0.96): copied to the windscreen as they are, and the game recolours only the dashboard"),
+        .. CityNames.Select(city => new AmigaPictureEntry($"{city}.pic", $"{city}.pix", City)),
+        .. ThumbnailNames.Select(city => new AmigaPictureEntry($"{city}.pic", $"{city}.pix", Thumbnail, Crop: true)),
+    ];
+
+    /// <summary>The entry for a picture file name of the game (compared without regard to letter case); null when the picture stays the PC's.</summary>
+    /// <param name="name">The file name the game asks for.</param>
+    public static AmigaPictureEntry? Find(string name) => Entries.FirstOrDefault(entry => string.Equals(entry.Name, name, StringComparison.OrdinalIgnoreCase));
+}

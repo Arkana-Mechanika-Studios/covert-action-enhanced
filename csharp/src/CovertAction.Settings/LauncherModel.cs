@@ -75,6 +75,7 @@ internal sealed class LauncherModel
     private string? _amigaFiles;
     private AmigaStatus? _amiga;
     private readonly (string? Files, bool OriginalOnly) _initialAmiga;
+    private readonly bool _initialAmigaPictures;
 
     public LauncherModel(LauncherContext context, (int Width, int Height)? display)
     {
@@ -109,6 +110,7 @@ internal sealed class LauncherModel
         _amigaFiles = Blank(start.AmigaFiles);
         AmigaOriginalOnly = start.AmigaOriginalOnly;
         _initialAmiga = (_amigaFiles, AmigaOriginalOnly);
+        AmigaPictures = _initialAmigaPictures = start.AmigaPictures;
     }
 
     private static string? Blank(string? text) => string.IsNullOrWhiteSpace(text) ? null : text;
@@ -185,6 +187,9 @@ internal sealed class LauncherModel
 
     /// <summary>The mouse in the menus, lists and maps (input.mouse).</summary>
     public bool Mouse { get; set; }
+
+    /// <summary>The Amiga version's pictures in place of the PC's where it has the same one (graphics.amiga, D-642).</summary>
+    public bool AmigaPictures { get; set; }
 
     /// <summary>The MT-32 ROM folder chosen; null: the default (MT32_ROMS next to the program, else where the ROMs are found).</summary>
     public string? Mt32Roms
@@ -329,6 +334,10 @@ internal sealed class LauncherModel
         {
             changes["input.mouse"] = Mouse;
         }
+        if (AmigaPictures != _initialAmigaPictures)
+        {
+            changes["graphics.amiga"] = AmigaPictures;
+        }
         return changes;
     }
 
@@ -357,6 +366,7 @@ internal sealed class LauncherModel
         s.AmigaFiles = AmigaFiles;
         s.AmigaOriginalOnly = AmigaOriginalOnly;
         s.Mouse = Mouse;
+        s.AmigaPictures = AmigaPictures;
         return s;
     }
 

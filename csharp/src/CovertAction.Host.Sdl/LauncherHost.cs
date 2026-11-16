@@ -96,7 +96,7 @@ internal static class LauncherHost
     }
 
     /// <summary>
-    /// What the Amiga files' folder holds (D-640, D-641): the folder the player chose (the folder itself, or its disk1 folder for the
+    /// What the Amiga files' folder holds (D-640, D-641, D-642): the folder the player chose (the folder itself, or its disk1 folder for the
     /// music, its disk2 folder for the sound banks), or when none is chosen the ones <see cref="AmigaFolderSearch"/> finds beside the
     /// program or the game, else the default folder.
     /// </summary>
@@ -105,20 +105,27 @@ internal static class LauncherHost
         string? source = null;
         string folder;
         string? banks;
+        string? pictures;
+        string? picturesSource = null;
         if (string.IsNullOrWhiteSpace(chosen))
         {
             var found = AmigaFolderSearch.Automatic(gameFolder);
             (folder, source) = found is { } place ? (place.Folder, place.Source) : (AmigaFolderSearch.DefaultFolder, null);
             banks = AmigaFolderSearch.AutomaticBanks(gameFolder)?.Folder;
+            var picturesFound = AmigaFolderSearch.AutomaticPictures(gameFolder);
+            (pictures, picturesSource) = (picturesFound?.Folder, picturesFound?.Source);
         }
         else
         {
             folder = AmigaFolderSearch.Resolve(chosen) ?? chosen;
             banks = AmigaFolderSearch.ResolveBanks(chosen);
+            pictures = AmigaFolderSearch.ResolvePictures(chosen);
         }
         var missing = AmigaFolderSearch.Missing(folder);
         var missingBanks = AmigaFolderSearch.MissingBanks(banks);
-        return new AmigaStatus(folder, missing.Count == 0, source, missing, missingBanks.Count == 0, missingBanks);
+        var missingPictures = AmigaFolderSearch.MissingPictures(pictures);
+        return new AmigaStatus(folder, missing.Count == 0, source, missing, missingBanks.Count == 0, missingBanks,
+            missingPictures.Count == 0, missingPictures, AmigaPictureList.Entries.Count, picturesSource);
     }
 
     /// <summary>A picture of the player's game in its own colours (the graphics driver's), or null when it cannot be read.</summary>

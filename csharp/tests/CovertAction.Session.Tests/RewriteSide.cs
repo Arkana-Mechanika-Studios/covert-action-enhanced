@@ -32,11 +32,16 @@ internal static class RewriteSide
     /// <param name="unixTime">A different time of day than the recording's (to check that a changed input is seen); null: the recording's.</param>
     /// <param name="writeFolder">A new folder for the files the game writes (the player's folder is never written); null: nothing can be written.</param>
     /// <param name="startScreen">The picture the program before the part left on the screen (the original side's start image), or null: black.</param>
-    public static RewriteRun Run(SessionRecording original, GameFolder folder, long? unixTime = null, string? writeFolder = null, byte[]? startScreen = null)
+    /// <param name="options">The player's options the game starts with (a tool that looks at a session with one on); null: the defaults, as the proof has them.</param>
+    /// <param name="created">Told the game once it is made, before it runs (to listen to its events).</param>
+    /// <param name="checkpointTaken">Told the number of each checkpoint just after the game took it (to look at the screen then).</param>
+    public static RewriteRun Run(SessionRecording original, GameFolder folder, long? unixTime = null, string? writeFolder = null, byte[]? startScreen = null,
+        GameOptions? options = null, Action<Game>? created = null, Action<int>? checkpointTaken = null)
     {
         var keys = original.Keys.Select(k => k ?? HeadlessHost.NoKeyYet);
         var host = new HeadlessHost(keys, unixTime ?? original.UnixTime);
-        var game = new Game(original.Disk.Count == 0 && original.Missing.Count == 0 ? folder : PlayersDisk(original, folder, writeFolder), host, writeFolder);
+        var game = new Game(original.Disk.Count == 0 && original.Missing.Count == 0 ? folder : PlayersDisk(original, folder, writeFolder), host, writeFolder, options ?? new GameOptions());
+        created?.Invoke(game);
         // item 14: a file the session's disk refuses to make: something Windows does not let the game write in its place
         // (a folder of that name), as a read-only save in the saves folder; the folder is no written file
         foreach (var name in original.CannotCreate)
@@ -82,6 +87,7 @@ internal static class RewriteSide
             writtenSeen = written;
             checkpoints.Add(new Checkpoint(checkpoints.Count, key, end, picture, Sha(Handoff(shared, original.HandoffIn)), calls.ToJsonString(), changed));
             calls.Clear();
+            checkpointTaken?.Invoke(checkpoints.Count - 1);
         };
 
         game.RunPart(shared);
@@ -109,21 +115,27 @@ internal static class RewriteSide
     /// <param name="folder">The player's game folder.</param>
     /// <param name="writeFolder">A new folder for the files the game writes.</param>
     /// <param name="withStick">Whether the host gets the recording's stick (item 12); false only to show that the comparison sees it.</param>
-    public static RewriteRun RunWhole(SessionRecording original, GameFolder folder, string writeFolder, bool withStick = true)
+    /// <param name="options">The player's options besides the set-up's questions (a tool that looks at a session with one on); null: none.</param>
+    /// <param name="created">Told the game once it is made, before it runs (to listen to its events).</param>
+    /// <param name="checkpointTaken">Told the number of each checkpoint just after the game took it (to look at the screen then).</param>
+    /// <param name="timeShift">Seconds added to every time of day of the recording (a tool that looks at other cases than the recorded one); 0: the recording's.</param>
+    public static RewriteRun RunWhole(SessionRecording original, GameFolder folder, string writeFolder, bool withStick = true,
+        GameOptions? options = null, Action<Game>? created = null, Action<int>? checkpointTaken = null, long timeShift = 0)
     {
         var keys = original.Keys.Select(k => k ?? HeadlessHost.NoKeyYet);
         // item 8: the sound driver plays on a device that never asks for frames; its timer interrupts are given as the
         // original's driver got them (as many before each sound request and each checkpoint)
         var output = new TickedOutput();
-        var host = new HeadlessHost(keys, original.UnixTime) { TimeOfDay = original.UnixTime, Audio = output };
+        var host = new HeadlessHost(keys, original.UnixTime + timeShift) { TimeOfDay = original.UnixTime + timeShift, Audio = output };
         // the original's set-up questions, answered by the recording's keys as on the original side (the player's game
         // shows only the set-up's title and takes the answers from the launcher's settings, D-603)
-        var options = new GameOptions(AskSetUpQuestions: true);
+        options = (options ?? new GameOptions()) with { AskSetUpQuestions = true };
         if (withStick)
         {
             GiveTheStick(original, host);
         }
         var game = new Game(original.Disk.Count == 0 ? folder : PlayersDisk(original, folder, writeFolder), host, writeFolder, options);
+        created?.Invoke(game);
         var shared = new SharedState();
         var part = "INTRO";
         var parts = 0;
@@ -147,7 +159,7 @@ internal static class RewriteSide
         {
             part = code >= 0 && code < LauncherPrograms.Length ? LauncherPrograms[code] : $"code {code}";
             // the time of day the original side gives this part (its seed): the spec's for the n-th part, the last one for the parts after
-            host.TimeOfDay = original.PartTimes.Count == 0 ? original.UnixTime : original.PartTimes[Math.Min(parts++, original.PartTimes.Count - 1)];
+            host.TimeOfDay = timeShift + (original.PartTimes.Count == 0 ? original.UnixTime : original.PartTimes[Math.Min(parts++, original.PartTimes.Count - 1)]);
         };
         game.SoundDeviceWritten += e =>
         {
@@ -206,6 +218,7 @@ internal static class RewriteSide
             frames.TryAdd("block-" + handoff, block);
             checkpoints.Add(new Checkpoint(checkpoints.Count, key, end, picture, handoff, calls.ToJsonString(), changed, part, text));
             calls.Clear();
+            checkpointTaken?.Invoke(checkpoints.Count - 1);
         };
 
         game.Main(shared);

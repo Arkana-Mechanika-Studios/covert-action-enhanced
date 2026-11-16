@@ -12,8 +12,13 @@ namespace CovertAction.Presentation;
 /// <param name="mouse">The mouse driver.</param>
 /// <param name="timer">The time of day and the display's frames.</param>
 /// <param name="files">The game's files.</param>
-public sealed class Boundaries(IGraphicsDriver graphics, ISoundDriver sound, IInputDriver input, IMouseDriver mouse, IGameTimer timer, IFiles files)
+/// <param name="pictures">The pictures shown in place of the game's own (a player's option, D-642); null, the default: the game's.</param>
+public sealed class Boundaries(IGraphicsDriver graphics, ISoundDriver sound, IInputDriver input, IMouseDriver mouse, IGameTimer timer, IFiles files,
+    IPictureReplacements? pictures = null)
 {
+    /// <summary>The pictures shown in place of the game's own (D-642); null: none, the game's pictures show.</summary>
+    public IPictureReplacements? PictureReplacements { get; } = pictures;
+
     /// <summary>The graphics library and driver.</summary>
     public IGraphicsDriver Graphics { get; } = graphics;
 

@@ -119,13 +119,18 @@ public sealed class Game
         _sound = new SoundDriverChoice(folder, host, romFolder: options.Mt32RomFolder, musicLetter: options.MusicLetter, effectsLetter: options.EffectsLetter,
             amigaFolder: options.AmigaFolder, amigaOnlyWhereOriginal: options.AmigaOnlyWhereOriginal);
         _files = new GameFolderFiles(folder, savesFolder);
-        _world = new Boundaries(Graphics, _sound, _keyboard = new KeyboardDriver(link), MouseDriver(host, options), new GameTimer(link), _files);
+        // DIVERGENCE: D-642 a player's option: the Amiga version's pictures, read from the player's own Amiga files, in place of the PC's where the layouts agree.
+        var pictures = AmigaPictures = options.AmigaPictures ? AmigaPictureSource.Open(Graphics.PictureColours, options.AmigaFolder, folder.Path) : null;
+        _world = new Boundaries(Graphics, _sound, _keyboard = new KeyboardDriver(link), MouseDriver(host, options), new GameTimer(link), _files, pictures);
         _host = host;
         _link = link;
     }
 
     /// <summary>The game's drawing code and its screen.</summary>
     public McgaGraphicsDriver Graphics { get; }
+
+    /// <summary>The Amiga version's pictures that replace the game's (D-642), or null: the option is off, or the Amiga files are missing.</summary>
+    public AmigaPictureSource? AmigaPictures { get; }
 
     /// <summary>The mouse driver the game's parts get (for tests: without the mouse option it is <see cref="NoMouseDriver"/>; new code).</summary>
     internal IMouseDriver Mouse => _world.Mouse;
