@@ -108,8 +108,8 @@ data), and [cut content](docs/cut-content.md) found in the original's code and d
   four-colour picture is not offered ([D-600](csharp/docs/faithfulness/DIVERGENCES-INTRO.md)).
 * Player options beyond the original (the mouse, arrow keys that walk in raids, music and effects on different sound
   cards) come after 1.0, which stays faithful to the original.
-* The joystick is not yet tried with a real controller; how a real stick's position turns into the game's readings is
-  a model ([U-12](csharp/docs/faithfulness/UNCERTAIN.md)).
+* The joystick is tried with a real gamepad (16 November 2026: the menus and a raid play as expected), but how a real
+  stick's position turns into the game's readings is still a model ([U-12](csharp/docs/faithfulness/UNCERTAIN.md)).
 * A damaged save (cut short or the wrong size) is listed as empty instead of loading into a broken campaign
   ([D-105](csharp/docs/faithfulness/DIVERGENCES-FINAL.md)).
 * Windows only for now.
