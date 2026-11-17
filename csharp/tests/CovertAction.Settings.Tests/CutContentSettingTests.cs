@@ -17,6 +17,7 @@ public sealed class CutContentSettingTests
     [
         (Item.CutCapturedDossier, "capturedDossier", s => s.CutCapturedDossier, m => m.CutCapturedDossier),
         (Item.CutStandaloneChase, "standaloneChase", s => s.CutStandaloneChase, m => m.CutStandaloneChase),
+        (Item.CutHardestCircuit, "hardestCircuit", s => s.CutHardestCircuit, m => m.CutHardestCircuit),
     ];
 
     private static LauncherContext Context(GameSettings? settings = null)

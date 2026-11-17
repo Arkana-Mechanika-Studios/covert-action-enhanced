@@ -81,7 +81,7 @@ internal sealed class LauncherModel
     private readonly bool _initialAmigaPictures;
 
     /// <summary>The cut-content options as the launcher opened.</summary>
-    private readonly bool _initialCapturedDossier, _initialStandaloneChase;
+    private readonly bool _initialCapturedDossier, _initialStandaloneChase, _initialHardestCircuit;
 
     public LauncherModel(LauncherContext context, (int Width, int Height)? display)
     {
@@ -122,6 +122,7 @@ internal sealed class LauncherModel
         AmigaPictures = _initialAmigaPictures = start.AmigaPictures;
         CutCapturedDossier = _initialCapturedDossier = start.CutCapturedDossier;
         CutStandaloneChase = _initialStandaloneChase = start.CutStandaloneChase;
+        CutHardestCircuit = _initialHardestCircuit = start.CutHardestCircuit;
     }
 
     private static string? Blank(string? text) => string.IsNullOrWhiteSpace(text) ? null : text;
@@ -213,6 +214,9 @@ internal sealed class LauncherModel
 
     /// <summary>The car chase on its own in the practice menu (cutContent.standaloneChase, D-661).</summary>
     public bool CutStandaloneChase { get; set; }
+
+    /// <summary>The electronics board's fourth difficulty (cutContent.hardestCircuit, D-662).</summary>
+    public bool CutHardestCircuit { get; set; }
 
     /// <summary>The MT-32 ROM folder chosen; null: the default (MT32_ROMS next to the program, else where the ROMs are found).</summary>
     public string? Mt32Roms
@@ -377,6 +381,10 @@ internal sealed class LauncherModel
         {
             changes["cutContent.standaloneChase"] = CutStandaloneChase;
         }
+        if (CutHardestCircuit != _initialHardestCircuit)
+        {
+            changes["cutContent.hardestCircuit"] = CutHardestCircuit;
+        }
         return changes;
     }
 
@@ -410,6 +418,7 @@ internal sealed class LauncherModel
         s.AmigaPictures = AmigaPictures;
         s.CutCapturedDossier = CutCapturedDossier;
         s.CutStandaloneChase = CutStandaloneChase;
+        s.CutHardestCircuit = CutHardestCircuit;
         return s;
     }
 

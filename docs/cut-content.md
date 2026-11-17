@@ -51,7 +51,7 @@ the pictures), the re-check of the 41 dead functions (6), the sound commands (7)
 | CC-13 | Shadowed duplicate tags: `*MSG0102`, `*C0102`, `*C0104`, `*PL0815`, and the stray `*C0105` | unreachable text | confirmed | open |
 | CC-14 | Cast and event fields of the crime files no module reads | unread data | confirmed | open |
 | CC-15 | Mouse support in the graphics library (int 33h), never called | cut feature | likely | explained |
-| CC-16 | BUG circuit difficulty 4 and the TAC "wait for a visited room" walk | dormant branches | confirmed | open |
+| CC-16 | BUG circuit difficulty 4 and the TAC "wait for a visited room" walk | dormant branches | confirmed | player option (D-662, the circuit board; the TAC walk stays open) |
 | CC-17 | Plain dormant statements and arms (the remaining `// DORMANT:` markers) | dormant code | confirmed | explained |
 | CC-18 | Prose variants `*nice3`..`*nice7` the reader could ask for | missing text | possible | open |
 | CC-19 | CAPTRD01.PAN: a woman's photo (image 6) and the sex switch the script itself defeats | dormant branch | confirmed; likely (cut) | verified (replay); player option (D-660) |
@@ -473,6 +473,15 @@ designed and not used.
 
 **How to verify.** Set the difficulty byte of BUG's hand-off to 4 after `bug_init` (patch the clamp) and open a
 circuit; patch the flag to 1 in TAC and watch the guards' routes.
+
+**Player option, the circuit board (D-662, `cutContent.hardestCircuit`, off by default).** `bug_init` computes the level
+of play less the electronics rating plus one and clamps it to 3; the option clamps it to 4. Only the hardest level with the
+lowest rating gets there. Tried on the game's own generator: a board of difficulty 4 shows only the last column's five chips,
+has eight fixed chips none of them shown, four phones, and the bounded search of CA-62 finds a win on 60 of 60 boards (and on
+200 of 200 in a trial); it builds as fast as a level-3 board. The TAC part of the entry (the flag that keeps the building
+generator's walk going "until it reached a room the player had visited") is not offered: the walk is the layout of a new
+building, where no room has been visited yet, so with the flag set the walk would only run out of tries and the layout would
+be rejected every time; it stays open.
 
 ## CC-17 The remaining dormant statements
 

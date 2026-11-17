@@ -105,6 +105,9 @@ internal sealed class GameSettings
     /// <summary>The practice menu offers the car chase on its own (cutContent.standaloneChase, D-661; not in the original, off by default).</summary>
     public bool? CutStandaloneChase { get; set; }
 
+    /// <summary>The electronics board may have its dormant difficulty 4 (cutContent.hardestCircuit, D-662; not in the original, off by default).</summary>
+    public bool? CutHardestCircuit { get; set; }
+
     /// <summary>A copy (a change to it leaves this one as it is).</summary>
     public GameSettings Copy() => (GameSettings)MemberwiseClone();
 

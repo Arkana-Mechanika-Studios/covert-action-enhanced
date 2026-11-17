@@ -51,6 +51,26 @@ public static class CircuitRules
         }
     }
 
+    /// <summary>The highest difficulty the original's part lets a board have, and the one its own code still carries (CC-16).</summary>
+    public const int HighestBoardDifficulty = 3, DormantBoardDifficulty = 4;
+
+    /// <summary>
+    /// The difficulty of the circuit board: the level of play less the agent's electronics rating plus one, at least 0 and at
+    /// most 3 (<c>bug_init</c>). With the player's option "hardest circuit board" (D-662, CC-16) the most is 4, the difficulty
+    /// the board's own code carries (the fixed hidden chips of column 5, no chip shown but the last column's, the phones and
+    /// the pairs of the terminals counted for it) and the original never lets happen: only the hardest level reaches it, with
+    /// an agent of the lowest rating.
+    /// </summary>
+    /// <param name="level">The level of play, 0..3.</param>
+    /// <param name="rating">The agent's electronics rating, 0..3.</param>
+    /// <param name="behaviour">The player's options; the original's own when left out.</param>
+    public static short BoardDifficulty(int level, int rating, OriginalBehaviour? behaviour = null)
+    {
+        // DIVERGENCE: D-662 a player's option (cutContent.hardestCircuit): the cap is the dormant difficulty 4
+        var highest = behaviour?.CutContent.HardestCircuit == true ? DormantBoardDifficulty : HighestBoardDifficulty;
+        return (short)GameLibrary.Clamp(level - rating + 1, 0, highest);
+    }
+
     /// <summary>
     /// Lays out the wires between the chip columns at random, until the number of diagonals (see below) lies between
     /// 4 * difficulty and 4 * difficulty + 4.
@@ -268,7 +288,7 @@ public static class CircuitRules
             // BUG: CA-25 "above 3" looks at the whole chip word, marks included: a shown chip passes whatever its
             // type, so only hidden chips of types 0..3 are spared
             // DORMANT: difficulty 4, under which column 5 could be fixed and a fixed chip would stay hidden; the
-            // difficulty is limited to 0..3 when the part starts (bug_init)
+            // difficulty is limited to 0..3 when the part starts (bug_init), unless the player's option lifts it (D-662, BoardDifficulty)
             if (chip > 3 && (chip & ElectronicsState.ChipFixed) == 0 && (column != lockedColumnOnlyAtDifficulty4 || state.Diff == 4))
             {
                 chip |= ElectronicsState.ChipFixed;

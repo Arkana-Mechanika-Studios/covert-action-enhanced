@@ -20,9 +20,6 @@ public sealed partial class ElectronicsWorkbench
     /// <summary>The agent's electronics skill: bits 6 and 7 of the skills word, 0..3; each level takes one off the difficulty.</summary>
     private const int ElectronicsSkillShift = 6;
 
-    /// <summary>The difficulties the puzzle knows: 0 (the easiest board) to 3.</summary>
-    private const int EasiestLevel = 0, HardestLevel = 3;
-
     /// <summary>A wiretap has 10 minutes of game time at the lowest alert and 2 at a high one; the car tracer half of that.</summary>
     private const int LongestTime = 10, ShortestTime = 2;
 
@@ -62,7 +59,7 @@ public sealed partial class ElectronicsWorkbench
         HandOff.ReadEnvState(state.HandOff.StrEnvSveRead);
         state.BaseLevel = state.Diff;
         var electronicsSkill = shared.SkillBits >> ElectronicsSkillShift & 3;
-        state.Diff = (short)GameLibrary.Clamp(state.Diff - electronicsSkill + 1, EasiestLevel, HardestLevel);
+        state.Diff = CircuitRules.BoardDifficulty(state.Diff, electronicsSkill, behaviour);
         var minutes = GameLibrary.Clamp(LongestTime - shared.Alert / AlertPerMinute, ShortestTime, LongestTime);
         state.TimeLeft = (short)(minutes * SecondsPerMinute);
         if (shared.NextModule == CarTracerPart)

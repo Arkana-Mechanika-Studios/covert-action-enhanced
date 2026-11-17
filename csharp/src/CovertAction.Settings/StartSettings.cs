@@ -77,6 +77,9 @@ internal sealed record StartSettings
     /// <summary>The practice menu offers the car chase on its own (cutContent.standaloneChase, D-661; off by default).</summary>
     public bool CutStandaloneChase { get; init; }
 
+    /// <summary>The electronics board may have its dormant difficulty 4 (cutContent.hardestCircuit, D-662; off by default).</summary>
+    public bool CutHardestCircuit { get; init; }
+
     /// <summary>The Amiga version's pictures in place of the PC's where it has the same one (graphics.amiga, D-642; off by default).</summary>
     public bool AmigaPictures { get; init; }
 
@@ -165,6 +168,7 @@ internal sealed record StartSettings
             FixCampaignBugs = file.FixCampaignBugs ?? false,
             CutCapturedDossier = file.CutCapturedDossier ?? false,
             CutStandaloneChase = file.CutStandaloneChase ?? false,
+            CutHardestCircuit = file.CutHardestCircuit ?? false,
             FixedKeys = fixedKeys,
         };
     }

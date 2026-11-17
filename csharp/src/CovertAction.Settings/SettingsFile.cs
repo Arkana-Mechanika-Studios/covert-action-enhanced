@@ -300,6 +300,7 @@ internal static class SettingsFile
             {
                 case "capturedDossier": settings.CutCapturedDossier = Boolean(key, property.Value) ?? settings.CutCapturedDossier; break;
                 case "standaloneChase": settings.CutStandaloneChase = Boolean(key, property.Value) ?? settings.CutStandaloneChase; break;
+                case "hardestCircuit": settings.CutHardestCircuit = Boolean(key, property.Value) ?? settings.CutHardestCircuit; break;
                 default: Unknown(key); break;
             }
         }
@@ -469,7 +470,11 @@ internal static class SettingsFile
             // true: the practice menu has a fifth choice, the car chase on its own as the original's program still
             // carries it (a random map, places labelled Loc1, Loc2 ..., a random start and goal, every place shown).
             // false: as the original.
-            "standaloneChase": false
+            "standaloneChase": false,
+            // true: the electronics board has a difficulty more, the fourth the game's own code carries: on the hardest
+            // level an agent of the lowest electronics rating gets a board that shows only its last column of chips and
+            // has eight fixed hidden ones. false: as the original (the hardest board is the third).
+            "hardestCircuit": false
           }
         }
         """;
