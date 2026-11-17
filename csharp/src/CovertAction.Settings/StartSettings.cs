@@ -50,6 +50,12 @@ internal sealed record StartSettings
     /// <summary>In a building raid the grey arrow keys walk (D-610).</summary>
     public bool ArrowKeysWalk { get; init; }
 
+    /// <summary>The key remapping "physical=original" (D-671); empty: the original's keys.</summary>
+    public IReadOnlyList<string> KeyMap { get; init; } = [];
+
+    /// <summary>The gamepad buttons mapped to keys "button=original" (D-672); empty: none.</summary>
+    public IReadOnlyList<string> PadMap { get; init; } = [];
+
     /// <summary>The card the tunes play on: "card" (the sound card, as the original) or a card of its own (D-620).</summary>
     public string MusicCard { get; init; } = "card";
 
@@ -161,6 +167,8 @@ internal sealed record StartSettings
             Mt32Roms = roms,
             SystemKeyRepeat = keyRepeat == "windows",
             ArrowKeysWalk = arrowsWalk,
+            KeyMap = file.KeyMap ?? [],
+            PadMap = file.PadMap ?? [],
             MusicCard = file.MusicCard ?? "card",
             EffectsCard = file.EffectsCard ?? "card",
             AmigaFiles = file.AmigaFiles,

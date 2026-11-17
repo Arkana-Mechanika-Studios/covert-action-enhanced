@@ -80,6 +80,9 @@ internal sealed class LauncherModel
     private readonly (string? Files, bool OriginalOnly) _initialAmiga;
     private readonly bool _initialAmigaPictures;
 
+    /// <summary>The key remapping and the pad's mapped buttons as the launcher opened (D-671, D-672).</summary>
+    private readonly string[] _initialKeyMap, _initialPadMap;
+
     /// <summary>The cut-content options as the launcher opened.</summary>
     private readonly bool _initialCapturedDossier, _initialStandaloneChase, _initialHardestCircuit, _initialFillerTexts;
 
@@ -124,7 +127,74 @@ internal sealed class LauncherModel
         CutStandaloneChase = _initialStandaloneChase = start.CutStandaloneChase;
         CutHardestCircuit = _initialHardestCircuit = start.CutHardestCircuit;
         CutFillerTexts = _initialFillerTexts = start.CutFillerTexts;
+        var ignored = new List<string>();
+        KeyMap = KeyBindings.ParsePairs(start.KeyMap, false, "input.keyMap", ignored);
+        PadMap = KeyBindings.ParsePairs(start.PadMap, true, "input.padMap", ignored);
+        _initialKeyMap = [.. KeyMap.Select(KeyBindings.Format)];
+        _initialPadMap = [.. PadMap.Select(KeyBindings.Format)];
     }
+
+    /// <summary>The key remapping, "physical key" and "key of the original" (input.keyMap, D-671); empty: the original's keys.</summary>
+    public List<(string From, string To)> KeyMap { get; }
+
+    /// <summary>The pad buttons beyond the joystick's, each with its key of the original (input.padMap, D-672); empty: none.</summary>
+    public List<(string From, string To)> PadMap { get; }
+
+    /// <summary>The key of the original shown on the Controls tab (an index of <see cref="KeyBindings.OriginalKeys"/>).</summary>
+    public int KeyIndex { get; set; }
+
+    /// <summary>The gamepad button shown on the Controls tab (an index of <see cref="KeyBindings.PadButtons"/>).</summary>
+    public int PadIndex { get; set; }
+
+    public KeyName ShownKey => KeyBindings.OriginalKeys[KeyIndex];
+
+    public PadButton ShownPad => KeyBindings.PadButtons[PadIndex];
+
+    public void CycleKey(int step) => KeyIndex = ((KeyIndex + step) % KeyBindings.OriginalKeys.Count + KeyBindings.OriginalKeys.Count) % KeyBindings.OriginalKeys.Count;
+
+    public void CyclePad(int step) => PadIndex = ((PadIndex + step) % KeyBindings.PadButtons.Count + KeyBindings.PadButtons.Count) % KeyBindings.PadButtons.Count;
+
+    /// <summary>The physical keys that send a key of the original now.</summary>
+    public IEnumerable<KeyName> KeysSending(KeyName original) =>
+        KeyMap.Where(p => p.To == original.Name).Select(p => KeyBindings.Find(p.From)!);
+
+    /// <summary>Makes the key of a scancode send a key of the original (replacing what it sent); false for a key that cannot be remapped (a modifier).</summary>
+    public bool Bind(KeyName original, int scancode)
+    {
+        if (KeyBindings.ByScancode(scancode) is not { } physical)
+        {
+            return false;
+        }
+        KeyMap.RemoveAll(p => p.From == physical.Name);
+        if (physical.Name != original.Name)
+        {
+            KeyMap.Add((physical.Name, original.Name));
+        }
+        return true;
+    }
+
+    /// <summary>Takes away every mapping to a key of the original.</summary>
+    public void ClearKey(KeyName original) => KeyMap.RemoveAll(p => p.To == original.Name);
+
+    public void ResetKeys() => KeyMap.Clear();
+
+    /// <summary>The key a pad button sends, or null.</summary>
+    public KeyName? PadTarget(PadButton button) => PadMap.FirstOrDefault(p => p.From == button.Name) is { From: not null } p ? KeyBindings.Find(p.To) : null;
+
+    /// <summary>Goes through "nothing" and the keys of the original for a pad button.</summary>
+    public void CyclePadKey(PadButton button, int step)
+    {
+        var keys = KeyBindings.OriginalKeys;
+        var now = PadTarget(button) is { } target ? keys.ToList().FindIndex(k => k.Name == target.Name) : -1;
+        var next = ((now + 1 + step) % (keys.Count + 1) + keys.Count + 1) % (keys.Count + 1) - 1;
+        PadMap.RemoveAll(p => p.From == button.Name);
+        if (next >= 0)
+        {
+            PadMap.Add((button.Name, keys[next].Name));
+        }
+    }
+
+    public void ResetPad() => PadMap.Clear();
 
     private static string? Blank(string? text) => string.IsNullOrWhiteSpace(text) ? null : text;
 
@@ -345,6 +415,14 @@ internal sealed class LauncherModel
         {
             changes["input.arrowKeysWalk"] = ArrowKeysWalk;
         }
+        if (!KeyMap.Select(KeyBindings.Format).SequenceEqual(_initialKeyMap))
+        {
+            changes["input.keyMap"] = new JsonArray([.. KeyMap.Select(p => (JsonNode?)JsonValue.Create(KeyBindings.Format(p)))]);
+        }
+        if (!PadMap.Select(KeyBindings.Format).SequenceEqual(_initialPadMap))
+        {
+            changes["input.padMap"] = new JsonArray([.. PadMap.Select(p => (JsonNode?)JsonValue.Create(KeyBindings.Format(p)))]);
+        }
         if (MusicCard != _initialParts.Music)
         {
             changes["sound.music"] = MusicCard;
@@ -416,6 +494,8 @@ internal sealed class LauncherModel
         s.SavesFolder = SavesFolder;
         s.KeyRepeat = KeyRepeat;
         s.ArrowKeysWalk = ArrowKeysWalk;
+        s.KeyMap = [.. KeyMap.Select(KeyBindings.Format)];
+        s.PadMap = [.. PadMap.Select(KeyBindings.Format)];
         s.MusicCard = MusicCard;
         s.EffectsCard = EffectsCard;
         s.AmigaFiles = AmigaFiles;

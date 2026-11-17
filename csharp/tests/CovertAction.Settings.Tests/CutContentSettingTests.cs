@@ -147,6 +147,9 @@ public sealed class CutContentSettingTests
             Assert.All(screen.Blocks, b => Assert.True(panel.Holds(b.Area), $"{b.What} at {b.Area} is outside the panel {panel}"));
         }
         screen.Handle(new KeyPressed(LauncherKey.Tab, Control: true));
+        Assert.True(screen.ControlsShown);
+        screen.Handle(new KeyPressed(LauncherKey.Tab, Control: true));
+        Assert.False(screen.ControlsShown);
         Assert.False(screen.CutContentShown);
         Assert.False(screen.AdvancedShown);
     }

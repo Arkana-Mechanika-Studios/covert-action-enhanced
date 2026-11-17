@@ -1,4 +1,5 @@
 using CovertAction.Platform;
+using CovertAction.Settings;
 
 namespace CovertAction.Host.Sdl;
 
@@ -89,6 +90,22 @@ internal sealed class SdlJoystick : IDisposable
         // the game reads the port in tight loops (waiting for a button to be let go) without pumping events
         SdlNative.SDL_UpdateJoysticks();
         return _gamepad != IntPtr.Zero ? ReadGamepad() : ReadPlainJoystick();
+    }
+
+    /// <summary>
+    /// Whether a gamepad button is held (D-672): SDL's button number, or <see cref="KeyBindings.TriggerBase"/> + an axis for a trigger.
+    /// False without a gamepad (a plain joystick has no such buttons).
+    /// </summary>
+    public bool IsDown(int id)
+    {
+        if (_gamepad == IntPtr.Zero)
+        {
+            return false;
+        }
+        SdlNative.SDL_UpdateJoysticks();
+        return id >= KeyBindings.TriggerBase
+            ? SdlNative.SDL_GetGamepadAxis(_gamepad, id - KeyBindings.TriggerBase) > KeyBindings.TriggerPressed
+            : SdlNative.SDL_GetGamepadButton(_gamepad, id);
     }
 
     private JoystickReading ReadGamepad()

@@ -1,6 +1,7 @@
 // Reused from the Darklands Restoration Project, src/Darklands.Host.Sdl/SdlKeyMap.cs; same author.
 // Adapted: the namespace; Keys is HostKeys here.
 using CovertAction.Platform;
+using CovertAction.Settings;
 
 namespace CovertAction.Host.Sdl;
 
@@ -24,6 +25,23 @@ internal static class SdlKeyMap
         [97] = HostKeys.PageUp | HostKeys.Keypad, [91] = HostKeys.PageDown | HostKeys.Keypad, [93] = HostKeys.Center | HostKeys.Keypad,
         [98] = HostKeys.Insert | HostKeys.Keypad, [99] = HostKeys.Delete | HostKeys.Keypad,
     };
+
+    /// <summary>
+    /// The game key of a key press with the player's key remapping applied first (D-671): a mapped key arrives as the key of the
+    /// original it is mapped to. With no mapping this is <see cref="ToGameKey(int, int, int, int)"/>.
+    /// </summary>
+    // DIVERGENCE: D-671 a player option (input.keyMap), empty by default: the key the game receives is the one the player mapped
+    public static int ToGameKey(KeyRemap remap, int scancode, int sym, int mod, int shifted = 0)
+    {
+        var (code, symbol, shift) = remap.Apply(scancode, sym, shifted);
+        return ToGameKey(code, symbol, mod, shift);
+    }
+
+    /// <summary>
+    /// The game key of a gamepad button's mapped key (D-672): the key of the original pressed with no modifier.
+    /// </summary>
+    // DIVERGENCE: D-672 a player option (input.padMap), empty by default: a pad button beyond the joystick's four types a key
+    public static int PadGameKey(int scancode) => ToGameKey(scancode, KeyBindings.UsSymbol(scancode), 0);
 
     /// <summary>
     /// The game key of a key press: <paramref name="sym"/> is the layout's unshifted key (the key events' symbol), <paramref name="shifted"/>

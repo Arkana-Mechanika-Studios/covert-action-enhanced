@@ -267,6 +267,8 @@ internal static class SettingsFile
                 case "controls": settings.Controls = OneOf(key, property.Value, GameSettings.ControlChoices) ?? settings.Controls; break;
                 case "keyRepeat": settings.KeyRepeat = OneOf(key, property.Value, GameSettings.KeyRepeats) ?? settings.KeyRepeat; break;
                 case "arrowKeysWalk": settings.ArrowKeysWalk = Boolean(key, property.Value) ?? settings.ArrowKeysWalk; break;
+                case "keyMap": settings.KeyMap = Pairs(key, property.Value, pad: false) ?? settings.KeyMap; break;
+                case "padMap": settings.PadMap = Pairs(key, property.Value, pad: true) ?? settings.PadMap; break;
                 case "mouse": settings.Mouse = Boolean(key, property.Value) ?? settings.Mouse; break;
                 default: Unknown(key); break;
             }
@@ -345,6 +347,22 @@ internal static class SettingsFile
             }
             text = Environment.ExpandEnvironmentVariables(text);
             return baseFolder is null || Path.IsPathRooted(text) ? text : Path.GetFullPath(Path.Combine(baseFolder, text));
+        }
+
+        // D-671, D-672: a list of "left=right" texts; the pairs that do not read are left out with a message
+        private List<string>? Pairs(string key, JsonElement value, bool pad)
+        {
+            if (value.ValueKind == JsonValueKind.Null)
+            {
+                return null;
+            }
+            if (value.ValueKind != JsonValueKind.Array)
+            {
+                problems.Add($"\"{key}\" must be a list of texts like \"Q=Up\"; ignored");
+                return null;
+            }
+            var texts = value.EnumerateArray().Select(e => e.ValueKind == JsonValueKind.String ? e.GetString() : null);
+            return [.. KeyBindings.ParsePairs(texts, pad, key, problems).Select(KeyBindings.Format)];
         }
 
         private bool? Boolean(string key, JsonElement value)
@@ -449,6 +467,13 @@ internal static class SettingsFile
             // arrow lunges. false: the original's keys (the keypad walks, the grey arrows lunge). Command line:
             // --arrow-keys-walk.
             "arrowKeysWalk": false,
+
+            // Key remapping (not in the original): a list of "your key=the original's key", e.g. ["Q=Up", "CapsLock=Esc"].
+            // Keys are named as in SETTINGS.md; empty: the original's keys. The launcher's Controls tab edits it.
+            "keyMap": [],
+            // Gamepad buttons beyond the joystick's four (not in the original): a list of "button=the original's key", e.g.
+            // ["Start=Esc"]. Buttons: LeftShoulder, RightShoulder, LeftTrigger, RightTrigger, Start, Back, LeftStick, RightStick.
+            "padMap": [],
 
             // true: the mouse in the menus, lists and maps (not in the original): pointing moves the highlight, a left
             // click takes the choice, a right click is Esc. Command line: --mouse, --no-mouse.

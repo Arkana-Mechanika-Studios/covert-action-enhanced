@@ -68,6 +68,10 @@ internal sealed class LauncherScreen
     private Item _focus;
     private bool _advanced;
     private bool _cut;
+    private bool _controls;
+
+    /// <summary>The Controls tab waits for the key to bind (D-671).</summary>
+    private bool _capturing;
     private string? _message;
     private uint _messageColour = Bad;
 
@@ -124,6 +128,14 @@ internal sealed class LauncherScreen
         TabGeneral,
         TabAdvanced,
         TabCutContent,
+        TabControls,
+        KeyPick,
+        KeyBind,
+        KeyClear,
+        KeysReset,
+        PadPick,
+        PadKey,
+        PadReset,
         Save,
         Play,
     }
@@ -147,6 +159,12 @@ internal sealed class LauncherScreen
 
     /// <summary>The "Cut content" tab is the one shown.</summary>
     public bool CutContentShown => _cut;
+
+    /// <summary>The "Controls" tab is the one shown.</summary>
+    public bool ControlsShown => _controls;
+
+    /// <summary>The Controls tab waits for a key to bind.</summary>
+    public bool Capturing => _capturing;
 
     /// <summary>The message shown in the details box (what an action did, why it could not), or null.</summary>
     public string? Message => _message;
@@ -174,12 +192,15 @@ internal sealed class LauncherScreen
 
     private static bool OnCutContent(Item item) => item is Item.CutCapturedDossier or Item.CutStandaloneChase or Item.CutHardestCircuit or Item.CutFillerTexts;
 
+    private static bool OnControls(Item item) => item is Item.KeyPick or Item.KeyBind or Item.KeyClear or Item.KeysReset or Item.PadPick or Item.PadKey or Item.PadReset;
+
     private bool OnAdvanced(Item item) => item is Item.Roms or Item.RomsChange or Item.AmigaFiles or Item.AmigaChange or Item.AmigaOriginalOnly or Item.AmigaPictures or Item.KeyRepeat or Item.ArrowKeysWalk or Item.Music or Item.MixTest or Item.Effects or Item.Mouse or Item.FixOriginalBugs or Item.FixCampaignBugs;
 
     // Tab and the arrows go through General's rows, then Advanced's (its tab opens), then the buttons
     private IEnumerable<Item> Order =>
         new[] { Item.GameFolder, Item.GameChange, Item.Window, Item.Fullscreen, Item.Scaling, Item.Sound, Item.Test, Item.Controls, Item.Saves, Item.SavesChange,
-            Item.Roms, Item.RomsChange, Item.AmigaFiles, Item.AmigaChange, Item.AmigaOriginalOnly, Item.AmigaPictures, Item.KeyRepeat, Item.ArrowKeysWalk, Item.Music, Item.MixTest, Item.Effects, Item.Mouse, Item.FixOriginalBugs, Item.FixCampaignBugs, Item.CutCapturedDossier, Item.CutStandaloneChase, Item.CutHardestCircuit, Item.CutFillerTexts, Item.Save, Item.Play }
+            Item.Roms, Item.RomsChange, Item.AmigaFiles, Item.AmigaChange, Item.AmigaOriginalOnly, Item.AmigaPictures, Item.KeyRepeat, Item.ArrowKeysWalk, Item.Music, Item.MixTest, Item.Effects, Item.Mouse, Item.FixOriginalBugs, Item.FixCampaignBugs, Item.CutCapturedDossier, Item.CutStandaloneChase, Item.CutHardestCircuit, Item.CutFillerTexts,
+            Item.KeyPick, Item.KeyBind, Item.KeyClear, Item.KeysReset, Item.PadPick, Item.PadKey, Item.PadReset, Item.Save, Item.Play }
             .Where(i => i is not (Item.Test or Item.MixTest) || _context.SoundTest is not null);
 
     /// <summary>Handles one input; returns the player's choice when the launcher should end.</summary>
@@ -200,6 +221,7 @@ internal sealed class LauncherScreen
                     return null;
                 }
                 _focus = hit.Item;
+                _capturing = false;
                 if (hit.Item is Item.GameFolder or Item.Saves or Item.Roms or Item.AmigaFiles)
                 {
                     // a click on a folder's field only chooses it: its Change… (or Enter) opens the dialog
@@ -225,7 +247,7 @@ internal sealed class LauncherScreen
                 Dropped(dropped.Path);
                 return null;
             case KeyPressed key:
-                return Key(key);
+                return _capturing ? Capture(key) : Key(key);
             default:
                 return null;
         }
@@ -233,9 +255,9 @@ internal sealed class LauncherScreen
 
     private (Rect Area, Item Item, Part Part) HotspotAt(int x, int y) => _hotspots.LastOrDefault(h => h.Area.Contains(x, y));
 
-    private static bool IsButton(Item item) => item is Item.GameChange or Item.SavesChange or Item.RomsChange or Item.AmigaChange or Item.Test or Item.MixTest or Item.Save or Item.Play;
+    private static bool IsButton(Item item) => item is Item.GameChange or Item.SavesChange or Item.RomsChange or Item.AmigaChange or Item.Test or Item.MixTest or Item.KeyBind or Item.KeyClear or Item.KeysReset or Item.PadReset or Item.Save or Item.Play;
 
-    private static bool IsSelect(Item item) => item is Item.Window or Item.Fullscreen or Item.Scaling or Item.Sound or Item.Controls or Item.AmigaOriginalOnly or Item.AmigaPictures or Item.KeyRepeat or Item.ArrowKeysWalk or Item.Music or Item.Effects or Item.Mouse or Item.FixOriginalBugs or Item.FixCampaignBugs or Item.CutCapturedDossier or Item.CutStandaloneChase or Item.CutHardestCircuit or Item.CutFillerTexts;
+    private static bool IsSelect(Item item) => item is Item.Window or Item.Fullscreen or Item.Scaling or Item.Sound or Item.Controls or Item.AmigaOriginalOnly or Item.AmigaPictures or Item.KeyRepeat or Item.ArrowKeysWalk or Item.Music or Item.Effects or Item.Mouse or Item.FixOriginalBugs or Item.FixCampaignBugs or Item.CutCapturedDossier or Item.CutStandaloneChase or Item.CutHardestCircuit or Item.CutFillerTexts or Item.KeyPick or Item.PadPick or Item.PadKey;
 
     private LauncherChoice? Key(KeyPressed key)
     {
@@ -248,7 +270,7 @@ internal sealed class LauncherScreen
                 MoveFocus(1);
                 return null;
             case LauncherKey.Tab when key.Control:
-                ShowTab(_cut ? 0 : _advanced ? 2 : 1);
+                ShowTab(((_controls ? 3 : _cut ? 2 : _advanced ? 1 : 0) + 1) % 4);
                 return null;
             case LauncherKey.Tab:
                 MoveFocus(key.Shift ? -1 : 1);
@@ -285,15 +307,44 @@ internal sealed class LauncherScreen
         {
             _advanced = OnAdvanced(_focus);
             _cut = OnCutContent(_focus);
+            _controls = OnControls(_focus);
         }
     }
 
-    /// <summary>Shows a tab (0 General, 1 Advanced, 2 Cut content) with its first row focused.</summary>
+    /// <summary>The Controls tab while it waits for a key (D-671): any key but Esc becomes the physical key of the chosen key of the original.</summary>
+    private LauncherChoice? Capture(KeyPressed key)
+    {
+        if (key.Key == LauncherKey.Escape)
+        {
+            _capturing = false;
+            _message = "Nothing changed.";
+            _messageColour = Note;
+        }
+        else if (key.Scancode > 0)
+        {
+            var original = _model.ShownKey;
+            if (_model.Bind(original, key.Scancode))
+            {
+                _capturing = false;
+                _message = $"{KeyBindings.ByScancode(key.Scancode)!.Label} now sends {original.Label}.";
+                _messageColour = Good;
+            }
+            else
+            {
+                _message = "Shift, Ctrl, Alt and the Windows key cannot be remapped. Press another key, or Esc.";
+            }
+        }
+        return null;
+    }
+
+    /// <summary>Shows a tab (0 General, 1 Advanced, 2 Cut content, 3 Controls) with its first row focused.</summary>
     private void ShowTab(int tab)
     {
+        _capturing = false;
         _advanced = tab == 1;
         _cut = tab == 2;
-        _focus = tab switch { 1 => Item.Roms, 2 => Item.CutCapturedDossier, _ => Item.GameFolder };
+        _controls = tab == 3;
+        _focus = tab switch { 1 => Item.Roms, 2 => Item.CutCapturedDossier, 3 => Item.KeyPick, _ => Item.GameFolder };
     }
 
     /// <summary>The fixed settings-file key of a row, or null.</summary>
@@ -336,8 +387,8 @@ internal sealed class LauncherScreen
         _messageColour = Bad;
         switch (item)
         {
-            case Item.TabGeneral or Item.TabAdvanced or Item.TabCutContent:
-                ShowTab(item == Item.TabAdvanced ? 1 : item == Item.TabCutContent ? 2 : 0);
+            case Item.TabGeneral or Item.TabAdvanced or Item.TabCutContent or Item.TabControls:
+                ShowTab(item == Item.TabAdvanced ? 1 : item == Item.TabCutContent ? 2 : item == Item.TabControls ? 3 : 0);
                 return null;
             case Item.Save:
                 return LauncherChoice.Quit;
@@ -349,6 +400,7 @@ internal sealed class LauncherScreen
                 _focus = Item.GameFolder;
                 _advanced = false;
                 _cut = false;
+                _controls = false;
                 _message = "Choose the folder of your copy of Covert Action first.";
                 return null;
         }
@@ -417,6 +469,35 @@ internal sealed class LauncherScreen
                 break;
             case Item.Mouse:
                 _model.Mouse = !_model.Mouse;
+                break;
+            case Item.KeyPick:
+                _model.CycleKey(step);
+                break;
+            case Item.KeyBind:
+                _capturing = true;
+                _message = $"Press the key of your keyboard that should send {_model.ShownKey.Label} (Esc: cancel).";
+                _messageColour = Note;
+                break;
+            case Item.KeyClear:
+                _model.ClearKey(_model.ShownKey);
+                _message = $"{_model.ShownKey.Label} is sent by its own key only.";
+                _messageColour = Note;
+                break;
+            case Item.KeysReset:
+                _model.ResetKeys();
+                _message = "Every key is the original's again.";
+                _messageColour = Note;
+                break;
+            case Item.PadPick:
+                _model.CyclePad(step);
+                break;
+            case Item.PadKey:
+                _model.CyclePadKey(_model.ShownPad, step);
+                break;
+            case Item.PadReset:
+                _model.ResetPad();
+                _message = "The gamepad's buttons send no keys.";
+                _messageColour = Note;
                 break;
             case Item.CutCapturedDossier:
                 _model.CutCapturedDossier = !_model.CutCapturedDossier;
@@ -822,7 +903,17 @@ internal sealed class LauncherScreen
         }
 
         // a row with its value between ‹ ›, and maybe a button at its end (Test sound)
-        int Select(int top, string name, string value, Item item, string? button = null, Item buttonItem = Item.None)
+        void ButtonRow(int top, params (string Text, Item Item)[] buttons)
+        {
+            var bx = label;
+            foreach (var (text, item) in buttons)
+            {
+                Button(new Rect(bx, top + (RowHeight - ButtonHeight) / 2, 168, ButtonHeight), text, item);
+                bx += 184;
+            }
+        }
+
+        int Select(int top, string name, string value, Item item, string? button = null, Item buttonItem = Item.None, bool arrows = true)
         {
             var row = new Rect(label - 8, top, selectEnd - label + 16, RowHeight);
             RowLight(row, item);
@@ -834,7 +925,7 @@ internal sealed class LauncherScreen
             Leaf(new Rect(label, ty, BitmapFont.Measure(shownName), 16), "label " + name);
             var inner = selectEnd - select - 2 * 16;
             var shown = BitmapFont.Fit(value, inner, fromEnd: false);
-            if (!fixedBy)
+            if (!fixedBy && arrows)
             {
                 _font.Draw(canvas, "‹", select, ty, Amber);
                 _font.Draw(canvas, "›", selectEnd - 8, ty, Amber);
@@ -874,7 +965,28 @@ internal sealed class LauncherScreen
             return top + RowHeight;
         }
 
-        if (_cut)
+        if (_controls)
+        {
+            y = Section("Keyboard: send the original's keys from other keys", y);
+            y = Status(y, ("Not in the original. Empty by default: every key is the original's.", Note));
+            var shown = _model.ShownKey;
+            y = Select(y, "Original key", shown.Label, Item.KeyPick);
+            var sending = string.Join(", ", _model.KeysSending(shown).Select(k => k.Label));
+            y = Select(y, "Sent by", _capturing ? "Press a key..." : sending.Length > 0 ? sending : "its own key only", Item.KeyBind, "Set...", Item.KeyBind, arrows: false);
+            ButtonRow(y, ("Clear this key", Item.KeyClear), ("Reset all keys", Item.KeysReset));
+            y += RowHeight;
+            y = Status(y, (_model.KeyMap.Count == 0 ? "No key remapped." : $"{_model.KeyMap.Count} key(s) remapped: " + string.Join(", ", _model.KeyMap.Select(p => KeyBindings.Find(p.From)!.Label + " = " + KeyBindings.Find(p.To)!.Label)), Note));
+
+            y = Section("Gamepad buttons", y);
+            y = Status(y, ("The stick and the four face buttons are the joystick's. The others can send keys.", Note));
+            var pad = _model.ShownPad;
+            y = Select(y, "Gamepad button", pad.Label, Item.PadPick);
+            y = Select(y, "Sends the key", _model.PadTarget(pad)?.Label ?? "(nothing)", Item.PadKey);
+            ButtonRow(y, ("Reset buttons", Item.PadReset));
+            y += RowHeight;
+            y = Status(y, (_model.PadMap.Count == 0 ? "No button sends a key." : string.Join(", ", _model.PadMap.Select(p => KeyBindings.FindPad(p.From)!.Label + " = " + KeyBindings.Find(p.To)!.Label)), Note));
+        }
+        else if (_cut)
         {
             y = Section("The original's cut content", y);
             y = Status(y, ("Not in the original: its own files hold these, its programs never use them. All off by default.", Note));
@@ -942,7 +1054,7 @@ internal sealed class LauncherScreen
     {
         const int height = 24;
         var x = x0;
-        foreach (var (name, item, open) in new[] { ("General", Item.TabGeneral, !_advanced && !_cut), ("Advanced", Item.TabAdvanced, _advanced), ("Cut content", Item.TabCutContent, _cut) })
+        foreach (var (name, item, open) in new[] { ("General", Item.TabGeneral, !_advanced && !_cut && !_controls), ("Advanced", Item.TabAdvanced, _advanced), ("Cut content", Item.TabCutContent, _cut), ("Controls", Item.TabControls, _controls) })
         {
             var width = BitmapFont.Measure(name);
             if (!open && _hover == item)
@@ -1153,7 +1265,14 @@ internal sealed class LauncherScreen
             Item.CutStandaloneChase => "Not in the original (D-661). Yes: the practice menu has a fifth choice, \"Free Chase\": the car chase on its own, as the game's chase program still carries it: a new random map every time, the places labelled Loc1, Loc2 and so on, a random start and goal, and every place shown and open to enter with F2. It stays in practice: nothing is handed to a campaign. No (the default): the four practice skills of the original." + fixedNote,
             Item.CutHardestCircuit => "Not in the original (D-662). Yes: the wiretap's and the car tracer's circuit board has one difficulty more, the fourth that the game's own code carries and never uses: on the hardest level an agent of the lowest electronics rating gets a board that shows only its last column of chips and hides eight fixed ones. Every other level and rating is as before. No (the default): the hardest board is the third, as the original." + fixedNote,
             Item.CutFillerTexts => "Not in the original (D-663). Yes: the filler sentence of an intercepted coded message is one of all sixteen that the game's TEXT.DTA holds; the game's code asks for twelve, so four sentences (\"Extreme caution is advised ...\", \"Do not hesitate to act in a decisive manner\", \"Your request for promotion is being considered\", \"Further communications may follow\") are never shown. No (the default): the twelve, as the original." + fixedNote,
-            Item.TabGeneral or Item.TabAdvanced or Item.TabCutContent => "General: the game, the display, the sound card, the controls and the saves. Advanced: the MT-32 ROMs, the Amiga files, the keyboard and the player options. Cut content: scenes and modes the original's files hold and its programs never reach. Everything of Advanced and Cut content is off by default and not in the original. Ctrl+Tab goes to the next tab.",
+            Item.KeyPick => "Not in the original (D-671). Choose a key of the original (the ones the game reads, as they are on the PC keyboard it was made for), then Set... and press the key of your keyboard that should send it. The key keeps working as before as well. Several keys can send the same one.",
+            Item.KeyBind => "Not in the original (D-671). Set... (or Enter) waits for the key to use: it is then taken as the original's key before the game sees it, the scan code and the character of that key. Esc cancels; Shift, Ctrl and Alt cannot be remapped.",
+            Item.KeyClear => "Takes away every key mapped to the key of the original shown.",
+            Item.KeysReset => "Takes away all the key mappings: every key is the original's again.",
+            Item.PadPick => "Not in the original (D-672). The gamepad's shoulders, triggers, Start, Back and stick clicks. The stick, the directional pad and the four face buttons stay the joystick's, as before (calibrated at the start when Controls is Keyboard and joystick).",
+            Item.PadKey => "The key of the original the button types when pressed (once for each press, no repeat). (nothing): the button does nothing, as the original. Ideas: Start = Esc, Back = F1.",
+            Item.PadReset => "Makes every gamepad button send nothing again.",
+            Item.TabGeneral or Item.TabAdvanced or Item.TabCutContent or Item.TabControls => "General: the game, the display, the sound card, the controls and the saves. Advanced: the MT-32 ROMs, the Amiga files, the keyboard and the player options. Cut content: scenes and modes the original's files hold and its programs never reach. Controls: map keys of your keyboard and gamepad buttons to the original's keys. Everything of Advanced, Cut content and Controls is off by default and not in the original. Ctrl+Tab goes to the next tab.",
             Item.Save => _context.SettingsPath is { } path ? $"Saves the settings into {path} and closes. Esc and the window's close button save too." : "Closes (no settings file can be written here: the changes are lost).",
             Item.Play => _model.CanPlay ? "Saves the settings and starts the game." : "Choose the folder of your copy of the game first.",
             _ => "",

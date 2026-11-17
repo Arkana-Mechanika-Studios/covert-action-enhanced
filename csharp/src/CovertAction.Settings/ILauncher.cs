@@ -160,7 +160,8 @@ internal sealed record PointerPressed(int X, int Y) : LauncherInput;
 /// <summary>The button let go: a button pressed and let go over itself acts then.</summary>
 internal sealed record PointerReleased(int X, int Y) : LauncherInput;
 
-internal sealed record KeyPressed(LauncherKey Key, bool Shift = false, bool Control = false) : LauncherInput;
+/// <summary>A key pressed; <paramref name="Scancode"/> is SDL's scancode of the physical key (0 when not given), which the Controls tab binds.</summary>
+internal sealed record KeyPressed(LauncherKey Key, bool Shift = false, bool Control = false, int Scancode = 0) : LauncherInput;
 
 internal sealed record PathDropped(string Path) : LauncherInput;
 
@@ -184,4 +185,7 @@ internal enum LauncherKey
     Escape,
     Tab,
     Paste,
+
+    /// <summary>Any other key: only its scancode is given (the Controls tab binds it).</summary>
+    Other,
 }

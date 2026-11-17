@@ -59,6 +59,8 @@ launcher but cannot be changed there (its details say what sets it); the launche
 | `input.controls` | `"joystick"` | `--controls <joystick\|keyboard>` | the set-up screen's controls answer (D-603): `joystick` ("1. Joystick and Keyboard" when a joystick or gamepad is plugged in at the start: the menus part then calibrates it; with none, "keyboard only") or `keyboard` ("2. Keyboard only") |
 | `input.keyRepeat` | `"pc"` | `--key-repeat <pc\|windows>`; `COVERT_KEY_REPEAT=system` | how a held key repeats: as the PC keyboard did (after half a second, 10.9 a second; PERFORMANCE.md) or at Windows' own rate |
 | `input.arrowKeysWalk` | false | `--arrow-keys-walk` | in a building raid only, the grey arrow keys (and Home, End, PgUp, PgDn) walk the agent like the keypad's digits 8/2/4/6 (and the diagonals), and Shift with an arrow lunges, which the grey arrows do in the original. Off: the original's keys (the keypad walks, the grey arrows lunge). A player option, divergence D-610 |
+| `input.keyMap` | `[]` (none) | none | key remapping, a list of `"your key=the original's key"` texts (not in the original, D-671): the key of your keyboard named on the left arrives at the game as the key of the original named on the right, with its scan code and character. Edited on the launcher's **Controls** tab; see "Key and button names" below. Empty: every key is the original's |
+| `input.padMap` | `[]` (none) | none | gamepad buttons beyond the joystick's, a list of `"button=the original's key"` texts (not in the original, D-672): the button types that key once for each press. Buttons: `LeftShoulder`, `RightShoulder`, `LeftTrigger`, `RightTrigger`, `Start`, `Back`, `LeftStick`, `RightStick`. Empty: the buttons do nothing, as the original. Edited on the **Controls** tab |
 | `input.mouse` | false | `--mouse`, `--no-mouse` | the mouse in the menus, lists and on the flight map (not in the original, D-630; MOUSE-SUPPORT.md): pointing at a choice highlights it, a left click takes it, a right click is Esc, a click answers "press a key"; the keys work as before. The system's pointer shows over the window only while it is on |
 
 An earlier file's `startup.skipSetup` is ignored without a message: there is nothing left to skip.
@@ -70,9 +72,28 @@ left and top face buttons the joystick's four buttons; a plain joystick gives it
 The game calibrates the stick where it is when the joystick is switched on, and learns the ends as the stick reaches
 them. With no controller the game sees no joystick, as on a PC without one (`SdlJoystick`, `JoystickReading`).
 
+### Key and button names (`input.keyMap`, `input.padMap`)
+
+Each entry is `left=right`, names not case-sensitive, spaces around `=` allowed; an entry that does not read is ignored
+with a message at the start. The right side is a key of the original, named as the key is on a US keyboard (the PC
+keyboard the game was made for): `Up`, `Down`, `Left`, `Right`, `Home`, `End`, `PageUp`, `PageDown`, `Insert`, `Delete`,
+`Keypad0` to `Keypad9`, `KeypadPeriod`, `KeypadDivide`, `KeypadMultiply`, `KeypadMinus`, `KeypadPlus`, `KeypadEnter`,
+`Enter`, `Esc`, `Space`, `Tab`, `Backspace`, `Minus`, `Equals` (the gears' keys), `F1` to `F10`, `A` to `Z`, `Digit0` to
+`Digit9`, `LeftBracket`, `RightBracket`, `Backslash`, `Semicolon`, `Apostrophe`, `Grave`, `Comma`, `Period`, `Slash`. The
+left side of `input.keyMap` is any of these or `F11`, `F12`, `CapsLock`, `PrintScreen`, `ScrollLock`, `Pause`, `NumLock`,
+`NonUsBackslash`, `Menu`, or `Key<n>` for the key with SDL scancode n; it names the key's place on the keyboard, whatever
+the layout (the key a French keyboard has as A is `Q`). Shift, Ctrl, Alt and the Windows key cannot be remapped. A key
+that is mapped does not send its own key any more; the key it is mapped to still sends itself. Example:
+`"keyMap": ["CapsLock=Esc", "Q=Up"]`. With Shift held, a mapped key gives the shifted key of the original (the US
+keyboard's).
+
+Gamepad buttons: the left stick, the directional pad and the four face buttons stay the joystick (above). Each of the
+buttons named under `input.padMap` can send one key of the original instead; the triggers count as pressed past half their travel.
+They are off by default. Suggestions, none applied: `Start=Esc`, `Back=F1`, `LeftShoulder=Space`, `RightShoulder=Enter`.
+
 Other command-line options: `--setup` (the launcher first), `--no-launcher` (never the launcher: a missing game ends the
 program with a message), `--launcher-screenshot <file.png>` (the launcher as it would open, drawn into a PNG without a
-window; `--launcher-screenshot-tab general|advanced|cut` picks the tab), `--practice crypto|chase` and `--level 0..3` (a developer's shortcut into one practice), `--help`. Developer
+window; `--launcher-screenshot-tab general|advanced|cut|controls` picks the tab), `--practice crypto|chase` and `--level 0..3` (a developer's shortcut into one practice), `--help`. Developer
 variables stay as they were: `COVERT_FRAME_TRACE`, `COVERT_INPUT_SCRIPT` and the others of PERFORMANCE.md.
 
 ### Finding the game
@@ -133,6 +154,12 @@ project, not affiliated with or endorsed by MicroProse or the game's rights hold
   at the workstations, in the raid and the chase), shown as planned and not offered.
 * **Cut content**: the original's cut content as options (`cutContent.*`, D-660 onward; docs/cut-content.md), each
   Yes or No and No by default: **Captured dossier** (D-660), **Free car chase** (D-661), **Hardest circuit board** (D-662), **All filler sentences** (D-663).
+* **Controls**: key remapping and the gamepad's extra buttons (`input.keyMap`, `input.padMap`; D-671, D-672), both empty
+  by default. **Original key** (‹ › goes through the keys of the original) shows the keys that send it in **Sent by**;
+  **Set…** (or Enter) waits for a key: press the key of your keyboard that should send it (Esc cancels; Shift, Ctrl and Alt are refused).
+  **Clear this key** takes away the keys mapped to it, **Reset all keys** all of them. Below, **Gamepad button** (a shoulder, a
+  trigger, Start, Back, a stick click) and **Sends the key** (‹ › goes through "(nothing)" and the keys of the original),
+  and **Reset buttons**.
 
 Rows show `‹ value ›`: a click on ‹ or › (or ←/→) steps through the values, a click on the row or Enter/Space steps on.
 Folders: **Change…** (or Enter on the field) opens Windows' folder dialog; a folder can also be dropped on the window

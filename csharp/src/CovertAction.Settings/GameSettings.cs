@@ -63,6 +63,12 @@ internal sealed class GameSettings
     /// <summary>In a building raid the grey arrow keys walk like the keypad's digits and Shift with them lunges (D-610; off: the original's keys).</summary>
     public bool? ArrowKeysWalk { get; set; }
 
+    /// <summary>The key remapping "physical=original" (input.keyMap, D-671); null or empty: the original's keys.</summary>
+    public List<string>? KeyMap { get; set; }
+
+    /// <summary>The gamepad buttons beyond the joystick's mapped to keys "button=original" (input.padMap, D-672); null or empty: none.</summary>
+    public List<string>? PadMap { get; set; }
+
     /// <summary>The cards the music or the effects can play on: "card" (the sound card plays both, as the original), else a card of its own (D-620).</summary>
     public static readonly IReadOnlyList<string> PartCards = ["card", "none", "speaker", "tandy", "adlib", "mt32"];
 
@@ -112,7 +118,13 @@ internal sealed class GameSettings
     public bool? CutFillerTexts { get; set; }
 
     /// <summary>A copy (a change to it leaves this one as it is).</summary>
-    public GameSettings Copy() => (GameSettings)MemberwiseClone();
+    public GameSettings Copy()
+    {
+        var copy = (GameSettings)MemberwiseClone();
+        copy.KeyMap = KeyMap is null ? null : [.. KeyMap];
+        copy.PadMap = PadMap is null ? null : [.. PadMap];
+        return copy;
+    }
 
     /// <summary>The letter for the Amiga version's music (D-640) and sound effects (D-641): not a sound card of the set-up; the launcher's <c>SoundDriverChoice.AmigaMusic</c> is the same letter.</summary>
     public const char AmigaMusicLetter = 'G';

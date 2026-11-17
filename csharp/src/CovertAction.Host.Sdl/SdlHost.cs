@@ -5,6 +5,7 @@
 // the mouse as a player option (csharp/docs/MOUSE-SUPPORT.md: the system's pointer, mapped through PictureLayout);
 // a controller as the PC's joystick (SdlJoystick).
 using CovertAction.Platform;
+using CovertAction.Settings;
 
 namespace CovertAction.Host.Sdl;
 
@@ -31,6 +32,9 @@ internal sealed class SdlHost : IHost, IVideo, IInput, IClock, IDisposable
 
     /// <summary>The game port's joystick: the first controller connected (SdlJoystick); none while a script plays.</summary>
     private readonly SdlJoystick? _joystick;
+
+    /// <summary>The player's key remapping and the pad's extra buttons (D-671, D-672); empty: the original's keys.</summary>
+    private readonly KeyRemap _remap;
 
     /// <summary>
     /// The keys the BIOS's keyboard buffer holds: 16 words, one always free. A key pressed while it is full is lost (the
@@ -84,6 +88,7 @@ internal sealed class SdlHost : IHost, IVideo, IInput, IClock, IDisposable
     public SdlHost(string title, SdlWindowOptions options)
     {
         _systemRepeat = options.SystemKeyRepeat;
+        _remap = options.Remap ?? KeyRemap.None;
         _pointer = options.Mouse ? new PointerLatch() : null;
         if (!SdlNative.SDL_Init(SdlNative.InitVideo | SdlNative.InitEvents))
         {
@@ -241,7 +246,7 @@ internal sealed class SdlHost : IHost, IVideo, IInput, IClock, IDisposable
                     {
                         break;      // the system's repeat: the keyboard's own is made below (TypematicInterval)
                     }
-                    var key = SdlKeyMap.ToGameKey(e.Keyboard.Scancode, e.Keyboard.Key, e.Keyboard.Mod);
+                    var key = SdlKeyMap.ToGameKey(_remap, e.Keyboard.Scancode, e.Keyboard.Key, e.Keyboard.Mod);
                     // the last key pressed is the one that repeats, as on a PC (a Shift pressed after a letter stops it)
                     _heldScancode = key == HostKeys.None ? -1 : e.Keyboard.Scancode;
                     _heldKey = key;
@@ -278,6 +283,14 @@ internal sealed class SdlHost : IHost, IVideo, IInput, IClock, IDisposable
                     _joystick?.Refresh();
                     _trace?.Mark($"joystick {_joystick?.Description ?? "none"}");
                     break;
+            }
+        }
+        if (_joystick is not null && !_remap.IsEmpty)
+        {
+            // DIVERGENCE: D-672 the pad's mapped buttons type their keys, once for each press
+            foreach (var scancode in _remap.PadPresses(_joystick.IsDown))
+            {
+                Type(SdlKeyMap.PadGameKey(scancode), 0);
             }
         }
         if (_heldScancode >= 0 && !_systemRepeat && PreciseMilliseconds >= _nextRepeat)
@@ -415,5 +428,6 @@ internal enum PictureScaling
 /// <param name="Fullscreen">The window fills the screen.</param>
 /// <param name="Scaling">How the picture is enlarged.</param>
 /// <param name="SystemKeyRepeat">A held key repeats at the system's rate (else the PC keyboard's).</param>
+/// <param name="Remap">The player's key remapping and the pad's extra buttons (input.keyMap, input.padMap; D-671, D-672); null: none.</param>
 /// <param name="Mouse">The mouse in the menus (input.mouse): the system's pointer over the window, read by the game.</param>
-internal sealed record SdlWindowOptions(int Width, int Height, bool Fullscreen = false, PictureScaling Scaling = PictureScaling.PixelArt, bool SystemKeyRepeat = false, bool Mouse = false);
+internal sealed record SdlWindowOptions(int Width, int Height, bool Fullscreen = false, PictureScaling Scaling = PictureScaling.PixelArt, bool SystemKeyRepeat = false, bool Mouse = false, KeyRemap? Remap = null);

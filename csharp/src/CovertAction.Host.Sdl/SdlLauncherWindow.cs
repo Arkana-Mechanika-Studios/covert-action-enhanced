@@ -205,9 +205,9 @@ internal sealed class SdlLauncherWindow : ILauncherSurface, IDisposable
                     SdlNative.KeyTab => LauncherKey.Tab,
                     SdlNative.KeyV when control => LauncherKey.Paste,
                     SdlNative.KeyInsert when shift => LauncherKey.Paste,
-                    _ => null,
+                    _ => LauncherKey.Other,
                 };
-                return key is { } k ? new KeyPressed(k, shift, control) : null;
+                return key is { } k ? new KeyPressed(k, shift, control, e.Keyboard.Scancode) : null;
             default:
                 return null;
         }

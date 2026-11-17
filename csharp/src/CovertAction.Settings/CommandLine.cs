@@ -39,7 +39,7 @@ internal sealed class CommandLine
         --launcher-screenshot <file.png>
                            draw the launcher as it would open into a PNG file, without a window, and end
         --launcher-screenshot-tab <tab>
-                           with --launcher-screenshot: the tab to draw, general (default), advanced or cut
+                           with --launcher-screenshot: the tab to draw, general (default), advanced, cut or controls
         --practice <part>  a developer's shortcut past the set-up and the menus: crypto (decode a message) or chase
         --level <n>        the practice's difficulty, 0 (Local Disturbance, the default) to 3 (Global Crisis)
         --help             this text
@@ -80,7 +80,7 @@ internal sealed class CommandLine
 
     public string? LauncherScreenshot { get; private set; }
 
-    /// <summary>--launcher-screenshot-tab: the tab drawn, 0 General (default), 1 Advanced, 2 Cut content.</summary>
+    /// <summary>--launcher-screenshot-tab: the tab drawn, 0 General (default), 1 Advanced, 2 Cut content, 3 Controls.</summary>
     public int LauncherScreenshotTab { get; private set; }
 
     /// <summary>"crypto", "chase", or "" (the whole game).</summary>
@@ -136,7 +136,8 @@ internal sealed class CommandLine
                         "general" => 0,
                         "advanced" => 1,
                         "cut" => 2,
-                        _ => cli.FailNumber("--launcher-screenshot-tab needs general, advanced or cut") ?? 0,
+                        "controls" => 3,
+                        _ => cli.FailNumber("--launcher-screenshot-tab needs general, advanced, cut or controls") ?? 0,
                     };
                     break;
                 case "--launcher-screenshot":

@@ -111,7 +111,8 @@ internal static partial class Program
             "smooth" => PictureScaling.Smooth,
             _ => PictureScaling.PixelArt,
         };
-        using var host = new SdlHost("Covert Action", new SdlWindowOptions(start.Width, start.Height, start.Fullscreen, scaling, start.SystemKeyRepeat, Mouse: start.Mouse));
+        using var host = new SdlHost("Covert Action", new SdlWindowOptions(start.Width, start.Height, start.Fullscreen, scaling, start.SystemKeyRepeat, Mouse: start.Mouse,
+            Remap: new KeyRemap(start.KeyMap, start.PadMap)));
         var options = new GameOptions(GameSettings.SoundLetter(start.SoundCard), start.Joystick, start.Mt32Roms, ArrowKeysWalk: start.ArrowKeysWalk,
             MusicLetter: GameSettings.PartLetter(start.MusicCard), EffectsLetter: GameSettings.PartLetter(start.EffectsCard), Mouse: start.Mouse,
             AmigaFolder: start.AmigaFiles, AmigaOnlyWhereOriginal: start.AmigaOriginalOnly, AmigaPictures: start.AmigaPictures,
