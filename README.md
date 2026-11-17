@@ -180,11 +180,11 @@ data), and [cut content](docs/cut-content.md) found in the original's code and d
 
 ## Linux (experimental)
 
-A release for Linux x64 (also the Steam Deck in desktop mode) comes as `CovertAction-<version>-linux-x64.tar.gz` with a
+A release for Linux x64 comes as `CovertAction-<version>-linux-x64.tar.gz` with a
 `.sha256` file. Unpack it with `tar -xzf` (a zip would lose the executable bits) and start `./CovertAction`, or
 `CovertAction Launcher` for the settings screen. It carries SDL 3.4.20 as `libSDL3.so.0` beside the program, built on Ubuntu
-22.04 from SDL's source release (`csharp/tools/linux/build_sdl3.sh` in an `ubuntu:22.04` container), so it runs on Ubuntu
-22.04 and later, Debian 12 and later and SteamOS, including systems without an SDL 3 of their own such as Ubuntu 24.04;
+22.04 from SDL's source release (`csharp/tools/linux/build_sdl3.sh` in an `ubuntu:22.04` container), so it needs glibc 2.34 or
+later (Ubuntu 22.04 and later, for example) and no SDL 3 of the system's own;
 delete it to use the system's. The .NET runtime inside the program needs `libicu`, which desktop systems have (a bare
 container does not: `apt install libicu70` or `libicu74`). Your own copy of the game is found beside the program, in Steam's libraries, Heroic's installed
 games, the usual GOG and Lutris folders and Wine prefixes, or you choose it in the launcher; file names may be in any case.

@@ -14,7 +14,8 @@ What you need
 * Your own copy of Sid Meier's Covert Action for DOS (the folder with COVERT.EXE, INTRO.EXE, FINAL.EXE, GAME.EXE,
   MGRAPHIC.EXE, FONTS.CV and the pictures; the GOG or Steam copy will do). None of the game's files come with this
   program, and your copy is never changed. File names may be in any case.
-* Linux x64 with glibc 2.34 or later (Ubuntu 22.04 or later, Debian 12 or later, Fedora, Arch, SteamOS) and a
+* Linux x64 with glibc 2.34 or later (Ubuntu 22.04 or later, for example; tried
+  only in Ubuntu 22.04 and 24.04) and a
   desktop (X11 or Wayland). Nothing else to install: the .NET runtime is inside the program and SDL 3 (libSDL3.so.0)
   is beside it, so systems without an SDL 3 of their own (Ubuntu 24.04) work too. Delete libSDL3.so.0 to use the
   system's SDL 3 instead; COVERT_SDL3_PATH names another library. The .NET runtime needs libicu (every desktop has it;
