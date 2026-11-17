@@ -1,7 +1,7 @@
 # Mouse support: how it could be added
 
-Study of 14 November 2026; **phases 0, 1 and 2 implemented on 15 November 2026, phases 3 and 4 (without the car chase) in version 1.1.5** (section 6): the mouse works in the
-menus, the lists, on the flight map, at the workbench and the workstation and in the building raid as a player option, off by default. Phase 5 and the car chase are not done. Question: the original's shared library carries int 33h mouse
+Study of 14 November 2026; **phases 0, 1 and 2 implemented on 15 November 2026, phases 3 and 4 (without the car chase) in version 1.1.5, the car chase in version 1.3** (sections 6 and 7): the mouse works in the
+menus, the lists, on the flight map, at the workbench and the workstation and in the building raid as a player option, off by default. Phase 5 is not done. Question: the original's shared library carries int 33h mouse
 routines that no program calls (`LibraryInput.cs` "DORMANT", `docs/cut-content.md` CC-15). Could the rewrite offer
 a mouse, how much of it is the original's own code, and what does it cost?
 
@@ -85,7 +85,7 @@ what a click means: the O part is only reading the pointer.
 | 8 | **Crypto workstation** (CODE, has the dormant routines) | `Crypto/CryptoWorkstation.cs` `CryptoKeyStep`, `WaitForKey`, `GuessLetter` | letter = cipher letter, then plain letter; Esc leave, F1 hint, F10 clear, Alt-S/P/Q | layout: letter column x 4 (guess), 12 (letter), 20 (count), row `y = 9 + 7*cipher`; cipher text cells `x = 44 + 6*col`, `y = 16 + 16*line` (42 columns, 11 lines), the guess under each at +7. **Click a letter row or a text cell = choose that cipher letter** (same as typing it); the plain letter stays a key, or a small alphabet strip is drawn (new graphics); right click = clear the guess (the "any other key" path); small on-screen "Hint / Clear / Leave" hot spots in the top bar (y 0..8, x >= 34) | N (O only for reading the pointer) |
 | 9 | **Electronics workbench** (BUG) | `Electronics/ElectronicsWorkbench.Board.cs` `PuzzleInputStep`/`HandleKey`/`MoveCursor`/`SwapChip` | cursor keys and the 8 diagonals, Return/Space = swap, Esc, Alt-S/P/Q | chip slots at `(32*col + 40, 32*row + 8)`, 16x16, cols 0..5, rows 0..4: **click a slot = move the cursor there and swap** (hover = cursor); right click or a "done" hot spot = Esc | N |
 | 10 | **Building raid** (TAC): walking, facing, running, firing, F1..F10, Alt-keys; arrest prompt; kit/equipment screen; file-room terminal | `Raid/BuildingRaid.Turn.cs` `ActOnKey`, `ReadJoystickKey`; `Kit.cs` `WaitForKitKey`; `Terminal.cs` | keypad digits (8 directions, run key 5/'5' = `KeyRun`), Space, F-keys | the real-time part has **no pointer concept**: a mouse is new design. Options: hold the left button = walk toward the pointer (8 octants from the player's screen position to the pointer), right click = Space (action), wheel or middle = F10 (weapon), left double click = run toggle. Equipment screen: the kit icons (positions `equip_icon_pos`) as a grid with the box keys | N (largest and riskiest) |
-| 11 | **Car chase** (CHASE, has the dormant routines) | `Chase/CarChase.Tick.cs` `TakeKey`, `CarChase.Offer.cs` `PickOffer` | arrows = turn, `-`/`=` gear, Space = switch car, `a`/F1 = arrest, `e`/F2/Enter = enter building, `f d s` speed, Alt-keys | street view at (200, 100); offers list (rows `OfferRowHeight`) as a list; in play: left/right click = turn left/right, wheel = gear, left button held = ... (needs a design: turn relative to the car's heading, queued like `QueueTurn`) | N |
+| 11 | **Car chase** (CHASE, has the dormant routines) | `Chase/CarChase.Tick.cs` `TakeKey`, `CarChase.Offer.cs` `PickOffer` | arrows = turn, `-`/`=` gear, Space = switch car, `a`/F1 = arrest, `e`/F2/Enter = enter building, `f d s` speed, Alt-keys | street view at (200, 100); offers list (rows `OfferRowHeight`) as a list; **Done in 1.3 (section 7, D-670)**: the offers list as in D-632; in play each click is one key: an arrow by the side of the car the click lies on (map or street view), gears on the windscreen and bonnet, the other tail car's dot = Space, a location's dot = E, right click = A | N |
 | 12 | **Hardware set-up** (INTRO, text mode 3) | `Intro/HardwareSetup.cs` (`ReadKeyRaw`, the digit is the answer) | digits 1..5 / 1..6 / 1..2 | the choice lines are text rows (graphics lines at row `m + 14`, text column 0x1b); the text page is 720x400 shown at the same 4:3 place (`PresentText`): column = `x * 80 / 720`, row = `y * 25 / 400`. **Click a line = type its digit** (no game logic involved; a host-level key injection) | N |
 | 13 | **"Press any key" waits and animation skips** (`LibraryScreens.WaitForKey`, `LibraryAnimation.AnimationStep`'s skip test, the briefing's `Getch`) | `Library/*` | any key | left click = any key (inject Space) | N |
 | 14 | **Alt-A / Alt-S / Alt-J / Alt-P toggles** | box loop, each part | Alt-letters | not mapped; Alt-S (sound) could be a hot spot on the box only if wanted | - |
@@ -169,7 +169,7 @@ Sizes are rough (new lines incl. tests; one developer-day = about 300 lines of r
 | 1 (**done**) | **Menu boxes** (rows 1, 3, 13): in `LibraryMenus.ShowBox` input loop add a pointer branch beside `PollJoystickKey`: hover moves the highlight (reusing `MoveHighlight`), left click accepts, right click = Esc; "press a key" boxes close on a click. One place serves city, hotel, HQ, data menus, quit boxes in all parts | ~200 lines, 1 day | low-medium: must not change timing (`WaitVsync(0xf)` after a move), the animation-skip and the Alt-key paths; the C# `Menus` is shared with `Func<int>? readKey` hooks used by tests |
 | 2 (**done**) | **Lists and maps** (rows 2, 4, 5): travel map list + city dots, clue/briefing lists, car offers, kit selection, faces grid; a small `PointerHit` helper (rectangles in game pixels -> choice index) | ~350 lines, 1.5 days | medium: each loop has its own redraw and sound order; the travel map needs the dot hit test and a visible hover cue (the highlight already exists) |
 | 3 | **Mini-games** (rows 8, 9): crypto (click letter or cell chooses the cipher letter, right click clears, hot spots for hint/clear/leave) and electronics (click slot = cursor + swap, hot spot = done) | ~350 lines, 1.5 days | medium: the crypto plain-letter step needs a decision (keep typing, or draw an alphabet strip: new graphics and a new faithfulness boundary: the picture would differ from the original's, only with the option on); timer loops must keep their `WaitVsync` cadence |
-| 4 | **Real-time parts** (rows 10, 11): raid walking by pointer, car-chase turning; needs game design (no analogue in the original) | ~600 lines, 3 days + play testing | high: easy to make the game easier or harder than the original; keep it an opt-in "mouse steering" sub-setting; verify with sessions on the headless host |
+| 4 (**done**: the raid in 1.1.5, the car chase in 1.3) | **Real-time parts** (rows 10, 11): raid walking by pointer, car-chase turning; needs game design (no analogue in the original) | ~600 lines, 3 days + play testing | high: easy to make the game easier or harder than the original; keep it an opt-in "mouse steering" sub-setting; verify with sessions on the headless host |
 | 5 | **Set-up screen** (row 12): click a choice line = its digit; code-name field click-to-position (row 7, optional) | ~120 lines, 0.5 day | low |
 
 Total about 7-8 developer-days for everything; phases 0+1 (2.5 days) already make the whole game usable with the
@@ -255,8 +255,46 @@ flight map by its list and by the city's dot, hotel, quit) ends in the same bloc
 
 **Left (planned, not in this version):**
 
-* Phase 4, the car chase's steering (decided against for now; the raid's walking is done).
+* The car chase's mouse was decided against until 1.3; section 7 is the design that makes it safe (a click is a key).
 * Phase 5, the set-up screen (click a choice line = its digit; `PictureLayout.TextCell` is ready) and the code-name
   field.
 * Unchanged on purpose: text entry (row 7, keyboard only), the Alt-letter toggles (row 14), the animation skips and
   the bulletins' ticker (a key stops them; a click does not).
+
+## 7. The mouse in the car chase (version 1.3, D-670)
+
+Why it was held back: steering by pointer can make the chase easier or harder than the keyboard does (a held button that
+steers by distance, a turn the keys cannot queue, a finer aim than four arrows). The rule that settles it: **the mouse gives
+the player nothing the keyboard does not; it only stands in for keys.** Every click ends in `TakeKey` as the key it replaces
+(the same state change, sound and redraw, the same U-turn rule after it), at most one per frame and only when no key waits;
+there is no held button and nothing that depends on how far or how fast the pointer moves.
+
+**The option.** `input.mouseChase`, `--mouse-chase` / `--no-mouse-chase`, off by default, a player option **on top of**
+`input.mouse` (D-630): it does nothing unless the mouse option is on too (`Game.MouseInChase`, `Boundaries.MouseChase`,
+`LibraryInput.ChasePointerOn`). In the launcher both live in one row, **Mouse**: No, Menus, Menus and car chase (the
+Advanced tab has no room for another row; the two settings keys stay separate in the file and on the command line).
+With the option off the chase never asks the mouse driver anything, so the oracle, the session proof and every key
+session are unchanged.
+
+**The mapping** (`CarChase.Pointer.cs`, `ReadChaseMouseKey`; positions are the ones the screen draws):
+
+| click | the key it stands for | notes |
+|---|---|---|
+| left, city map (x < 200) or street view (x >= 200, y >= 100) | the arrow of the side of the steered car the click lies on: Up, Right, Down, Left | the car is its map dot (`MapPixel`), or its place in the street view (`X - CamX + 200`, `Y - CamY + 100`); the longer part of the vector decides, a tie is vertical, a click within one pixel of the car does nothing. It queues the turn at the next crossing (`QueueTurn`), exactly as the arrow does |
+| left, the other tail car's dot on the map (within 3 pixels) | Space (switch car) | not while fleeing (the key only changes the engine's sound there) |
+| left, the dot of a location the map shows (within 3 pixels) | `e` (enter the building) | only locations the map shows: the known ones, all in the stand-alone chase; the key itself decides whether the quarry is there |
+| left, the windscreen picture | `=` (gear up) | |
+| left, the bonnet under it | `-` (gear down) | |
+| left, the auto-follow lamp | F10 | |
+| left, the clock | the next speed: `s` (slow), `d`, `f`, then `s` again | one click is one of the three keys |
+| right, anywhere | `a` (the arrest when a tail car meets the quarry head-on, else it enters the building, as the key) | the fire button's place, as in the raid (D-636) |
+
+Not mapped: Esc (give up), Alt-Q, Alt-S, Alt-P (keyboard only, as for the menus' Alt keys), and no click on the quarry:
+a quarry out of sight has no dot, and a click on its true place would tell what the picture does not show. The offers screen
+before the chase already takes the mouse (D-632).
+
+**Proof.** `ChaseMouseTests`: with either option off the chase's gate is shut and the mouse driver gets no call; each click
+above returns the key code the chase's key switch compares (`0x4d00` for Right and so on), including the speed cycle and the
+dead zone on the car; `PointerHit.Direction4` for its ties. `MouseChaseSettingTests`: the setting, the file and the flags.
+Playing it on a real display is a player's test; the parts that need the game files are covered by the existing session proof
+with the options off.
