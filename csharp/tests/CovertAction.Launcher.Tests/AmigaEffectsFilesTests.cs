@@ -307,6 +307,33 @@ public sealed class AmigaEffectsFilesTests : IDisposable
         }
     }
 
+    [SkippableFact]
+    public void ARaidsEffectsInOrderAreWrittenAsOneStereoWavFileWhenAskedTo()
+    {
+        var folder = RealFolder();
+        var target = Environment.GetEnvironmentVariable(WavFolderVariable);
+        Skip.If(folder is null || string.IsNullOrEmpty(target), "no COVERT_AMIGA_DIR or COVERT_AMIGA_WAV_DIR");
+        var banks = ReadReal(folder!);
+        Directory.CreateDirectory(target!);
+        const int rate = 44100;
+        var driver = new AmigaEffectsDriver(banks, rate) { Bank = AmigaBank.Tac };
+        // a door, the camera, a shot that misses the player (x = 100, a little to the left), a guard hit, the siren, a blast
+        // with the player's own hit over it, as the Amiga's calls name them (D-680)
+        var sequence = new (int Command, double Seconds)[] { (13, 0.8), (9, 0.8), (33, 0.5), (6, 0.4), (4, 0.6), (18, 1.0), (7, 1.0), (3, 0.5), (14, 1.0) };
+        var frames = new List<short>();
+        foreach (var (command, seconds) in sequence)
+        {
+            driver.PlaySound(command);
+            var chunk = new short[2 * (int)(rate * seconds)];
+            driver.Render(chunk);
+            frames.AddRange(chunk);
+        }
+        var tail = new short[2 * rate];
+        driver.Render(tail);
+        frames.AddRange(tail);
+        WriteWav(Path.Combine(target!, "raid-sequence.wav"), [.. frames], rate);
+    }
+
     private static void WriteWav(string path, short[] frames, int rate)
     {
         using var file = new BinaryWriter(File.Create(path));

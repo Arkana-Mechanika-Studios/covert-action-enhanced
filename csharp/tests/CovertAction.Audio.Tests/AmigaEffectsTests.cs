@@ -444,4 +444,122 @@ public sealed class AmigaEffectsTests
         router.PlaySound(9);
         Assert.True(Loud(Render(router, 500), 0));
     }
+
+    // placement: where the Amiga's calls put each effect (D-680)
+
+    /// <summary>The left side's divisors of the Amiga's pan (the program's own table, hunk 132 at 0x34b4), in 256ths; the right side's are the same read backwards.</summary>
+    private static readonly int[] ProgramLeftDivisors = [256, 256, 256, 256, 256, 256, 256, 256, 256, 341, 409, 512, 682, 1024, 2048, 16384];
+
+    [Fact]
+    public void EachTwentiethOfTheScreenTakesTheVolumeOfEachSideFromTheProgramsTable()
+    {
+        for (var step = 0; step < 16; step++)
+        {
+            foreach (var x in new[] { step * 20, step * 20 + 19 })
+            {
+                var left = Math.Min(64, 64 * 256 / ProgramLeftDivisors[step]);
+                var right = Math.Min(64, 64 * 256 / ProgramLeftDivisors[15 - step]);
+                Assert.Equal(left, AmigaEffectsDriver.SideVolume(64, x, left: true));
+                Assert.Equal(right, AmigaEffectsDriver.SideVolume(64, x, left: false));
+            }
+        }
+    }
+
+    [Fact]
+    public void AllButOneCallOfTheTableIsAtTheMiddleAndTheMissedPlayerIsAtX100()
+    {
+        // the program's calls: h28+0x2756 pushes x = 0x64; every other call that the PC has a twin for pushes 0xa0
+        var off = AmigaEffectMap.Rows.Where(r => r.Match != AmigaMatch.None && r.PanX != 160).Select(r => (r.Bank, r.Command, r.PanX));
+        Assert.Equal([(AmigaBank.Tac, 33, 100)], off);
+    }
+
+    [Fact]
+    public void AnEffectAtTheMiddleSoundsAsLoudOnBothSidesAndTheMissedPlayersLeansLeft()
+    {
+        foreach (var row in AmigaEffectMap.Rows.Where(r => r.Match != AmigaMatch.None))
+        {
+            var driver = new AmigaEffectsDriver(AllBanks(), Rate, lowPass: false) { Bank = row.Bank };
+            driver.PlaySound(row.Command);
+            var buffer = Render(driver, 300);
+            var left = buffer.Where((_, i) => i % 2 == 0).Max(s => (int)s);
+            var right = buffer.Where((_, i) => i % 2 == 1).Max(s => (int)s);
+            Assert.True(left > 0 && right > 0, row.Name);
+            if (row.PanX == 160)
+            {
+                Assert.Equal(left, right);
+            }
+            else
+            {
+                Assert.True(left > right, row.Name);
+            }
+        }
+    }
+
+    [Theory]
+    [InlineData(0, true, false)]
+    [InlineData(319, false, true)]
+    public void AnEffectAtAnEdgeSoundsOnOneSideOnly(int x, bool left, bool right)
+    {
+        var bank = BankOf(3);
+        var driver = new AmigaEffectsDriver(new AmigaSoundBanks(bank, bank, bank, bank, bank), Rate, lowPass: false);
+        // the chase's own calls (never made by a PC command) are at the screen's edges: h16+0x250 at x = 319, 0x278 at x = 0
+        driver.Play(bank.Effects[0], id: 0, volume: 10, x: x);
+        driver.Play(bank.Effects[1], id: 1, volume: 10, x: x);
+        var buffer = Render(driver, 300);
+        Assert.Equal(left, Loud(buffer, 0, 50));
+        Assert.Equal(right, Loud(buffer, 1, 50));
+    }
+
+    [Fact]
+    public void ACardsOutputIsUntouchedWhenNothingOfTheAmigaPlays()
+    {
+        var card = new ConstantCard(1000, -500);
+        var router = new AmigaEffectsRouter(new AmigaEffectsDriver(AllBanks(), Rate) { Bank = AmigaBank.Tac }, card);
+        var buffer = Render(router, 200);
+        Assert.All(Enumerable.Range(0, 200), i => Assert.Equal((1000, -500), (buffer[2 * i], buffer[2 * i + 1])));
+        // a command the Amiga has no twin for goes to the card and leaves the output as the card makes it
+        router.PlaySound(44);
+        buffer = Render(router, 200);
+        Assert.All(Enumerable.Range(0, 200), i => Assert.Equal((1000, -500), (buffer[2 * i], buffer[2 * i + 1])));
+    }
+
+    [Fact]
+    public void AnAmigaEffectAtTheLeftEdgeLeavesTheRightChannelToTheCard()
+    {
+        var card = new ConstantCard(1000, -500);
+        var banks = AllBanks();
+        var amiga = new AmigaEffectsDriver(banks, Rate, lowPass: false) { Bank = AmigaBank.Chase };
+        var router = new AmigaEffectsRouter(amiga, card);
+        amiga.Play(banks.Of(AmigaBank.Chase).Effects[0], id: 0, volume: 64, x: 0);
+        var buffer = Render(router, 200);
+        // the far side keeps one sixty-fourth of the volume at the very edge (the program's last divisor, 16384/256 = 64), so it is not quite silent
+        Assert.All(Enumerable.Range(0, 200), i => Assert.InRange(buffer[2 * i + 1] + 500, 0, 400));
+        Assert.Contains(Enumerable.Range(0, 200), i => buffer[2 * i] > 1500);
+    }
+
+    private sealed class ConstantCard(short left, short right) : ISoundDriver, IPcmSource
+    {
+        public void PlaySound(int effect)
+        {
+        }
+
+        public void PlaySound(int effect, int parameter)
+        {
+        }
+
+        public void PlaySound(int effect, int mode, int variant)
+        {
+        }
+
+        public void Render(Span<short> interleavedStereo)
+        {
+            for (var i = 0; i + 1 < interleavedStereo.Length; i += 2)
+            {
+                interleavedStereo[i] = left;
+                interleavedStereo[i + 1] = right;
+            }
+        }
+    }
+
+    private static bool Loud(short[] buffer, int channel, int level) => Enumerable.Range(0, buffer.Length / 2).Any(i => Math.Abs(buffer[2 * i + channel]) > level);
 }

@@ -107,6 +107,34 @@ Not decided by the table (the rest of the PC's commands, in any part): the optio
 Amiga plays nothing when an option is switched), the commands the animation cues (PAN files) ask for, the commands of FINAL (the
 menus part has no Amiga effects), and the commands above 46 of the Roland driver. They have no Amiga twin.
 
+## Where the Amiga places each effect (D-680)
+
+The Amiga game's `DoSound` takes an x position, and the program (all 47 calls of its wrapper at hunk 1+0x724, through the stubs
+of hunks 7, 10, 13, 16, 22, 25, 28, 31, 37, 73 and 79) passes it as follows:
+
+* x = 160, the middle of the 320-pixel screen, at every call that has a PC twin (both sides at the same volume), and at the calls
+  with no twin (the pause beeps, the engine and teleprinter loops, the hint's blinks).
+* x = 100 at the raid's "the player is missed" (tac[4], h28+0x2756, PC command 33): a little to the left, the left voices
+  at full volume and the right voices at 39/64.
+* x = 319 and x = 0 at the car chase's two edge sounds (chase[0] and chase[1], volume 10, h16+0x250 and 0x278, drawn at random
+  in the wait loop of the offers screen: 2 in 50 for the right one, else 3 in 100 for the left one, at each pass).
+
+No call passes the position of a sound's source (a guard, a shot, a door); a sound is never placed by where it happens. The
+channels are not alternated: a side takes its first free voice (left 0 then 3, right 1 then 2), as in "The four voices" above.
+The pan table is the program's own (hunk 132+0x34b4, tested against it: `EachTwentiethOfTheScreenTakesTheVolumeOfEachSideFromTheProgramsTable`).
+
+The driver has done all of this since D-641 (`AmigaEffectRow.PanX`, `AmigaEffectsDriver.SideVolume`), so the placement is part
+of the option and no setting was added. The output is stereo; the sound card's own sound is added to it unchanged, so a mono
+sound card is heard on both channels as before and the Amiga's voices sit on top.
+
+Not reproduced: the chase's two edge sounds. They are played by no PC command, the effects slot is never told that the
+offers screen has started (its tune goes to the music slot), and the pace of the Amiga's loop is not known (a pass of that loop
+is probably one frame, which would make a passing car every third of a second).
+
+To listen to a raid: with `COVERT_AMIGA_DIR` and `COVERT_AMIGA_WAV_DIR` set,
+`AmigaEffectsFilesTests.ARaidsEffectsInOrderAreWrittenAsOneStereoWavFileWhenAskedTo` writes `raid-sequence.wav` (a door, the
+camera, a miss at x = 100, the Uzi, a guard hit, the siren, a blast, the player's hit, a door closing).
+
 ## What plays where
 
 * A command with an Amiga twin in the part's bank plays on the Amiga voices.

@@ -184,6 +184,7 @@ public sealed class AmigaEffectsDriver : ISoundDriver, IPcmSource
     {
         lock (_lock)
         {
+            // DIVERGENCE: D-680 each effect is placed left or right by the Amiga call's x (the PC plays every effect in the middle)
             // the voices the Amiga numbers 0 and 3 sound on the left, 1 and 2 on the right
             Start(ChooseVoice(0, 2, effect.Priority), effect.Left, effect, id, SideVolume(volume, x, left: true), periodOffset);
             Start(ChooseVoice(1, 3, effect.Priority), effect.Right, effect, id, SideVolume(volume, x, left: false), periodOffset);
