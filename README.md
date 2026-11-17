@@ -1,14 +1,14 @@
 # Covert Action Enhanced
 
-A rewrite of *Sid Meier's Covert Action* (MicroProse, 1990, DOS) as a native Windows program in C#, made from the
+A rewrite of *Sid Meier's Covert Action* (MicroProse, 1990, DOS) as a native Windows program in C# (and, experimental, a Linux one), made from the
 original's own code, part by part, so that it plays as the original did. You need your own copy of the game: none of its
 files come with this project, and your copy is never changed.
 
-**Status: version 1.2.** The whole game runs, from the set-up screen to the end of a career: the menus, the
+**Status: version 1.3.** The whole game runs, from the set-up screen to the end of a career: the menus, the
 briefings, the campaign, the building raids, the electronics workbench, the car chase, the cryptography workstation,
 saving and loading, the joystick and all four of the original's sound cards. Version 1.0 is the faithful version and
 stays the reference (its `release/1.0` branch and the tag `v1.0`; what it had to meet is in
-[release 1.0](csharp/docs/RELEASE-1.0.md)). Versions 1.1 to 1.2 add [player options](#player-options), all off by default: with them off,
+[release 1.0](csharp/docs/RELEASE-1.0.md)). Versions 1.1 to 1.3 add [player options](#player-options), all off by default: with them off,
 the game plays as 1.0 and the original. Its limits are in [Known limits](#known-limits).
 
 <table>
@@ -85,7 +85,12 @@ Not in the original, each off by default, on the launcher's Advanced, Cut conten
   pointing at a choice highlights it, a left click takes it, a right click is Esc. At the electronics workbench it moves
   the cursor to a chip's slot and a click swaps the chip; at the cryptography workstation a click on a letter of the
   message selects it (the replacement is typed); in a building raid the agent walks towards the pointer while the left
-  button is held and a right click is the fire button. Not in the car chase.
+  button is held and a right click is the fire button. In the car chase, with its own setting ([D-670](csharp/docs/faithfulness/DIVERGENCES.md)),
+  a click stands for one of the chase's keys: the arrow of that side of the car, the gears, switching cars, entering a
+  place, the arrest; it gives nothing the keys do not.
+* **Your own keys and the gamepad's other buttons** ([D-671, D-672](csharp/docs/faithfulness/DIVERGENCES.md), on the
+  Controls tab): any key of your keyboard can send one of the original's keys, and the gamepad's shoulders, triggers,
+  Start, Back and stick clicks can each send one; the original keys keep working.
 * **Arrow keys that walk in a building raid** ([D-610](csharp/docs/faithfulness/DIVERGENCES-INTRO.md)): the grey arrow keys
   walk the agent as the keypad does, and Shift with an arrow lunges.
 * **Music and sound effects on different sound cards** ([D-620](csharp/docs/faithfulness/DIVERGENCES-INTRO.md)), for example
@@ -96,16 +101,17 @@ Not in the original, each off by default, on the launcher's Advanced, Cut conten
 * **The Amiga version's sound effects** ([D-641](csharp/docs/faithfulness/DIVERGENCES.md), [the table](csharp/docs/AMIGA-EFFECTS.md)):
   the shots, doors, camera, aeroplane, chips and the rest of the Amiga version's effects, played from the Amiga sound
   files you own where the Amiga game has the same sound, the sound card's effects elsewhere (or silence, if you prefer).
-* **The Amiga version's pictures** ([D-642](csharp/docs/faithfulness/DIVERGENCES.md), [the list](csharp/docs/AMIGA-PICTURES.md)):
-  the faces, icons, maps, the hotel and most city pictures of the Amiga version, in its colours, read from the Amiga picture
-  files you own; a picture the Amiga redrew in another layout stays the PC's.
+* **The Amiga version's pictures and animations** ([D-642, D-681 to D-684](csharp/docs/faithfulness/DIVERGENCES.md), [the list](csharp/docs/AMIGA-PICTURES.md)):
+  the faces, icons, maps, the hotel and most city pictures of the Amiga version, in its colours, and eleven of its
+  animations, read from the Amiga files you own; a picture or animation the Amiga made in another layout stays the PC's.
+  With the captured dossier on as well, the Amiga's own unused dossier plays.
 * **Fix the original's bugs** ([D-650](csharp/docs/faithfulness/DIVERGENCES.md), [the register](docs/original-bugs.md)): the
   original's bugs that do not change the story are fixed: a clue that read "is information requires security clearance",
   the key that skips an animation staying in the keyboard buffer, the chief's comment after every capture being the
   first one's, the Delete key of the name field taking out two characters, a car chase that stops when you press F2 with
   a building not yet known, a desk drawn over a wall, "Stasi" not found in the file room, an electronics board that cannot be
   won, the pause in walking at the fast speed of a raid and a missing Hall of Fame file that kept scores from being saved.
-  A second option, **Also fix campaign-logic bugs**, is for the bugs that change the story: events that never
+  A second option, **Campaign-logic bugs**, is for the bugs that change the story: events that never
   happened (the "blueprints missing" bulletin, two receive events), the "prevented crime" ending of one crime, extra
   doors in big buildings, cast members never seen leaving a city, duplicate faces, the training ratings, the apartment
   scene, a career record that overwrites a case, the hours charged after code-breaking, a new case that could hang
@@ -168,7 +174,7 @@ data), and [cut content](docs/cut-content.md) found in the original's code and d
 
 * Only the MCGA picture. In this game the EGA, VGA and Tandy choices show the same 16 colours as the MCGA; the CGA's
   four-colour picture is not offered ([D-600](csharp/docs/faithfulness/DIVERGENCES-INTRO.md)).
-* The mouse works everywhere but the car chase (a player option, off by default).
+* In the car chase the mouse only stands for keys: there is no steering towards the pointer.
 * The joystick is tried with a real gamepad (16 November 2026: the menus and a raid play as expected), but how a real
   stick's position turns into the game's readings is still a model ([U-12](csharp/docs/faithfulness/UNCERTAIN.md)).
 * A damaged save (cut short or the wrong size) is listed as empty instead of loading into a broken campaign
