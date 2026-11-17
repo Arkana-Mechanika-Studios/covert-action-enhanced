@@ -150,7 +150,7 @@ project, not affiliated with or endorsed by MicroProse or the game's rights hold
   card or the ROMs; the controls: Keyboard and joystick, or Keyboard only), Saved games (the folder, **Change…**).
 * **Advanced**: Roland MT-32 (the ROM folder, **Change…**, found or missing with the D-20 note); Amiga music, effects and
   pictures: **Amiga files** (the folder, **Change…**, a line saying whether the music, sound effect and picture files are
-  found) with **Amiga's sounds only** (`sound.amigaOriginalOnly`) and **Amiga pictures** (Yes or No, D-642,
+  found) with **Amiga's sounds only** (`sound.amigaOriginalOnly`) and **Amiga graphics** (pictures and animations; Yes or No, D-642,
   AMIGA-PICTURES.md); Music and effects on two sound cards: **Music on** with **Test mix** and **Effects on** (each "The
   sound card", a card of its own or the Amiga's, a line saying what plays where, D-620, D-640, D-641); Fix the original's
   bugs: **Story-safe bugs** and **Campaign-logic bugs** (`fixes.originalBugs`, `fixes.campaignBugs`, D-650).
