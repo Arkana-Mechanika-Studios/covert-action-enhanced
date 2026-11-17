@@ -131,8 +131,8 @@ public sealed class AmigaPicturesTests : IDisposable
     {
         var colours = new PictureColours(new byte[3 * 256]);
         var file = AmigaPixBuilder.Make(4, 2, new byte[8], ThirtyTwoColours());
-        var source = Source(colours, ("faces.pix", file), ("ad.pix", file));
-        Assert.Null(source.Find("ad.pic", 4, 2));         // redrawn on the Amiga: not on the list
+        var source = Source(colours, ("faces.pix", file), ("camera.pix", file));
+        Assert.Null(source.Find("camera.pic", 4, 2));     // redrawn on the Amiga: not on the list
         Assert.Null(source.Find("faces.pic", 8, 2));      // another size: not the same picture
         Assert.Null(source.Find("icons.pic", 4, 2));      // the file is not there
         Assert.NotNull(source.Find("faces.pic", 4, 2));
@@ -329,7 +329,7 @@ public sealed class AmigaPicturesTests : IDisposable
     public void ThePicturesTheGamesCodeReadsBackOrRecoloursByColourNumberAreNotOnTheList()
     {
         string[] stay = ["board", "cars", "equip1", "equip1m", "ad", "camera", "gender", "training", "sneakin", "wiretap", "guys2", "guys3", "sprites", "spritesf", "bugs",
-            "geneva", "helsinki", "istanbul", "khartoum", "london", "miami", "rome", "washingt", "havana", "kingston"];
+            "geneva", "helsinki", "istanbul", "khartoum", "washingt", "havana", "kingston"];
         Assert.All(stay, name => Assert.Null(AmigaPictureList.Find(name + ".pic")));
     }
 }

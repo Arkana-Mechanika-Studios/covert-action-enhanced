@@ -89,6 +89,15 @@ public sealed class AmigaPictureSource : IPictureReplacements
             }
             picture = picture.Crop(width, height);
         }
+        if (entry.WindowWidth > 0)
+        {
+            // DIVERGENCE: D-681 the picture of the PC's measured size on the PC's canvas; a picture too small for the window stays the PC's
+            if (picture.Width < entry.WindowWidth || picture.Height < entry.WindowHeight)
+            {
+                return null;
+            }
+            picture = picture.OnCanvas(entry.WindowWidth, entry.WindowHeight, width, height, out _);
+        }
         Replaced?.Invoke(entry.Name);
         return new ReplacementPicture(width, height, DisplayPixels(picture));
     }

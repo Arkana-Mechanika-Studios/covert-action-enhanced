@@ -62,6 +62,64 @@ public sealed class AmigaPictureFile
         return new AmigaPictureFile(width, height, cropped, Colours);
     }
 
+    /// <summary>
+    /// The picture's top left part, <paramref name="windowWidth"/> by <paramref name="windowHeight"/> pixels (the size the game
+    /// measures the PC's picture to be), on a canvas of colour 0 of the size of the game's picture (D-681). The game finds a
+    /// city picture's size by walking the first row and the first column up to the first pixel of colour 0, so these two lines
+    /// are the one place of the picture it reads: inside the window a pixel of colour 0 on them (a hole in the sky, a black
+    /// edge) takes the colour of the nearest picture pixel of the line, so that the game measures the PC's size. Everything
+    /// else of the window is the Amiga's pixels as they are.
+    /// </summary>
+    /// <param name="windowWidth">The window's width; at most the picture's.</param>
+    /// <param name="windowHeight">The window's height; at most the picture's.</param>
+    /// <param name="width">The canvas's width, that of the game's picture.</param>
+    /// <param name="height">The canvas's height.</param>
+    /// <param name="adjusted">How many pixels of the first row and column had to take a neighbour's colour.</param>
+    /// <returns>The picture on its canvas, with the same colours.</returns>
+    public AmigaPictureFile OnCanvas(int windowWidth, int windowHeight, int width, int height, out int adjusted)
+    {
+        if (windowWidth <= 0 || windowHeight <= 0 || windowWidth > Width || windowHeight > Height || windowWidth > width || windowHeight > height)
+        {
+            throw new ArgumentOutOfRangeException(nameof(windowWidth), $"a window of {windowWidth} x {windowHeight} does not fit a picture of {Width} x {Height} on a canvas of {width} x {height}");
+        }
+        var canvas = new byte[width * height];
+        for (var row = 0; row < windowHeight; row++)
+        {
+            Pixels.AsSpan(row * Width, windowWidth).CopyTo(canvas.AsSpan(row * width));
+        }
+        adjusted = 0;
+        FillHoles(canvas, 0, 1, windowWidth, ref adjusted);
+        FillHoles(canvas, 0, width, windowHeight, ref adjusted);
+        return new AmigaPictureFile(width, height, canvas, Colours);
+    }
+
+    /// <summary>Gives each pixel of colour 0 on a line of the canvas the colour of the nearest pixel of the line that has one.</summary>
+    private static void FillHoles(byte[] canvas, int start, int step, int count, ref int adjusted)
+    {
+        var line = new byte[count];
+        for (var i = 0; i < count; i++)
+        {
+            line[i] = canvas[start + i * step];
+        }
+        for (var i = 0; i < count; i++)
+        {
+            if (line[i] != 0)
+            {
+                continue;
+            }
+            for (var distance = 1; distance < count; distance++)
+            {
+                var neighbour = i - distance >= 0 && line[i - distance] != 0 ? line[i - distance] : i + distance < count ? line[i + distance] : (byte)0;
+                if (neighbour != 0)
+                {
+                    canvas[start + i * step] = neighbour;
+                    adjusted++;
+                    break;
+                }
+            }
+        }
+    }
+
     /// <summary>Decodes a picture.</summary>
     /// <param name="data">The file's bytes.</param>
     /// <exception cref="InvalidDataException">The bytes are not a picture of the Amiga version, or the picture is damaged.</exception>

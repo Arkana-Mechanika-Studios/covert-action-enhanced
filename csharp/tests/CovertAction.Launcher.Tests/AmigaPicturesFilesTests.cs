@@ -20,6 +20,12 @@ public sealed class AmigaPicturesFilesTests
     /// <summary>The least score of the edge comparison (1.00: every edge of the one picture is an edge of the other) for a picture to be on the list.</summary>
     private const double LeastLayoutScore = 0.95;
 
+    /// <summary>The least score for a picture shown in a window (D-681): the Amiga's dithering differs from the PC's, so the edges agree less (1.00 for six of the nine, 0.48 for Miami whose PC sky is dithered and the Amiga's flat), and the composition was looked at.</summary>
+    private const double LeastWindowScore = 0.45;
+
+    /// <summary>The most pixels of a window's first row and column that may take a neighbour's colour so that the game measures the PC's size.</summary>
+    private const int MostAdjustedPixels = 3;
+
     private static string AmigaFolder()
     {
         var folder = Environment.GetEnvironmentVariable(FolderVariable);
@@ -109,9 +115,25 @@ public sealed class AmigaPicturesFilesTests
             {
                 amiga = amiga.Crop(own.Width, own.Height);
             }
+            if (entry.WindowWidth > 0)
+            {
+                // D-681: the picture of the PC's measured size on the PC's canvas; the few pixels the measure needed are the only ones changed
+                Assert.Equal((entry.WindowWidth, entry.WindowHeight), Measure(own.Pixels, own.Width, own.Height));
+                var window = amiga.OnCanvas(entry.WindowWidth, entry.WindowHeight, own.Width, own.Height, out var adjusted);
+                Assert.True(adjusted <= MostAdjustedPixels, $"{entry.Name}: {adjusted} pixels of the measured lines adjusted");
+                Assert.Equal(entry.WindowWidth * entry.WindowHeight - adjusted, Enumerable.Range(0, entry.WindowHeight).Sum(row => Enumerable.Range(0, entry.WindowWidth).Count(x => window.Pixels[row * own.Width + x] == amiga.Pixels[row * amiga.Width + x])));
+                Assert.All(Enumerable.Range(0, own.Height).SelectMany(row => Enumerable.Range(0, own.Width).Where(x => x >= entry.WindowWidth || row >= entry.WindowHeight).Select(x => window.Pixels[row * own.Width + x])), pixel => Assert.Equal(0, pixel));
+                var ownWindow = Cut(own.Pixels, own.Width, entry.WindowWidth, entry.WindowHeight);
+                var windowScore = EdgeOverlap(ownWindow, Cut(window.Pixels, own.Width, entry.WindowWidth, entry.WindowHeight), entry.WindowWidth, entry.WindowHeight);
+                Assert.True(windowScore >= LeastWindowScore, $"{entry.Name}: layout score {windowScore:0.00} in the window");
+                amiga = window;
+            }
             Assert.Equal((own.Width, own.Height), (amiga.Width, amiga.Height));
-            var score = EdgeOverlap(own.Pixels, amiga.Pixels, own.Width, own.Height);
-            Assert.True(score >= LeastLayoutScore, $"{entry.Name}: layout score {score:0.00}");
+            if (!entry.Backdrop && entry.WindowWidth == 0)
+            {
+                var score = EdgeOverlap(own.Pixels, amiga.Pixels, own.Width, own.Height);
+                Assert.True(score >= LeastLayoutScore, $"{entry.Name}: layout score {score:0.00}");
+            }
             if (cities.Entries.Any(city => string.Equals(city.Name, entry.Name, StringComparison.OrdinalIgnoreCase)))
             {
                 // game 00f7:3e38 load_picture_measure: the width along the first row and the height down the first column, up to the first colour 0
@@ -128,7 +150,7 @@ public sealed class AmigaPicturesFilesTests
         Skip.If(pictures is null, "no Amiga picture files");
         var game = FindGame();
         var cities = new CatArchive(game.Read("CITIES.CAT"));
-        foreach (var name in new[] { "ad", "camera", "gender", "training", "sneakin", "wiretap", "geneva", "helsinki", "istanbul", "london", "miami", "rome", "washingt" })
+        foreach (var name in new[] { "ad", "camera", "gender", "training", "sneakin", "wiretap", "geneva", "helsinki", "istanbul", "washingt" })
         {
             var own = PcPicture(game, cities, name + ".pic");
             var amiga = AmigaPictureFile.Read(File.ReadAllBytes(AmigaFolderSearch.BankFile(pictures!, name + ".pix")!));
@@ -160,21 +182,24 @@ public sealed class AmigaPicturesFilesTests
         var source = AmigaPictureSource.Open(graphics.PictureColours, pictures, game.Path, _ => { });
         Assert.NotNull(source);
         var loader = new LibraryPictures(new Boundaries(graphics, new SilentSoundDriver(), new KeyboardDriver(link), new NoMouseDriver(), new GameTimer(link), files, source));
+        var gameLoader = new LibraryPictures(new Boundaries(graphics, new SilentSoundDriver(), new KeyboardDriver(link), new NoMouseDriver(), new GameTimer(link), files));
         graphics.SubCode0208(0);
         Assert.True(loader.OpenArchive("CITIES.CAT"));
+        Assert.True(gameLoader.OpenArchive("CITIES.CAT"));
         Directory.CreateDirectory(screens!);
         const int backPage = 1, cornerX = 0xf0, cornerY = 0x8c;
-        foreach (var entry in AmigaPictureList.Entries)
+        // each picture twice: as the Amiga's replacement shows (picture-name.png) and as the game's own shows (picture-name-pc.png), for looking at side by side
+        void Show(LibraryPictures pictureLoader, AmigaPictureEntry entry, string suffix)
         {
             graphics.FillPage(0, 0);
             graphics.FillPage(backPage, 0);
             if (cities.Entries.All(city => !string.Equals(city.Name, entry.Name, StringComparison.OrdinalIgnoreCase)))
             {
-                loader.LoadPicture(0, entry.Name);
+                pictureLoader.LoadPicture(0, entry.Name);
             }
             else
             {
-                loader.LoadPicture(backPage, entry.Name);
+                pictureLoader.LoadPicture(backPage, entry.Name);
                 // game 00f7:3e38 and 00f7:3cfd: the picture is measured, and its measured part is put centred on the corner's place
                 var (width, height) = Measure(graphics.Pages[backPage], McgaGraphicsDriver.Width, McgaGraphicsDriver.Height);
                 for (var row = 0; row < height; row++)
@@ -182,7 +207,12 @@ public sealed class AmigaPicturesFilesTests
                     Array.Copy(graphics.Pages[backPage], row * McgaGraphicsDriver.Width, graphics.Pages[0], (cornerY - height / 2 + row) * McgaGraphicsDriver.Width + cornerX - width / 2, width);
                 }
             }
-            File.WriteAllBytes(Path.Combine(screens!, $"picture-{entry.Name[..^4]}.png"), PngFile.Screen(graphics.Screen, graphics.Palette));
+            File.WriteAllBytes(Path.Combine(screens!, $"picture-{entry.Name[..^4]}{suffix}.png"), PngFile.Screen(graphics.Screen, graphics.Palette));
+        }
+        foreach (var entry in AmigaPictureList.Entries)
+        {
+            Show(loader, entry, "");
+            Show(gameLoader, entry, "-pc");
         }
     }
 
@@ -212,6 +242,16 @@ public sealed class AmigaPicturesFilesTests
             }
         }
         return either == 0 ? 1 : (double)both / either;
+    }
+
+    private static byte[] Cut(byte[] pixels, int width, int cutWidth, int cutHeight)
+    {
+        var cut = new byte[cutWidth * cutHeight];
+        for (var row = 0; row < cutHeight; row++)
+        {
+            Array.Copy(pixels, row * width, cut, row * cutWidth, cutWidth);
+        }
+        return cut;
     }
 
     private const int WidestThumbnail = 0xa0, HighestThumbnail = 0x64;

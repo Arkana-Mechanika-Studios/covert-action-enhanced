@@ -110,6 +110,28 @@ A picture is replaced only when it is on `Launcher.AmigaPictureList`, one by one
 | the Amiga-only pictures (`bchback`, `casback`, `lauback`, `offback`, `disk`, `setupscr`, `titlesnew`, `chase2`, `samerica`) | no place in the PC game |
 | all animations (`.pan`) | another container; they stay the PC's |
 
+## The second round (version 1.3, D-681 onward)
+
+The first list kept to pictures whose layout is the PC's as they stand. A second look at the pictures listed above as not
+replaced (`build/amiga-study2/`, each compared with the PC's by eye, in the game's own palette) shows that several are the
+same picture on another canvas, or a picture the game puts on the screen whole, so that they can be shown where the game's
+layout allows, with every spot the game reads kept the PC's. Each group is one commit and one register entry; each picture was
+written side by side with the PC's (`AmigaPicturesFilesTests.EveryPictureOfTheListIsWrittenAsAPngWhenAskedTo` now writes
+`picture-<name>.png` and `picture-<name>-pc.png`; the pairs were put together in `build/amiga-study2/pictures/`, not committed)
+and approved by eye.
+
+### Cities in a window (D-681)
+
+`paris`, `moscow`, `berlin`, `amsterda`, `baghdad`, `riyadh`, `london`, `miami`, `rome`. The Amiga's picture is the PC's view
+(the same composition in the Amiga's dithering and colours); what differed was only what the campaign measures
+(`load_picture_measure`: the first row and column up to the first colour 0). The picture is shown in a window of the size the
+game measures the PC's picture to be, on a canvas of colour 0; a pixel of colour 0 on the first row or column inside the window
+(a hole in the sky, a black edge: up to three pixels) takes the colour of the nearest picture pixel on that line, so the game
+measures exactly the PC's size and frames, cuts and places it as the PC's. The Amiga's strip beyond the window is not shown (the
+game would not copy it). Left out: `geneva`, `helsinki`, `istanbul`, `khartoum`, `havana`, `kingston` (the Amiga's picture is the
+same view without the PC's 12 leftmost columns, so the PC's frame would hold a black strip or another view) and `washingt` (a
+repainted picture: other trees and sky).
+
 ## Without the files
 
 The folder is the one named in the launcher, else `amiga/files` (or `amiga`) next to the program, else next to the game folder

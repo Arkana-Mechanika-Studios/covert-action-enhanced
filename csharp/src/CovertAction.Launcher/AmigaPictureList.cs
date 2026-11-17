@@ -5,7 +5,10 @@ namespace CovertAction.Launcher;
 /// <param name="File">The Amiga version's picture in the player's Amiga files ("faces.pix").</param>
 /// <param name="Reason">Why this picture may be replaced: what was checked, and how the game uses its pixels.</param>
 /// <param name="Crop">The Amiga's picture is a full-screen canvas with the picture at its top left; the part the size of the game's picture is used.</param>
-public sealed record AmigaPictureEntry(string Name, string File, string Reason, bool Crop = false);
+/// <param name="Backdrop">The game puts the picture on the screen as a whole and reads nothing back from it (no sheet to cut from, nothing recoloured): the Amiga's own composition shows, and its layout is not compared with the PC's.</param>
+/// <param name="WindowWidth">For a city picture the game measures (D-681): the width the game measures the PC's picture to be; the Amiga's picture is used up to it (0: not a window).</param>
+/// <param name="WindowHeight">The height the game measures the PC's picture to be.</param>
+public sealed record AmigaPictureEntry(string Name, string File, string Reason, bool Crop = false, bool Backdrop = false, int WindowWidth = 0, int WindowHeight = 0);
 
 /// <summary>
 /// The pictures the Amiga pictures option replaces, one by one, each with the reason (D-642; new code, outside the game).
@@ -38,6 +41,7 @@ public static class AmigaPictureList
     private const string Icons = "the same icons on the same grid (score 0.96); index 0 is the see-through colour in both";
     private const string Map = "the same map, the cities' dots and menu drawn over it (score 1.00)";
     private const string City = "the city's picture on the same layout (score at least 0.95): the picture at the top left of the canvas, colour 0 outside it, and the game's measure of its width and height (along the first row and the first column up to the first colour 0) gives the same numbers as for the PC's picture";
+    private const string Windowed = "the same picture of the city as the PC's (the same composition, the Amiga's own dithering and colours) on the same canvas: the game measures the PC's picture along its first row and column, and the Amiga's is used up to that size, the pixels of those two lines that are colour 0 taking the colour of their neighbour on the line (D-681), so the game measures, frames and cuts it as it does the PC's";
     private const string Thumbnail = "the PC's thumbnail is the top left of the Amiga's full-screen canvas, the same picture (score at least 0.98 when cut to the PC's size)";
 
     /// <summary>The city pictures of the same layout whose measure the game gets the same: 15 of the 29 whose PC picture fills the screen's size.</summary>
@@ -45,6 +49,13 @@ public static class AmigaPictureList
     private static readonly string[] CityNames =
     [
         "vienna", "athens", "telaviv", "madrid", "belgrade", "budapest", "prague", "cairo", "amman", "beirut", "tripoli", "damascus", "tehran", "bogota", "nassau",
+    ];
+
+    /// <summary>The cities of the same composition whose measure the game gets right only inside the PC's size (D-681), with that size as the game measures the PC's picture.</summary>
+    private static readonly (string City, int Width, int Height)[] WindowedCities =
+    [
+        ("paris", 82, 89), ("moscow", 88, 84), ("berlin", 80, 64), ("amsterda", 112, 56), ("baghdad", 112, 64), ("riyadh", 96, 48),
+        ("london", 54, 96), ("miami", 104, 64), ("rome", 80, 52),
     ];
 
     /// <summary>The cities whose PC picture is a thumbnail the size of the picture: the Amiga's is that thumbnail at the top left of a full canvas.</summary>
@@ -64,6 +75,7 @@ public static class AmigaPictureList
         new("street.pic", "street.pix", "the car chase's windscreen views (score 0.96): copied to the windscreen as they are, and the game recolours only the dashboard"),
         .. CityNames.Select(city => new AmigaPictureEntry($"{city}.pic", $"{city}.pix", City)),
         .. ThumbnailNames.Select(city => new AmigaPictureEntry($"{city}.pic", $"{city}.pix", Thumbnail, Crop: true)),
+        .. WindowedCities.Select(city => new AmigaPictureEntry($"{city.City}.pic", $"{city.City}.pix", Windowed, WindowWidth: city.Width, WindowHeight: city.Height)),
     ];
 
     /// <summary>The entry for a picture file name of the game (compared without regard to letter case); null when the picture stays the PC's.</summary>
