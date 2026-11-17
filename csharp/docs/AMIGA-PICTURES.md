@@ -194,6 +194,20 @@ the jail scene) and does not begin by setting the variable to -1 as the PC's scr
 for a woman, are in `build/amiga-study2/animations/captrd01-man.png` and `captrd01-woman.png` (not committed). The page shows the
 Amiga's placeholder faces; neither version draws the captured person's own.
 
+## The third round (D-685 onward)
+
+The rule decided with the user: a picture is added only if **every pixel shown is a pixel the Amiga drew, in the colour it drew it**.
+Moving whole regions and renumbering colour indices are allowed; drawing, cropping into missing areas and mixing the PC's and the
+Amiga's artwork are not. Each picture added has a side by side PNG (the PC's, then the Amiga's as the game shows it) in
+`build/amiga-study2/pictures/`, named after the picture (not committed). Added so far, and what stays out:
+
+### The choice of agent, halves exchanged (D-685)
+
+`gender`. The Amiga's picture has the woman on the left and the man on the right, the reverse of the game's Max and Maxine. The two
+halves are exchanged (`AmigaPictureFile.SwapHalves`, `AmigaPictureEntry.Arrange`): a permutation of whole columns, so no pixel is
+new. The Amiga's gradient between the two portraits is cut at its middle by the exchange and lies at the two edges of the screen.
+The game shows the picture whole and reads none of it (`Backdrop`).
+
 ## Without the files
 
 The folder is the one named in the launcher, else `amiga/files` (or `amiga`) next to the program, else next to the game folder

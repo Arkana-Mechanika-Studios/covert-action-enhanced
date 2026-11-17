@@ -1,3 +1,5 @@
+using CovertAction.Content;
+
 namespace CovertAction.Launcher;
 
 /// <summary>One picture of the game that the Amiga pictures option may replace (D-642).</summary>
@@ -8,7 +10,8 @@ namespace CovertAction.Launcher;
 /// <param name="Backdrop">The game puts the picture on the screen as a whole and reads nothing back from it (no sheet to cut from, nothing recoloured): the Amiga's own composition shows, and its layout is not compared with the PC's.</param>
 /// <param name="WindowWidth">For a city picture the game measures (D-681): the width the game measures the PC's picture to be; the Amiga's picture is used up to it (0: not a window).</param>
 /// <param name="WindowHeight">The height the game measures the PC's picture to be.</param>
-public sealed record AmigaPictureEntry(string Name, string File, string Reason, bool Crop = false, bool Backdrop = false, int WindowWidth = 0, int WindowHeight = 0);
+/// <param name="Arrange">Whole regions of the Amiga's picture moved to where the game's layout has them (D-685): a pure rearrangement of the Amiga's own pixels, applied first; null: none.</param>
+public sealed record AmigaPictureEntry(string Name, string File, string Reason, bool Crop = false, bool Backdrop = false, int WindowWidth = 0, int WindowHeight = 0, Func<AmigaPictureFile, AmigaPictureFile>? Arrange = null);
 
 /// <summary>
 /// The pictures the Amiga pictures option replaces, one by one, each with the reason (D-642; new code, outside the game).
@@ -20,7 +23,7 @@ public sealed record AmigaPictureEntry(string Name, string File, string Reason, 
 /// </summary>
 /// <remarks>
 /// <para>
-/// Not on the list, and why: <c>ad</c>, <c>camera</c>, <c>gender</c>, <c>training</c>, <c>sneakin</c>, <c>wiretap</c>,
+/// Not on the list, and why: <c>ad</c>, <c>camera</c>, <c>training</c>, <c>sneakin</c>, <c>wiretap</c>,
 /// <c>guysnew2</c> and <c>guysnew3</c> are redrawn (different art or layout: the game's rectangles would cut the wrong
 /// parts); <c>sprites</c> and <c>spritesf</c> are redrawn with 16 colours (the raid's guards, cell by cell not the same) and
 /// the game recolours their wall colour; <c>bugs</c> (the electronics workbench's pieces) differs in layout; the cities
@@ -79,6 +82,8 @@ public static class AmigaPictureList
         new("sneakin.pic", "sneakin.pix", "the picture of the break-in (D-682): loaded on a page and dissolved onto the screen whole, with nothing drawn over it and no pixel read back; the Amiga's composition (the same hands at the door, placed further right) shows as it is", Backdrop: true),
         new("ad.pic", "ad.pix", "the picture shown when the player leaves the game (D-682): loaded on the screen whole while the game waits for a key; the Amiga's own advertisement shows", Backdrop: true),
         new("training.pic", "training.pix", "the training screen's backdrop (D-682): the four skills' cells at the PC's places (the game's menu is drawn at the top over the empty part and its rating boxes over the black strips under the cells); no pixel is read back and the menu recolours only its own colours", Backdrop: true),
+        // DIVERGENCE: D-685 the Amiga's menu picture has the woman on the left and the man on the right: its halves are exchanged
+        new("gender.pic", "gender.pix", "the choice of agent (D-685): the Amiga's picture shows the woman on the left and the man on the right, the reverse of the game's Max and Maxine; its two halves are exchanged (nothing is drawn: every pixel is the Amiga's, in its colour), and the game puts it on the screen whole and reads no pixel", Backdrop: true, Arrange: picture => picture.SwapHalves()),
         .. WindowedCities.Select(city => new AmigaPictureEntry($"{city.City}.pic", $"{city.City}.pix", Windowed, WindowWidth: city.Width, WindowHeight: city.Height)),
     ];
 

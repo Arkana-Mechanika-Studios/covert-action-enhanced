@@ -93,6 +93,30 @@ public sealed class AmigaPictureFile
         return new AmigaPictureFile(width, height, canvas, Colours);
     }
 
+    /// <summary>
+    /// The picture with its left half and its right half exchanged (D-685): every row's first <c>Width / 2</c> pixels and its last
+    /// <c>Width / 2</c> pixels change places. A pure permutation of whole columns, so every pixel of the result is a pixel of the
+    /// picture in its own colour, and the two pixels that meet at the middle were the picture's own ends, side by side in the
+    /// picture's wrap.
+    /// </summary>
+    /// <returns>The picture with its halves exchanged, with the same colours.</returns>
+    /// <exception cref="InvalidOperationException">The width is odd: there are no two halves.</exception>
+    public AmigaPictureFile SwapHalves()
+    {
+        if (Width % 2 != 0)
+        {
+            throw new InvalidOperationException($"a picture {Width} pixels wide has no two halves");
+        }
+        var half = Width / 2;
+        var swapped = new byte[Pixels.Length];
+        for (var row = 0; row < Height; row++)
+        {
+            Pixels.AsSpan(row * Width, half).CopyTo(swapped.AsSpan(row * Width + half));
+            Pixels.AsSpan(row * Width + half, half).CopyTo(swapped.AsSpan(row * Width));
+        }
+        return new AmigaPictureFile(Width, Height, swapped, Colours);
+    }
+
     /// <summary>Gives each pixel of colour 0 on a line of the canvas the colour of the nearest pixel of the line that has one.</summary>
     private static void FillHoles(byte[] canvas, int start, int step, int count, ref int adjusted)
     {

@@ -150,12 +150,53 @@ public sealed class AmigaPicturesFilesTests
         Skip.If(pictures is null, "no Amiga picture files");
         var game = FindGame();
         var cities = new CatArchive(game.Read("CITIES.CAT"));
-        foreach (var name in new[] { "camera", "gender", "wiretap", "geneva", "helsinki", "istanbul", "washingt" })
+        foreach (var name in new[] { "camera", "wiretap", "geneva", "helsinki", "istanbul", "washingt" })
         {
             var own = PcPicture(game, cities, name + ".pic");
             var amiga = AmigaPictureFile.Read(File.ReadAllBytes(AmigaFolderSearch.BankFile(pictures!, name + ".pix")!));
             Assert.True(EdgeOverlap(own.Pixels, amiga.Pixels, own.Width, own.Height) < LeastLayoutScore, name);
         }
+    }
+
+    /// <summary>
+    /// D-685: the Amiga's choice-of-agent picture has the woman on the left and the man on the right, the PC's the reverse (Max
+    /// on the left in the blue panel, Maxine on the right in the red one). The replacement is the Amiga's two halves exchanged:
+    /// every pixel the Amiga's, in the Amiga's colour, and the woman (her red background) now on the right.
+    /// </summary>
+    [SkippableFact]
+    public void TheAgentsPictureShowsTheManOnTheLeftAndTheWomanOnTheRightWithEveryPixelTheAmigas()
+    {
+        var pictures = AmigaFolderSearch.ResolvePictures(AmigaFolder());
+        Skip.If(pictures is null, "no Amiga picture files");
+        var game = FindGame();
+        var cities = new CatArchive(game.Read("CITIES.CAT"));
+        var own = PcPicture(game, cities, "gender.pic");
+        var amiga = AmigaPictureFile.Read(File.ReadAllBytes(AmigaFolderSearch.BankFile(pictures!, "gender.pix")!));
+        Assert.Equal((own.Width, own.Height), (amiga.Width, amiga.Height));
+        var colours = new PictureColours(new byte[3 * 256]);
+        var source = AmigaPictureSource.Open(colours, pictures, "", _ => { });
+        var shown = source!.Find("gender.pic", own.Width, own.Height)!.Value.Pixels;
+        var expected = source.DisplayPixels(amiga.SwapHalves());
+        Assert.Equal(expected, shown);
+        var half = amiga.Width / 2;
+        // the swap is exact: each row is the Amiga's right half then its left half, and no colour is new
+        for (var row = 0; row < amiga.Height; row++)
+        {
+            var amigaRow = amiga.Pixels.AsSpan(row * amiga.Width, amiga.Width);
+            var shownRow = shown.AsSpan(row * amiga.Width, amiga.Width);
+            var direct = source.DisplayPixels(amiga);
+            Assert.True(direct.AsSpan(row * amiga.Width + half, half).SequenceEqual(shownRow[..half]), $"row {row} left");
+            Assert.True(direct.AsSpan(row * amiga.Width, half).SequenceEqual(shownRow[half..]), $"row {row} right");
+            Assert.True(amigaRow.Length == shownRow.Length);
+        }
+        // the woman's panel is the one of the Amiga's red background (colour 0xf00): on the Amiga's left, on the shown picture's right
+        var red = Array.IndexOf(amiga.Colours, (ushort)0xf00);
+        Assert.True(red >= 0);
+        int RedIn(byte[] pixels, int from) => Enumerable.Range(0, amiga.Height).Sum(row => Enumerable.Range(from, half).Count(x => pixels[row * amiga.Width + x] == red));
+        Assert.True(RedIn(amiga.Pixels, 0) > 4 * RedIn(amiga.Pixels, half));
+        Assert.True(RedIn(amiga.SwapHalves().Pixels, half) > 4 * RedIn(amiga.SwapHalves().Pixels, 0));
+        // the PC's woman (the game's red, colour 4) is on its right
+        Assert.True(Enumerable.Range(0, own.Height).Sum(row => Enumerable.Range(half, half).Count(x => own.Pixels[row * own.Width + x] == 4)) > 4 * Enumerable.Range(0, own.Height).Sum(row => Enumerable.Range(0, half).Count(x => own.Pixels[row * own.Width + x] == 4)));
     }
 
     /// <summary>Where the tool below writes the pictures (outside the repository); unset: none are written.</summary>

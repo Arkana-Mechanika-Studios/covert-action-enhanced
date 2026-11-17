@@ -82,6 +82,11 @@ public sealed class AmigaPictureSource : IPictureReplacements, IAnimationReplace
         {
             return null;
         }
+        if (entry.Arrange is not null && picture.Width == width && picture.Height == height)
+        {
+            // DIVERGENCE: D-685 whole regions of the Amiga's picture moved where the game's layout has them
+            picture = entry.Arrange(picture);
+        }
         if (picture.Width != width || picture.Height != height)
         {
             // a canvas bigger than the game's picture holds it at its top left (the thumbnails); any other size is another picture

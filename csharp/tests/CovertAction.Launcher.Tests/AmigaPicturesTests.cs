@@ -89,6 +89,32 @@ public sealed class AmigaPicturesTests : IDisposable
         Assert.Throws<ArgumentOutOfRangeException>(() => picture.Crop(5, 2));
     }
 
+    [Fact]
+    public void SwappingTheHalvesIsAPermutationOfWholeColumnsAndSwappingTwiceGivesTheOriginal()
+    {
+        byte[] pixels = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
+        var picture = AmigaPictureFile.Read(AmigaPixBuilder.Make(4, 3, pixels, ThirtyTwoColours()));
+        var swapped = picture.SwapHalves();
+        Assert.Equal((4, 3), (swapped.Width, swapped.Height));
+        Assert.Equal(new byte[] { 3, 4, 1, 2, 7, 8, 5, 6, 11, 12, 9, 10 }, swapped.Pixels);
+        Assert.Same(picture.Colours, swapped.Colours);
+        Assert.Equal(pixels, swapped.SwapHalves().Pixels);
+        Assert.Throws<InvalidOperationException>(() => AmigaPictureFile.Read(AmigaPixBuilder.Make(3, 1, [1, 2, 3], ThirtyTwoColours())).SwapHalves());
+    }
+
+    [Fact]
+    public void TheMenuPictureOfTheAgentsShowsTheAmigasHalvesExchangedAndOnlyWhenTheFileIsThere()
+    {
+        var colours = new PictureColours(new byte[3 * 256]);
+        byte[] pixels = [1, 2, 3, 4, 5, 6, 7, 8];
+        var source = Source(colours, ("gender.pix", AmigaPixBuilder.Make(4, 2, pixels, ThirtyTwoColours())));
+        var replacement = source.Find("gender.pic", 4, 2);
+        Assert.NotNull(replacement);
+        // the display colours are given in order of first appearance of the swapped picture: 3, 4, 1, 2, 7, 8, 5, 6
+        Assert.Equal(new byte[] { 128, 129, 130, 131, 132, 133, 134, 135 }, replacement.Value.Pixels);
+        Assert.Null(source.Find("gender.pic", 8, 2));
+    }
+
     // the replacement of a picture
 
     private static AmigaPictureSource Source(PictureColours colours, params (string File, byte[] Bytes)[] files)
@@ -328,7 +354,7 @@ public sealed class AmigaPicturesTests : IDisposable
     [Fact]
     public void ThePicturesTheGamesCodeReadsBackOrRecoloursByColourNumberAreNotOnTheList()
     {
-        string[] stay = ["board", "cars", "equip1", "equip1m", "camera", "gender", "wiretap", "guys2", "guys3", "sprites", "spritesf", "bugs",
+        string[] stay = ["board", "cars", "equip1", "equip1m", "camera", "wiretap", "guys2", "guys3", "sprites", "spritesf", "bugs",
             "geneva", "helsinki", "istanbul", "khartoum", "washingt", "havana", "kingston"];
         Assert.All(stay, name => Assert.Null(AmigaPictureList.Find(name + ".pic")));
     }
