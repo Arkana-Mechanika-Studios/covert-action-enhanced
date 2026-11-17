@@ -37,7 +37,7 @@ the pictures), the re-check of the 41 dead functions (6), the sound commands (7)
 | ID | Title | Kind | Confidence | Status |
 |---|---|---|---|---|
 | CC-1 | CAPTRD01.PAN, an animation no program names ("CAPTURED" stamp on a dossier photo) | unused asset | confirmed | player option (D-660) |
-| CC-2 | CHASE's stand-alone mode (`campaign_mode`, "Loc<n>" labels, random start and goal) | dormant mode | confirmed | open |
+| CC-2 | CHASE's stand-alone mode (`campaign_mode`, "Loc<n>" labels, random start and goal) | dormant mode | confirmed | player option (D-661) |
 | CC-3 | Module code 5: a second CHASE mode (arrest-only) that nothing starts | dormant mode | confirmed | open |
 | CC-4 | Module code 0x63: `mcv.exe cv /2 <module>` (CA-2) | dormant mode | confirmed | open |
 | CC-5 | Plots built for six variants (and a seventh in Max's apartment); three shipped | cut variants | confirmed (reserved slots); likely (cut) | open |
@@ -131,6 +131,14 @@ update. Not yet done.
 
 **Related.** `csharp/docs/faithfulness`: none; CA-4 (`check_location_entry`).
 
+**Player option (D-661, `cutContent.standaloneChase`, off by default).** The practice menu (main menu, Practice, the level)
+has a fifth line, "Free Chase", which starts the driving practice's hand-off and runs CHASE with `campaign_mode` clear. Played:
+a new random map on each start, `Loc1`..`Loc15` on the map (all 15 dotted), a random start and goal, no hand-off written.
+Verified by rendering it (the map shows the labels) and by `CutContentChaseTests`. One adaptation: the F2 "enter the
+building" test, which in the original's own non-campaign arm still reads the city's known organisations, takes every place as
+known, so the places the map shows can be entered; the F2 leaves the chase as an "enter the building" in a practice does.
+The only new text is the name of the menu line.
+
 ## CC-3 Module code 5, a second CHASE mode
 
 **What it is.** The launcher's module table names `chase.exe` for codes 3, 5, 6 and 0x0e. Code 6 is "you are followed"
@@ -153,6 +161,10 @@ arrest (line 129).
 the chase should end with no "lost track" text. Not yet done.
 
 **Related.** CC-1, CC-4, the reconstructed `state.h` (module codes).
+
+**Not offered (decided with D-661).** The code 5 plays as a tail with no closing text for losing or being spotted (the C
+makes the texts only for the tail and the flee), so a chase that ends so shows an empty box, and only an arrest has its
+text: nothing in it says what the mode was for, and it would need text written for it. Left as the original has it.
 
 ## CC-4 Module code 0x63 (`mcv.exe`)
 

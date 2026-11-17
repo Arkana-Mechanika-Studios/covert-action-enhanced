@@ -71,7 +71,8 @@ public sealed partial class CarChase
         // DIVERGENCE: D-2 the original attaches the graphics, input and sound drivers here (attach_driver_segment three times).
 
         LoadSheets();
-        state.CampaignMode = true;
+        // DIVERGENCE: D-661 the original sets the campaign flag here unconditionally (CC-2); the stand-alone chase, a player's option, leaves it clear
+        state.CampaignMode = !Standalone;
         state.RandomSeed = LibraryRandom.SeedRandom(state.Random, _world.Timer);
         _world.Graphics.SetPalette(state.PaletteChase);
         if (state.ChaseMode != ChaseMode.Flee)

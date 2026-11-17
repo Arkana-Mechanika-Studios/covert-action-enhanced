@@ -118,6 +118,7 @@ internal sealed class LauncherScreen
         FixOriginalBugs,
         FixCampaignBugs,
         CutCapturedDossier,
+        CutStandaloneChase,
         TabGeneral,
         TabAdvanced,
         TabCutContent,
@@ -169,14 +170,14 @@ internal sealed class LauncherScreen
     /// <summary>A sound test is playing: the launcher draws again now and then to show its status.</summary>
     public bool Animating => _context.SoundTest is { Playing: true };
 
-    private static bool OnCutContent(Item item) => item is Item.CutCapturedDossier;
+    private static bool OnCutContent(Item item) => item is Item.CutCapturedDossier or Item.CutStandaloneChase;
 
     private bool OnAdvanced(Item item) => item is Item.Roms or Item.RomsChange or Item.AmigaFiles or Item.AmigaChange or Item.AmigaOriginalOnly or Item.AmigaPictures or Item.KeyRepeat or Item.ArrowKeysWalk or Item.Music or Item.MixTest or Item.Effects or Item.Mouse or Item.FixOriginalBugs or Item.FixCampaignBugs;
 
     // Tab and the arrows go through General's rows, then Advanced's (its tab opens), then the buttons
     private IEnumerable<Item> Order =>
         new[] { Item.GameFolder, Item.GameChange, Item.Window, Item.Fullscreen, Item.Scaling, Item.Sound, Item.Test, Item.Controls, Item.Saves, Item.SavesChange,
-            Item.Roms, Item.RomsChange, Item.AmigaFiles, Item.AmigaChange, Item.AmigaOriginalOnly, Item.AmigaPictures, Item.KeyRepeat, Item.ArrowKeysWalk, Item.Music, Item.MixTest, Item.Effects, Item.Mouse, Item.FixOriginalBugs, Item.FixCampaignBugs, Item.CutCapturedDossier, Item.Save, Item.Play }
+            Item.Roms, Item.RomsChange, Item.AmigaFiles, Item.AmigaChange, Item.AmigaOriginalOnly, Item.AmigaPictures, Item.KeyRepeat, Item.ArrowKeysWalk, Item.Music, Item.MixTest, Item.Effects, Item.Mouse, Item.FixOriginalBugs, Item.FixCampaignBugs, Item.CutCapturedDossier, Item.CutStandaloneChase, Item.Save, Item.Play }
             .Where(i => i is not (Item.Test or Item.MixTest) || _context.SoundTest is not null);
 
     /// <summary>Handles one input; returns the player's choice when the launcher should end.</summary>
@@ -232,7 +233,7 @@ internal sealed class LauncherScreen
 
     private static bool IsButton(Item item) => item is Item.GameChange or Item.SavesChange or Item.RomsChange or Item.AmigaChange or Item.Test or Item.MixTest or Item.Save or Item.Play;
 
-    private static bool IsSelect(Item item) => item is Item.Window or Item.Fullscreen or Item.Scaling or Item.Sound or Item.Controls or Item.AmigaOriginalOnly or Item.AmigaPictures or Item.KeyRepeat or Item.ArrowKeysWalk or Item.Music or Item.Effects or Item.Mouse or Item.FixOriginalBugs or Item.FixCampaignBugs or Item.CutCapturedDossier;
+    private static bool IsSelect(Item item) => item is Item.Window or Item.Fullscreen or Item.Scaling or Item.Sound or Item.Controls or Item.AmigaOriginalOnly or Item.AmigaPictures or Item.KeyRepeat or Item.ArrowKeysWalk or Item.Music or Item.Effects or Item.Mouse or Item.FixOriginalBugs or Item.FixCampaignBugs or Item.CutCapturedDossier or Item.CutStandaloneChase;
 
     private LauncherChoice? Key(KeyPressed key)
     {
@@ -313,6 +314,7 @@ internal sealed class LauncherScreen
         Item.Effects => "sound.effects",
         Item.Mouse => "input.mouse",
         Item.CutCapturedDossier => "cutContent.capturedDossier",
+        Item.CutStandaloneChase => "cutContent.standaloneChase",
         Item.FixOriginalBugs => "fixes.originalBugs",
         Item.FixCampaignBugs => "fixes.campaignBugs",
         _ => null,
@@ -414,6 +416,9 @@ internal sealed class LauncherScreen
                 break;
             case Item.CutCapturedDossier:
                 _model.CutCapturedDossier = !_model.CutCapturedDossier;
+                break;
+            case Item.CutStandaloneChase:
+                _model.CutStandaloneChase = !_model.CutStandaloneChase;
                 break;
             case Item.FixOriginalBugs:
                 _model.FixOriginalBugs = !_model.FixOriginalBugs;
@@ -864,6 +869,7 @@ internal sealed class LauncherScreen
             y = Section("The original's cut content", y);
             y = Status(y, ("Not in the original: its own files hold these, its programs never use them. All off by default.", Note));
             y = Select(y, "Captured dossier", _model.CutCapturedDossier ? "Yes" : "No", Item.CutCapturedDossier);
+            y = Select(y, "Free car chase", _model.CutStandaloneChase ? "Yes" : "No", Item.CutStandaloneChase);
         }
         else if (!_advanced)
         {
@@ -1132,6 +1138,7 @@ internal sealed class LauncherScreen
             Item.FixOriginalBugs => "Not in the original. Yes: the original's bugs that do not change the story are fixed (a clue's text, a key left in the buffer, the Delete key of the name field, the chief's comment after a capture, the Tandy driver's second pause, and others the release notes list). A game saved this way loads in the original. No (the default): the original as it was played in 1990." + fixedNote,
             Item.FixCampaignBugs => "Not in the original. Yes: also the bugs of the campaign's logic are fixed; this changes the story's events. No (the default): as the original." + fixedNote,
             Item.CutCapturedDossier => "Not in the original (D-660). Yes: when a cast member is captured, the dossier page stamped CAPTURED that the game ships (CAPTRD01.PAN) is shown after the arrest, before the chief's comment, with the photograph of a man or of a woman. No (the default): as the original, which never plays it." + fixedNote,
+            Item.CutStandaloneChase => "Not in the original (D-661). Yes: the practice menu has a fifth choice, \"Free Chase\": the car chase on its own, as the game's chase program still carries it: a new random map every time, the places labelled Loc1, Loc2 and so on, a random start and goal, and every place shown and open to enter with F2. It stays in practice: nothing is handed to a campaign. No (the default): the four practice skills of the original." + fixedNote,
             Item.TabGeneral or Item.TabAdvanced or Item.TabCutContent => "General: the game, the display, the sound card, the controls and the saves. Advanced: the MT-32 ROMs, the Amiga files, the keyboard and the player options. Cut content: scenes and modes the original's files hold and its programs never reach. Everything of Advanced and Cut content is off by default and not in the original. Ctrl+Tab goes to the next tab.",
             Item.Save => _context.SettingsPath is { } path ? $"Saves the settings into {path} and closes. Esc and the window's close button save too." : "Closes (no settings file can be written here: the changes are lost).",
             Item.Play => _model.CanPlay ? "Saves the settings and starts the game." : "Choose the folder of your copy of the game first.",

@@ -102,6 +102,9 @@ internal sealed class GameSettings
     /// <summary>The captured cast member's dossier, CAPTRD01.PAN, plays after an arrest (cutContent.capturedDossier, D-660; not in the original, off by default).</summary>
     public bool? CutCapturedDossier { get; set; }
 
+    /// <summary>The practice menu offers the car chase on its own (cutContent.standaloneChase, D-661; not in the original, off by default).</summary>
+    public bool? CutStandaloneChase { get; set; }
+
     /// <summary>A copy (a change to it leaves this one as it is).</summary>
     public GameSettings Copy() => (GameSettings)MemberwiseClone();
 

@@ -6,7 +6,8 @@ namespace CovertAction.Core;
 /// original (<see cref="OriginalBehaviour.CutContent"/>).
 /// </summary>
 /// <param name="CapturedDossier">CC-1, CC-19 (settings key cutContent.capturedDossier, D-660): the animation CAPTRD01.PAN, a dossier page stamped CAPTURED, plays when a cast member is captured.</param>
-public sealed record CutContentOptions(bool CapturedDossier = false)
+/// <param name="StandaloneChase">CC-2 (settings key cutContent.standaloneChase, D-661): the practice menu offers the car chase on its own, the mode CHASE.EXE carries for a play without a campaign: a random map with "Loc" labels, a random start and goal, every place shown.</param>
+public sealed record CutContentOptions(bool CapturedDossier = false, bool StandaloneChase = false)
 {
     /// <summary>The original: none of the cut content.</summary>
     public static CutContentOptions None { get; } = new();

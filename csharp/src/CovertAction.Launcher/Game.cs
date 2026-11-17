@@ -91,6 +91,15 @@ public sealed class Game
     private readonly OriginalBehaviour _behaviour;
     private readonly KeyboardDriver _keyboard;
 
+    /// <summary>The practice chosen from the menus part is the car chase on its own (D-661); taken by the next chase part.</summary>
+    private bool _standaloneChase;
+
+    /// <summary>The variables of the last car chase part that ran, for the tests.</summary>
+    internal ChaseState? LastChase { get; private set; }
+
+    /// <summary>Whether the last car chase part ran without a campaign (D-661); for the tests.</summary>
+    internal bool LastChaseStandalone => LastChase is { CampaignMode: false };
+
     /// <summary>Sets the game up: reads the fonts and colours from the player's files and puts the drivers on the host.</summary>
     /// <param name="folder">The player's copy of the game.</param>
     /// <param name="host">The program hosting the game: window, keys, sound device, time.</param>
@@ -423,7 +432,11 @@ public sealed class Game
         ChaseDgroup.Layout.Load(Executable.Read(_folder.Read(ChaseProgram)).DataSegment(), state);
         try
         {
-            new CarChase(state, shared, _world, _behaviour).Main();
+            // DIVERGENCE: D-661 a player's option: the practice menu's car chase on its own runs without a campaign
+            var standalone = _standaloneChase;
+            LastChase = state;
+            _standaloneChase = false;
+            new CarChase(state, shared, _world, _behaviour) { Standalone = standalone }.Main();
         }
         catch (ProgramExitException e) when (e.Code == 0)
         {
@@ -444,7 +457,15 @@ public sealed class Game
         var state = LoadMenus();
         try
         {
-            new Headquarters(state, shared, _world, _behaviour).TitleStartup();
+            var headquarters = new Headquarters(state, shared, _world, _behaviour);
+            try
+            {
+                headquarters.TitleStartup();
+            }
+            finally
+            {
+                _standaloneChase = headquarters.StandaloneChase;
+            }
         }
         catch (ProgramExitException e) when (e.Code == 0)
         {

@@ -81,7 +81,7 @@ internal sealed class LauncherModel
     private readonly bool _initialAmigaPictures;
 
     /// <summary>The cut-content options as the launcher opened.</summary>
-    private readonly bool _initialCapturedDossier;
+    private readonly bool _initialCapturedDossier, _initialStandaloneChase;
 
     public LauncherModel(LauncherContext context, (int Width, int Height)? display)
     {
@@ -121,6 +121,7 @@ internal sealed class LauncherModel
         _initialAmiga = (_amigaFiles, AmigaOriginalOnly);
         AmigaPictures = _initialAmigaPictures = start.AmigaPictures;
         CutCapturedDossier = _initialCapturedDossier = start.CutCapturedDossier;
+        CutStandaloneChase = _initialStandaloneChase = start.CutStandaloneChase;
     }
 
     private static string? Blank(string? text) => string.IsNullOrWhiteSpace(text) ? null : text;
@@ -209,6 +210,9 @@ internal sealed class LauncherModel
 
     /// <summary>The dossier page of a captured cast member (cutContent.capturedDossier, D-660).</summary>
     public bool CutCapturedDossier { get; set; }
+
+    /// <summary>The car chase on its own in the practice menu (cutContent.standaloneChase, D-661).</summary>
+    public bool CutStandaloneChase { get; set; }
 
     /// <summary>The MT-32 ROM folder chosen; null: the default (MT32_ROMS next to the program, else where the ROMs are found).</summary>
     public string? Mt32Roms
@@ -369,6 +373,10 @@ internal sealed class LauncherModel
         {
             changes["cutContent.capturedDossier"] = CutCapturedDossier;
         }
+        if (CutStandaloneChase != _initialStandaloneChase)
+        {
+            changes["cutContent.standaloneChase"] = CutStandaloneChase;
+        }
         return changes;
     }
 
@@ -401,6 +409,7 @@ internal sealed class LauncherModel
         s.FixCampaignBugs = FixCampaignBugs;
         s.AmigaPictures = AmigaPictures;
         s.CutCapturedDossier = CutCapturedDossier;
+        s.CutStandaloneChase = CutStandaloneChase;
         return s;
     }
 

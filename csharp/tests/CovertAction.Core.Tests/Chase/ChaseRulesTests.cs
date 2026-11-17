@@ -321,4 +321,30 @@ public sealed class ChaseRulesTests
         state.Gtime = 1439;
         Assert.Equal("0:00:59", ChaseRules.FormatGameTime(state, 119));
     }
+
+    [Fact]
+    public void D661InTheStandaloneChaseEveryPlaceCanBeEnteredAndNothingIsHandedBack()
+    {
+        // CC-2: no place is "known" (the city's record is empty), and the original, were it run so, reads an unset distance;
+        // the player's option makes every place known, as the map shows them all
+        var state = Chase();
+        var shared = new SharedState { OrgOut = 9 };
+        state.CampaignMode = false;
+        state.AtLoc = 5;
+        state.LocX[3] = 200;
+        state.LocY[3] = 200;
+        var option = OriginalBehaviour.ForPlayer(false, false, new CutContentOptions(StandaloneChase: true));
+        Assert.Throws<UninitialisedReadException>(() => ChaseRules.CheckLocationEntry(state, shared, 203, 202, OriginalBehaviour.ForPlayer(false, false)));
+        Assert.False(ChaseRules.CheckLocationEntry(state, shared, 220, 200, option));
+        Assert.True(ChaseRules.CheckLocationEntry(state, shared, 203, 202, option));
+        Assert.Equal((5, 9), ((int)state.AtLoc, (int)shared.OrgOut));
+
+        // a campaign chase is unchanged by the option: only the known places
+        state.CampaignMode = true;
+        state.Ct[0].OrgClues = 1 << 1;
+        state.LocX[1] = 0;
+        state.LocY[1] = 0;
+        Assert.False(ChaseRules.CheckLocationEntry(state, shared, 203, 202, option));
+    }
 }
+

@@ -25,8 +25,18 @@ public sealed partial class Headquarters
         // C: Esc answers -1, which becomes the level as it is
         _state.Diff = (short)MenuChoice(_state.Txt, 0x50, 0x80);
         // C: the original has no return statement and gives back what the practice menu left in AX, its choice
-        return TrainingMenu(1);
+        // DIVERGENCE: D-661 a player's option: the practice menu has one choice more, the car chase on its own
+        return TrainingMenu(1, _behaviour.CutContent.StandaloneChase);
     }
+
+    /// <summary>The practice menu's choice for the car chase on its own (D-661): the one after the four skills.</summary>
+    internal const int FreeChaseChoice = FinalState.SkillCount;
+
+    /// <summary>
+    /// The name of the extra choice of the practice menu (D-661), the only text the option has of its own: the original's
+    /// four skills have names, and this chase is none of them.
+    /// </summary>
+    private const string FreeChaseName = "Free Chase";
 
     /// <summary>
     /// The training screen: the four skills in a menu over the training picture. For a practice mission
@@ -38,7 +48,10 @@ public sealed partial class Headquarters
     /// <param name="practice">0 for a new agent's training, else the practice menu.</param>
     /// <returns>For the practice menu the skill chosen, 0..3, or -1 for Esc (the original leaves its answer in AX); for a new agent's training nothing meaningful (0).</returns>
     // orig: FINAL 0100:0c70 training_menu (src/c/final/final_0100_0c70.c) matched; tests: FinalOracleTests
-    public int TrainingMenu(int practice)
+    public int TrainingMenu(int practice) => TrainingMenu(practice, false);
+
+    /// <summary>The training screen, with the car chase on its own as a fifth choice of the practice menu when asked (D-661).</summary>
+    private int TrainingMenu(int practice, bool freeChase)
     {
         const short skillRatingBits = 0xff;
         const int menuX = 0x5c, menuY = 0x19, screenColour = 5, settleFrames = 0x3c;
@@ -67,6 +80,10 @@ public sealed partial class Headquarters
             foreach (var skill in _state.SkillNames)
             {
                 menu += skill + _state.StrSkillMenu[practice != 0 ? 1 : 2];
+            }
+            if (freeChase && practice != 0)
+            {
+                menu += FreeChaseName + _state.StrSkillMenu[1];
             }
             _state.Txt.Text = menu;
             choice = MenuChoice(_state.Txt, menuX, menuY);

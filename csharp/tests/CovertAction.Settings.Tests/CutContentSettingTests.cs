@@ -16,6 +16,7 @@ public sealed class CutContentSettingTests
     private static readonly (Item Row, string Key, Func<StartSettings, bool> Start, Func<LauncherModel, bool> Model)[] Options =
     [
         (Item.CutCapturedDossier, "capturedDossier", s => s.CutCapturedDossier, m => m.CutCapturedDossier),
+        (Item.CutStandaloneChase, "standaloneChase", s => s.CutStandaloneChase, m => m.CutStandaloneChase),
     ];
 
     private static LauncherContext Context(GameSettings? settings = null)

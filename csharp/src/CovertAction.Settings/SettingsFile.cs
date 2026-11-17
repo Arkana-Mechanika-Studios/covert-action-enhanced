@@ -299,6 +299,7 @@ internal static class SettingsFile
             switch (property.Name)
             {
                 case "capturedDossier": settings.CutCapturedDossier = Boolean(key, property.Value) ?? settings.CutCapturedDossier; break;
+                case "standaloneChase": settings.CutStandaloneChase = Boolean(key, property.Value) ?? settings.CutStandaloneChase; break;
                 default: Unknown(key); break;
             }
         }
@@ -464,7 +465,11 @@ internal static class SettingsFile
           "cutContent": {
             // true: the dossier page stamped CAPTURED (CAPTRD01.PAN, which the original ships but never plays) is shown
             // when a cast member is captured, before the chief's comment. false: as the original.
-            "capturedDossier": false
+            "capturedDossier": false,
+            // true: the practice menu has a fifth choice, the car chase on its own as the original's program still
+            // carries it (a random map, places labelled Loc1, Loc2 ..., a random start and goal, every place shown).
+            // false: as the original.
+            "standaloneChase": false
           }
         }
         """;

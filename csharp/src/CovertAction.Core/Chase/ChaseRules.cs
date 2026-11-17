@@ -307,9 +307,11 @@ public static class ChaseRules
     public static bool CheckLocationEntry(ChaseState state, SharedState shared, int x, int y, OriginalBehaviour? behaviour = null)
     {
         int? distance = null;
+        var allKnown = !state.CampaignMode && behaviour?.CutContent.StandaloneChase == true;
         for (var location = 1; location < ChaseState.Locations; location++)
         {
-            if ((state.Ct[state.InCity].OrgClues & 1 << location) != 0)
+            // DIVERGENCE: D-661 the stand-alone chase (cutContent.standaloneChase) shows every place, so every place can be entered; in a campaign only the known ones
+            if (allKnown || (state.Ct[state.InCity].OrgClues & 1 << location) != 0)
             {
                 distance = C16.Int(C16.Abs(C16.Int(x - state.LocX[location])) + C16.Abs(C16.Int(y - state.LocY[location])));
             }

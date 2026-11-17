@@ -74,6 +74,9 @@ internal sealed record StartSettings
     /// <summary>The captured cast member's dossier plays after an arrest (cutContent.capturedDossier, D-660; off by default).</summary>
     public bool CutCapturedDossier { get; init; }
 
+    /// <summary>The practice menu offers the car chase on its own (cutContent.standaloneChase, D-661; off by default).</summary>
+    public bool CutStandaloneChase { get; init; }
+
     /// <summary>The Amiga version's pictures in place of the PC's where it has the same one (graphics.amiga, D-642; off by default).</summary>
     public bool AmigaPictures { get; init; }
 
@@ -161,6 +164,7 @@ internal sealed record StartSettings
             FixOriginalBugs = file.FixOriginalBugs ?? false,
             FixCampaignBugs = file.FixCampaignBugs ?? false,
             CutCapturedDossier = file.CutCapturedDossier ?? false,
+            CutStandaloneChase = file.CutStandaloneChase ?? false,
             FixedKeys = fixedKeys,
         };
     }

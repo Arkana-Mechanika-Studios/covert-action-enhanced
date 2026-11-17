@@ -139,6 +139,12 @@ public sealed partial class Headquarters
         }
     }
 
+    /// <summary>The practice the player started is the car chase on its own (D-661): the launcher runs the chase part without a campaign. False otherwise.</summary>
+    public bool StandaloneChase { get; private set; }
+
+    /// <summary>The practice menu's driving choice (the order of the four skills).</summary>
+    private const int DrivingPractice = 1;
+
     /// <summary>The main menu, until the player has chosen a way to go on.</summary>
     private Start MainMenu()
     {
@@ -166,7 +172,9 @@ public sealed partial class Headquarters
                     var skill = ChooseDifficulty();
                     if (skill != NoChoice)
                     {
-                        StartPracticeModule(skill);
+                        // DIVERGENCE: D-661 the car chase on its own is the driving practice's hand-off, run without a campaign
+                        StandaloneChase = skill == FreeChaseChoice;
+                        StartPracticeModule(StandaloneChase ? DrivingPractice : skill);
                         return Start.HandedOff;
                     }
                     break;

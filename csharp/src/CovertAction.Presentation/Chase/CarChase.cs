@@ -90,6 +90,12 @@ public sealed partial class CarChase
     private readonly Boundaries _world;
     private readonly OriginalBehaviour _behaviour;
 
+    /// <summary>
+    /// The chase without a campaign (the player's option cutContent.standaloneChase, D-661; CC-2): the part runs with the
+    /// original's own non-campaign mode, which no program of the original starts. Off, as the original.
+    /// </summary>
+    public bool Standalone { get; init; }
+
     /// <summary>Wires the part's routines to its state and to the outside world.</summary>
     /// <param name="state">The part's variables.</param>
     /// <param name="shared">The hand-off block.</param>
