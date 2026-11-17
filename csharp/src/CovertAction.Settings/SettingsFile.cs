@@ -306,6 +306,7 @@ internal static class SettingsFile
                 case "hardestCircuit": settings.CutHardestCircuit = Boolean(key, property.Value) ?? settings.CutHardestCircuit; break;
                 case "fillerTexts": settings.CutFillerTexts = Boolean(key, property.Value) ?? settings.CutFillerTexts; break;
                 case "chaseGrounds": settings.CutChaseGrounds = Boolean(key, property.Value) ?? settings.CutChaseGrounds; break;
+                case "homeRooms": settings.CutHomeRooms = Boolean(key, property.Value) ?? settings.CutHomeRooms; break;
                 default: Unknown(key); break;
             }
         }
@@ -514,7 +515,11 @@ internal static class SettingsFile
             "fillerTexts": false,
             // true: the car chase's map draws its ground pictures from all 20 cells of CHASE.PIC; the generator asks for
             // 16 and never shows the last four. false: as the original.
-            "chaseGrounds": false
+            "chaseGrounds": false,
+            // true: a building's medium rooms may also be a Bed Room or a Kitchen, the two room types the game's table
+            // switches off; their furniture (bed, range, refrigerator, television) comes with them, the drawers not.
+            // false: as the original.
+            "homeRooms": false
           }
         }
         """;

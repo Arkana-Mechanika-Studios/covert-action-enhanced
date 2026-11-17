@@ -95,6 +95,9 @@ internal sealed record StartSettings
     /// <summary>The car chase's map draws from all 20 ground pictures of CHASE.PIC (cutContent.chaseGrounds, D-664; off by default).</summary>
     public bool CutChaseGrounds { get; init; }
 
+    /// <summary>A building's rooms may be a Bed Room or a Kitchen (cutContent.homeRooms, D-665; off by default).</summary>
+    public bool CutHomeRooms { get; init; }
+
     /// <summary>The Amiga version's pictures in place of the PC's where it has the same one (graphics.amiga, D-642; off by default).</summary>
     public bool AmigaPictures { get; init; }
 
@@ -190,6 +193,7 @@ internal sealed record StartSettings
             CutHardestCircuit = file.CutHardestCircuit ?? false,
             CutFillerTexts = file.CutFillerTexts ?? false,
             CutChaseGrounds = file.CutChaseGrounds ?? false,
+            CutHomeRooms = file.CutHomeRooms ?? false,
             FixedKeys = fixedKeys,
         };
     }

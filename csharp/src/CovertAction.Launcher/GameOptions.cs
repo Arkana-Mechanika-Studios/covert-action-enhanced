@@ -32,14 +32,15 @@ namespace CovertAction.Launcher;
 /// <param name="CutHardestCircuit">The launcher's option "Hardest circuit board" (cutContent.hardestCircuit, D-662): the electronics board may have its dormant difficulty 4; off by default.</param>
 /// <param name="CutFillerTexts">The launcher's option "All filler sentences" (cutContent.fillerTexts, D-663): the coded messages' filler is drawn from all 16 sentences of TEXT.DTA; off by default.</param>
 /// <param name="CutChaseGrounds">The launcher's option "All 20 chase grounds" (cutContent.chaseGrounds, D-664): the car chase's map draws its ground pictures from all 20 of CHASE.PIC; off by default.</param>
+/// <param name="CutHomeRooms">The launcher's option "Kitchens and bedrooms" (cutContent.homeRooms, D-665): a building's rooms may be a Bed Room or a Kitchen; off by default.</param>
 /// <param name="CutCapturedDossier">The launcher's option "Captured dossier" (cutContent.capturedDossier, D-660): CAPTRD01.PAN plays when a cast member is captured; off by default.</param>
 public sealed record GameOptions(char SoundLetter = 'A', bool Joystick = true, string? Mt32RomFolder = null, bool AskSetUpQuestions = false,
     bool ArrowKeysWalk = false, char? MusicLetter = null, char? EffectsLetter = null, bool Mouse = false, string? AmigaFolder = null, bool AmigaOnlyWhereOriginal = false, bool AmigaPictures = false,
-    bool FixOriginalBugs = false, bool FixCampaignBugs = false, bool MouseChase = false, bool CutCapturedDossier = false, bool CutStandaloneChase = false, bool CutHardestCircuit = false, bool CutFillerTexts = false, bool CutChaseGrounds = false)
+    bool FixOriginalBugs = false, bool FixCampaignBugs = false, bool MouseChase = false, bool CutCapturedDossier = false, bool CutStandaloneChase = false, bool CutHardestCircuit = false, bool CutFillerTexts = false, bool CutChaseGrounds = false, bool CutHomeRooms = false)
 {
     /// <summary>
     /// Which of the original's bugs the game reproduces, from the two fix options: every part of the game gets this one object.
     /// With both options off it is the release 1.0's (<see cref="CovertAction.Core.OriginalBehaviour.Player"/>).
     /// </summary>
-    public CovertAction.Core.OriginalBehaviour Behaviour => CovertAction.Core.OriginalBehaviour.ForPlayer(FixOriginalBugs, FixCampaignBugs, new CovertAction.Core.CutContentOptions(CutCapturedDossier, CutStandaloneChase, CutHardestCircuit, CutFillerTexts, CutChaseGrounds));
+    public CovertAction.Core.OriginalBehaviour Behaviour => CovertAction.Core.OriginalBehaviour.ForPlayer(FixOriginalBugs, FixCampaignBugs, new CovertAction.Core.CutContentOptions(CutCapturedDossier, CutStandaloneChase, CutHardestCircuit, CutFillerTexts, CutChaseGrounds, CutHomeRooms));
 }

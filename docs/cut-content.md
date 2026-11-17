@@ -61,7 +61,7 @@ the pictures), the re-check of the 41 dead functions (6), the sound commands (7)
 | CC-23 | Sound commands 15 and 21 are never sent; the sent ones the drivers leave empty (gear shifts, 0x27, vacation, 0x2c) | unused and silent commands | confirmed | explained |
 | CC-24 | Raid sprites (SPRITES/SPRITESF): 24 cut cells never drawn (columns 17-19), the hands-up pair, two lying figures, a boxed inset | unused sprite cells | confirmed (never drawn / cut); possible (use) | open |
 | CC-25 | CHASE.PIC ground textures 16..19 (16 and 18 copies of 11 and 10), never picked by the generator | unused art | confirmed; possible (cut) | player option (D-664) |
-| CC-26 | Room tile sheets GUYS3/GUYS2: 28 cells no tile entry references; Television and Drawers never placed (extends CA-8) | unused sprite cells | confirmed; possible (Drawers y wrong) | open |
+| CC-26 | Room tile sheets GUYS3/GUYS2: 28 cells no tile entry references; Television and Drawers never placed (extends CA-8) | unused sprite cells | confirmed; possible (Drawers y wrong) | player option (D-665; the rooms and their pieces, not the sprite cells) |
 | CC-27 | BUGS.PIC leftovers: second chip set, sample circuits, "ALARM" board edge, wire duplicates 8-15 | unused art | confirmed (untaken); possible | open |
 | CC-28 | Sound data no command reaches: AdLib tunes DS:1efa and 1f0e, speaker engine sounds DS:03a6/03b2, Roland tune DS:149e, unused instruments, commands 15/21 data | unused sound data | confirmed; likely (cut) | open |
 | CC-29 | RSOUND's dead "At controlled CRASH!" error exit | embedded developer text | confirmed | explained |
@@ -773,7 +773,14 @@ keeps fewer slots. The Drawers y is probably wrong (0x60 for 0x30, so the pictur
 no harm because `where` keeps drawers from being placed. Neither is proven.
 
 **Status.** The 28 cells and the never-placed Television and Drawers: confirmed (from the table and the generator, not
-seen in a run). The wrong y: possible. Open.
+seen in a run). The wrong y: possible. The unreferenced cells stay open.
+
+**Player option (D-665, `cutContent.homeRooms`, off by default).** For the never-placed pieces of the CA-8 extension: the
+room-type choice treats Bed Room (6) and Kitchen (8) as allowed (the loaded table is not changed; the one-room ambush is
+exempt), so medium rooms (41 to 72 cells) can be either and get Bed, Range, Refrigerator and Television 53 by the game's own
+table. The Drawers (57, 59) are excluded by the option because of their y; Television 55 stays unplaceable (bit 10 only).
+Tested: 300 buildings and ambushes with the option off are identical to the code before; with it on no Drawers appear
+and no room of 300 buildings is cut off.
 
 **Related.** CA-8, CA-31, CC-24.
 

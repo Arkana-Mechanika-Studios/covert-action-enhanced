@@ -1,15 +1,15 @@
 # The cut-content options
 
-Version 1.3 has five options for things the original game's own files and programs carry and never use. They are on
-the launcher's **Cut content** tab, they are off by default, and none of them is in the original. With all five off the
+Version 1.3 has six options for things the original game's own files and programs carry and never use. They are on
+the launcher's **Cut content** tab, they are off by default, and none of them is in the original. With all six off the
 game plays as version 1.0 and the original. Nothing is drawn or written new, except one menu line (the name "Free
 Chase"); the pictures, the code and the texts are the game's own. Where each came from is in
 [the register of cut content](cut-content.md) (the entries CC-n) and, as changes to the original's behaviour, in
-[DIVERGENCES.md](../csharp/docs/faithfulness/DIVERGENCES.md) (D-660 to D-664).
+[DIVERGENCES.md](../csharp/docs/faithfulness/DIVERGENCES.md) (D-660 to D-665).
 
 To turn one on, open the launcher (Shift held while the game starts, or `CovertAction Launcher.exe`), choose the
 **Cut content** tab, set the row to **Yes** and press **Save and quit** or **Play**. The settings file keys are
-`cutContent.capturedDossier`, `cutContent.standaloneChase`, `cutContent.hardestCircuit`, `cutContent.fillerTexts` and `cutContent.chaseGrounds`
+`cutContent.capturedDossier`, `cutContent.standaloneChase`, `cutContent.hardestCircuit`, `cutContent.fillerTexts`, `cutContent.chaseGrounds` and `cutContent.homeRooms`
 ([the settings](../csharp/docs/SETTINGS.md)).
 
 ![The launcher's Cut content tab](screenshots/cut-content/launcher-cut-content.png)
@@ -142,6 +142,27 @@ sheet has room for twenty; the map generator draws one of the first sixteen for 
 **Limits.** The generator makes the same random calls in the same places; only the range of the ground's draw differs. So the
 streets, the places and every later draw are the original's, and only the ground pictures of the blocks are not. The Amiga
 pictures option changes only the chase's windscreen views, not CHASE.PIC, so the same four cells show with it.
+
+## Kitchens and bedrooms
+
+Row: **Kitchens and bedrooms**. Key: `cutContent.homeRooms`. Register: CC-26 and CA-8; divergence D-665. No picture.
+
+**What the original left unused.** The building generator's table has ten room types; the choice can take only eight,
+because the table switches off Bed Room and Kitchen. Both are complete rows, and so are the pieces made for them (a
+bed, a range, a refrigerator, a television).
+
+**Evidence.** `furnish_room` (TAC 00e8:4f8d 50-60) tests `rms[t].where & building_kind_mask` with the mask 1 and
+`where` 0 for those two types (CA-8, CC-26).
+
+**What you see.** In a building the medium rooms (41 to 72 cells) can be a Bed Room or a Kitchen, with the bed, the
+range, the refrigerator and the television the game's table has for them. The title bar shows the room's name. A photograph
+or a bug in such a room is worth the room's own value (Bed Room 6, Kitchen 4). The buildings differ from the original's
+ones, for the same city and organisation.
+
+**Limits.** The chest of drawers is not placed even with the option on: the game's table would show it with the
+plot-icon strip as its picture. The refrigerator's name has no terminating byte in the original (CA-31), so facing one
+shows a stray character after its name. The one-room ambush is not changed. A second television that the table
+allows in no room stays out.
 
 ## Left out, and why
 

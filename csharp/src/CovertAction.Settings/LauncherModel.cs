@@ -85,7 +85,7 @@ internal sealed class LauncherModel
     private readonly string[] _initialKeyMap, _initialPadMap;
 
     /// <summary>The cut-content options as the launcher opened.</summary>
-    private readonly bool _initialCapturedDossier, _initialStandaloneChase, _initialHardestCircuit, _initialFillerTexts, _initialChaseGrounds;
+    private readonly bool _initialCapturedDossier, _initialStandaloneChase, _initialHardestCircuit, _initialFillerTexts, _initialChaseGrounds, _initialHomeRooms;
 
     public LauncherModel(LauncherContext context, (int Width, int Height)? display)
     {
@@ -130,6 +130,7 @@ internal sealed class LauncherModel
         CutHardestCircuit = _initialHardestCircuit = start.CutHardestCircuit;
         CutFillerTexts = _initialFillerTexts = start.CutFillerTexts;
         CutChaseGrounds = _initialChaseGrounds = start.CutChaseGrounds;
+        CutHomeRooms = _initialHomeRooms = start.CutHomeRooms;
         var ignored = new List<string>();
         KeyMap = KeyBindings.ParsePairs(start.KeyMap, false, "input.keyMap", ignored);
         PadMap = KeyBindings.ParsePairs(start.PadMap, true, "input.padMap", ignored);
@@ -318,6 +319,9 @@ internal sealed class LauncherModel
     /// <summary>The car chase's ground pictures from all 20 of CHASE.PIC (cutContent.chaseGrounds, D-664).</summary>
     public bool CutChaseGrounds { get; set; }
 
+    /// <summary>A building's rooms may be a Bed Room or a Kitchen (cutContent.homeRooms, D-665).</summary>
+    public bool CutHomeRooms { get; set; }
+
     /// <summary>The MT-32 ROM folder chosen; null: the default (MT32_ROMS next to the program, else where the ROMs are found).</summary>
     public string? Mt32Roms
     {
@@ -505,6 +509,10 @@ internal sealed class LauncherModel
         {
             changes["cutContent.chaseGrounds"] = CutChaseGrounds;
         }
+        if (CutHomeRooms != _initialHomeRooms)
+        {
+            changes["cutContent.homeRooms"] = CutHomeRooms;
+        }
         return changes;
     }
 
@@ -544,6 +552,7 @@ internal sealed class LauncherModel
         s.CutHardestCircuit = CutHardestCircuit;
         s.CutFillerTexts = CutFillerTexts;
         s.CutChaseGrounds = CutChaseGrounds;
+        s.CutHomeRooms = CutHomeRooms;
         return s;
     }
 

@@ -123,6 +123,9 @@ internal sealed class GameSettings
     /// <summary>The car chase's map draws from all 20 ground pictures of CHASE.PIC (cutContent.chaseGrounds, D-664; not in the original, off by default).</summary>
     public bool? CutChaseGrounds { get; set; }
 
+    /// <summary>A building's rooms may be a Bed Room or a Kitchen (cutContent.homeRooms, D-665; not in the original, off by default).</summary>
+    public bool? CutHomeRooms { get; set; }
+
     /// <summary>A copy (a change to it leaves this one as it is).</summary>
     public GameSettings Copy()
     {

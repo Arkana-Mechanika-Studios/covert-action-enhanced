@@ -126,6 +126,7 @@ internal sealed class LauncherScreen
         CutHardestCircuit,
         CutFillerTexts,
         CutChaseGrounds,
+        CutHomeRooms,
         TabGeneral,
         TabAdvanced,
         TabCutContent,
@@ -191,7 +192,7 @@ internal sealed class LauncherScreen
     /// <summary>A sound test is playing: the launcher draws again now and then to show its status.</summary>
     public bool Animating => _context.SoundTest is { Playing: true };
 
-    private static bool OnCutContent(Item item) => item is Item.CutCapturedDossier or Item.CutStandaloneChase or Item.CutHardestCircuit or Item.CutFillerTexts or Item.CutChaseGrounds;
+    private static bool OnCutContent(Item item) => item is Item.CutCapturedDossier or Item.CutStandaloneChase or Item.CutHardestCircuit or Item.CutFillerTexts or Item.CutChaseGrounds or Item.CutHomeRooms;
 
     private static bool OnControls(Item item) => item is Item.KeyRepeat or Item.ArrowKeysWalk or Item.Mouse or Item.KeyPick or Item.KeyBind or Item.KeyClear or Item.KeysReset or Item.PadPick or Item.PadKey or Item.PadReset;
 
@@ -200,7 +201,7 @@ internal sealed class LauncherScreen
     // Tab and the arrows go through General's rows, then Advanced's (its tab opens), then the buttons
     private IEnumerable<Item> Order =>
         new[] { Item.GameFolder, Item.GameChange, Item.Window, Item.Fullscreen, Item.Scaling, Item.Sound, Item.Test, Item.Controls, Item.Saves, Item.SavesChange,
-            Item.Roms, Item.RomsChange, Item.AmigaFiles, Item.AmigaChange, Item.AmigaOriginalOnly, Item.AmigaPictures, Item.Music, Item.MixTest, Item.Effects, Item.FixOriginalBugs, Item.FixCampaignBugs, Item.CutCapturedDossier, Item.CutStandaloneChase, Item.CutHardestCircuit, Item.CutFillerTexts, Item.CutChaseGrounds,
+            Item.Roms, Item.RomsChange, Item.AmigaFiles, Item.AmigaChange, Item.AmigaOriginalOnly, Item.AmigaPictures, Item.Music, Item.MixTest, Item.Effects, Item.FixOriginalBugs, Item.FixCampaignBugs, Item.CutCapturedDossier, Item.CutStandaloneChase, Item.CutHardestCircuit, Item.CutFillerTexts, Item.CutChaseGrounds, Item.CutHomeRooms,
             Item.KeyRepeat, Item.ArrowKeysWalk, Item.Mouse, Item.KeyPick, Item.KeyBind, Item.KeyClear, Item.KeysReset, Item.PadPick, Item.PadKey, Item.PadReset, Item.Save, Item.Play }
             .Where(i => i is not (Item.Test or Item.MixTest) || _context.SoundTest is not null);
 
@@ -258,7 +259,7 @@ internal sealed class LauncherScreen
 
     private static bool IsButton(Item item) => item is Item.GameChange or Item.SavesChange or Item.RomsChange or Item.AmigaChange or Item.Test or Item.MixTest or Item.KeyBind or Item.KeyClear or Item.KeysReset or Item.PadReset or Item.Save or Item.Play;
 
-    private static bool IsSelect(Item item) => item is Item.Window or Item.Fullscreen or Item.Scaling or Item.Sound or Item.Controls or Item.AmigaOriginalOnly or Item.AmigaPictures or Item.KeyRepeat or Item.ArrowKeysWalk or Item.Music or Item.Effects or Item.Mouse or Item.FixOriginalBugs or Item.FixCampaignBugs or Item.CutCapturedDossier or Item.CutStandaloneChase or Item.CutHardestCircuit or Item.CutFillerTexts or Item.CutChaseGrounds or Item.KeyPick or Item.PadPick or Item.PadKey;
+    private static bool IsSelect(Item item) => item is Item.Window or Item.Fullscreen or Item.Scaling or Item.Sound or Item.Controls or Item.AmigaOriginalOnly or Item.AmigaPictures or Item.KeyRepeat or Item.ArrowKeysWalk or Item.Music or Item.Effects or Item.Mouse or Item.FixOriginalBugs or Item.FixCampaignBugs or Item.CutCapturedDossier or Item.CutStandaloneChase or Item.CutHardestCircuit or Item.CutFillerTexts or Item.CutChaseGrounds or Item.CutHomeRooms or Item.KeyPick or Item.PadPick or Item.PadKey;
 
     private LauncherChoice? Key(KeyPressed key)
     {
@@ -372,6 +373,7 @@ internal sealed class LauncherScreen
         Item.CutHardestCircuit => "cutContent.hardestCircuit",
         Item.CutFillerTexts => "cutContent.fillerTexts",
         Item.CutChaseGrounds => "cutContent.chaseGrounds",
+        Item.CutHomeRooms => "cutContent.homeRooms",
         Item.FixOriginalBugs => "fixes.originalBugs",
         Item.FixCampaignBugs => "fixes.campaignBugs",
         _ => null,
@@ -520,6 +522,9 @@ internal sealed class LauncherScreen
                 break;
             case Item.CutChaseGrounds:
                 _model.CutChaseGrounds = !_model.CutChaseGrounds;
+                break;
+            case Item.CutHomeRooms:
+                _model.CutHomeRooms = !_model.CutHomeRooms;
                 break;
             case Item.FixOriginalBugs:
                 _model.FixOriginalBugs = !_model.FixOriginalBugs;
@@ -1010,6 +1015,7 @@ internal sealed class LauncherScreen
             y = Select(y, "Hardest circuit board", _model.CutHardestCircuit ? "Yes" : "No", Item.CutHardestCircuit);
             y = Select(y, "All filler sentences", _model.CutFillerTexts ? "Yes" : "No", Item.CutFillerTexts);
             y = Select(y, "All 20 chase grounds", _model.CutChaseGrounds ? "Yes" : "No", Item.CutChaseGrounds);
+            y = Select(y, "Kitchens and bedrooms", _model.CutHomeRooms ? "Yes" : "No", Item.CutHomeRooms);
         }
         else if (!_advanced)
         {
@@ -1280,6 +1286,7 @@ internal sealed class LauncherScreen
             Item.CutHardestCircuit => "Not in the original (D-662). Yes: the wiretap's and the car tracer's circuit board has one difficulty more, the fourth that the game's own code carries and never uses: on the hardest level an agent of the lowest electronics rating gets a board that shows only its last column of chips and hides eight fixed ones. Every other level and rating is as before. No (the default): the hardest board is the third, as the original." + fixedNote,
             Item.CutFillerTexts => "Not in the original (D-663). Yes: the filler sentence of an intercepted coded message is one of all sixteen that the game's TEXT.DTA holds; the game's code asks for twelve, so four sentences (\"Extreme caution is advised ...\", \"Do not hesitate to act in a decisive manner\", \"Your request for promotion is being considered\", \"Further communications may follow\") are never shown. No (the default): the twelve, as the original." + fixedNote,
             Item.CutChaseGrounds => "Not in the original (D-664). Yes: the car chase's map draws its ground pictures from all twenty cells of CHASE.PIC; the game's generator asks for sixteen, so four (two copies of earlier grounds, a striped block and a court with a plaza) are never shown. No (the default): the sixteen, as the original." + fixedNote,
+            Item.CutHomeRooms => "Not in the original (D-665). Yes: the medium rooms of a building may also be a Bed Room or a Kitchen, the two types the game's table switches off, with the furniture it has for them (bed, range, refrigerator, television); the drawers are left out. No (the default): as the original, which never builds them." + fixedNote,
             Item.KeyPick => "Not in the original (D-671). Choose a key of the original (the ones the game reads, as they are on the PC keyboard it was made for), then Set... and press the key of your keyboard that should send it. The key keeps working as before as well. Several keys can send the same one.",
             Item.KeyBind => "Not in the original (D-671). Set... (or Enter) waits for the key to use: it is then taken as the original's key before the game sees it, the scan code and the character of that key. Esc cancels; Shift, Ctrl and Alt cannot be remapped.",
             Item.KeyClear => "Takes away every key mapped to the key of the original shown.",

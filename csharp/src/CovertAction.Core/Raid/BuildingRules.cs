@@ -582,7 +582,7 @@ public static class BuildingRules
     /// <param name="room">The room, 1..<see cref="RaidState.Nroom"/>.</param>
     /// <param name="behaviour">Which of the original's bugs to reproduce (CA-59); the original's own when left out.</param>
     // orig: TAC 00e8:4f8d furnish_room (src/c/tac/tac_00e8_4f8d.c) matched; tests: BuildingRulesTests, TacOracleTests
-    // BUG: CA-8 no room type allowed in no kind of building (bed room, kitchen) is ever chosen; reproduced as coded.
+    // BUG: CA-8 no room type allowed in no kind of building (bed room, kitchen) is ever chosen; reproduced as coded unless OriginalBehaviour.CutContent.HomeRooms (D-665).
     // BUG: CA-59 the other half of a wide piece is written over whatever is beside it, a wall too; reproduced as coded unless OriginalBehaviour.FixWideFurnitureOverWall.
     public static void FurnishRoom(RaidState state, int room, OriginalBehaviour? behaviour = null)
     {
@@ -593,7 +593,9 @@ public static class BuildingRules
         }
         var area = record.Dx * record.Dy;
         var sizeClass = area > BigRoomCells ? 4 : area > MiddleRoomCells ? 2 : 1;
-        var type = ChooseRoomType(state, sizeClass);
+        // DIVERGENCE: D-665 a player's option (cutContent.homeRooms): CA-8, the Bed Room and the Kitchen may be chosen; not in the one-room ambush, whose draws stay the original's
+        var homeRooms = behaviour?.CutContent.HomeRooms == true && state.GameMode != RaidState.OneRoomMode;
+        var type = ChooseRoomType(state, sizeClass, homeRooms);
         if (state.GameMode == RaidState.OneRoomMode)
         {
             type = 0;
@@ -610,7 +612,8 @@ public static class BuildingRules
                 y = record.Y + GameLibrary.RandomBelow(state.Random, record.Dy);
                 tile = ChooseFurniture(state, record, x, y);
             }
-            while ((tile == -1 || (state.Ob[tile].Where & 1 << type) == 0) && ++tries < PieceTries);
+            // DIVERGENCE: D-665 with the option on the Drawers (tiles 57 and 59, only ever allowed in a Bed Room, CC-26) are not placed: their picture is the plot-icon strip
+            while ((tile == -1 || (state.Ob[tile].Where & 1 << type) == 0 || (homeRooms && tile is TileDrawersLeft or TileDrawersRight)) && ++tries < PieceTries);
             if (tries < PieceTries)
             {
                 var wide = (state.Ob[tile].Bits & TileFlags.Wide) != 0;
@@ -664,8 +667,17 @@ public static class BuildingRules
         }
     }
 
+    /// <summary>The room type numbers the original's table switches off (CA-8): Bed Room and Kitchen.</summary>
+    private const int BedRoomType = 6, KitchenType = 8;
+
+    /// <summary>The two Drawers tiles (CC-26), which the home-rooms option leaves unplaced.</summary>
+    private const int TileDrawersLeft = 57, TileDrawersRight = 59;
+
     /// <summary>A random room type that fits the size class and the kind of building: each type in turn wins with a chance of one half.</summary>
-    private static int ChooseRoomType(RaidState state, int sizeClass)
+    /// <param name="state">The building and the random generator.</param>
+    /// <param name="sizeClass">1 small, 2 middle, 4 big.</param>
+    /// <param name="homeRooms">D-665: the Bed Room and the Kitchen count as allowed in this kind of building (the original's table has them at 0).</param>
+    private static int ChooseRoomType(RaidState state, int sizeClass, bool homeRooms = false)
     {
         var type = -1;
         do
@@ -674,7 +686,8 @@ public static class BuildingRules
             {
                 var kind = state.Rms[candidate];
                 // C: the random draw is made only when both masks fit (&& short-circuits)
-                if ((kind.Size & sizeClass) != 0 && (kind.Where & state.BuildingKindMask) != 0 && GameLibrary.RandomBelow(state.Random, 2) != 0)
+                // DIVERGENCE: D-665 with the option on, types 6 and 8 pass the kind-of-building test as the other eight do
+                if ((kind.Size & sizeClass) != 0 && ((kind.Where & state.BuildingKindMask) != 0 || homeRooms && candidate is BedRoomType or KitchenType) && GameLibrary.RandomBelow(state.Random, 2) != 0)
                 {
                     type = candidate;
                     break;
