@@ -20,11 +20,12 @@ First found wins:
 
 1. `--settings <file>` (also where the launcher saves then);
 2. `covertaction.settings.json` next to the program;
-3. `%APPDATA%\CovertAction\covertaction.settings.json`.
+3. `%APPDATA%\CovertAction\covertaction.settings.json` (on Linux `$XDG_CONFIG_HOME/CovertAction/covertaction.settings.json`,
+   `~/.config/CovertAction/...` when `XDG_CONFIG_HOME` is not set).
 
 With none of them the defaults are used and nothing is written until the launcher saves a change: it then writes the
 commented template (every key, its default, its command-line option) next to the program when that folder can be
-written, else in `%APPDATA%\CovertAction`, and sets the changed keys in it. The launcher's edits keep the file's
+written, else in `%APPDATA%\CovertAction` (Linux: `$XDG_CONFIG_HOME/CovertAction`), and sets the changed keys in it. The launcher's edits keep the file's
 comments and layout (`SettingsFileEdits`, from Darklands).
 
 ### Precedence
@@ -38,7 +39,7 @@ launcher but cannot be changed there (its details say what sets it); the launche
 | Key | Default | Command line / environment | Meaning |
 |---|---|---|---|
 | `gameFolder` | searched (below) | first argument; `COVERT_GAME_DIR` | your copy of the game: the folder with COVERT.EXE, INTRO.EXE, FINAL.EXE, GAME.EXE, MGRAPHIC.EXE, FONTS.CV ... (or a folder above it with a `Covert` subfolder) |
-| `savesFolder` | `Saves` next to the program (`%LOCALAPPDATA%\CovertAction\Saves` when the program's folder cannot be written to) | `--saves` | saved games (CV0.SVE .. CV3.SVE) and the Hall of Fame; the game folder is never written to. A save this folder does not hold is read from the game folder, so the saves made with the original load; a save in the same slot then goes here and hides the original's |
+| `savesFolder` | `Saves` next to the program (`%LOCALAPPDATA%\CovertAction\Saves` when the program's folder cannot be written to; Linux: `$XDG_DATA_HOME/CovertAction/Saves`, `~/.local/share/CovertAction/Saves` without `XDG_DATA_HOME`) | `--saves` | saved games (CV0.SVE .. CV3.SVE) and the Hall of Fame; the game folder is never written to. A save this folder does not hold is read from the game folder, so the saves made with the original load; a save in the same slot then goes here and hides the original's |
 | `display.scale` | 3 | `--scale N` | the window is 320x240 times N (the picture's 4:3 shape), 1 to 8 |
 | `display.resolution` | | `--window WxH` | any window size, e.g. `"1280x960"`; when set it replaces `scale` |
 | `display.fullscreen` | false | `--fullscreen` | the window fills the screen (the picture keeps its shape) |
@@ -198,3 +199,18 @@ empty `MT32_ROMS`, `README.txt` (csharp/releases/README.txt), `RELEASE_NOTES.md`
 `THIRD_PARTY_NOTICES.md` and `licences/` (SDL's zlib licence, the LGPL 2.1 of mt32emu with where its source is, the .NET
 runtime's licence and notices). The script refuses a folder with any of the game's files in it. The player supplies the
 game.
+
+### Linux x64 (experimental)
+
+`python -B csharp/tools/publish_release.py --platform linux-x64` makes `build/release/<version>/CovertAction-<version>-linux-x64.tar.gz`
+and a `.sha256` file beside it (it can run on Windows: `dotnet publish` cross-compiles). The folder holds `CovertAction` (one
+self-contained, compressed file), `CovertAction Launcher` (a three-line shell script that runs `CovertAction --setup`),
+`libSDL3.so.0` (SDL 3.4.20, built on Ubuntu 22.04 by `csharp/tools/linux/build_sdl3.sh`, so it loads on glibc 2.34 and later;
+the program loads it before the system's, and `COVERT_SDL3_PATH` names another), `libmt32emu.so`, `MT32_ROMS`, the documents
+and `licences/`. The archive sets 0755 on the program and the script explicitly. Without a game folder named, the program
+looks beside itself, then in Steam's libraries (also the Deck's SD card and Flatpak/Snap Steam), Heroic's installed games, the usual
+GOG, Lutris and `~/Games` folders, Wine prefixes (`~/.wine`, `WINEPREFIX`, Lutris, Heroic, Bottles, Proton) and `/run/media`,
+`/media`, `/mnt`; file names in the game folder may be in any case (`HostFiles`). Settings and saved games are kept beside
+the program when its folder can be written to, else under `XDG_CONFIG_HOME` and `XDG_DATA_HOME` as above. If SDL 3 cannot be
+loaded a message (and a zenity or kdialog box on a desktop) says how to get it. The .NET runtime needs `libicu`. Tried in clean Ubuntu 22.04 and 24.04
+containers (a window-less start and the launcher's picture); the sound and a player's machine are not yet tried.

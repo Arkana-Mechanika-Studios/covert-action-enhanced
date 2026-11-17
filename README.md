@@ -176,7 +176,23 @@ data), and [cut content](docs/cut-content.md) found in the original's code and d
 * The Amiga options need the Amiga version's own files; without them the PC's music, effects and pictures play.
 * The bug fixes are options, off by default: with them off the original's bugs stay, bug for bug
   ([the register](docs/original-bugs.md)).
-* Windows only for now.
+* Windows is the tested system; the Linux x64 build is experimental (below). There is no macOS build.
+
+## Linux (experimental)
+
+A release for Linux x64 (also the Steam Deck in desktop mode) comes as `CovertAction-<version>-linux-x64.tar.gz` with a
+`.sha256` file. Unpack it with `tar -xzf` (a zip would lose the executable bits) and start `./CovertAction`, or
+`CovertAction Launcher` for the settings screen. It carries SDL 3.4.20 as `libSDL3.so.0` beside the program, built on Ubuntu
+22.04 from SDL's source release (`csharp/tools/linux/build_sdl3.sh` in an `ubuntu:22.04` container), so it runs on Ubuntu
+22.04 and later, Debian 12 and later and SteamOS, including systems without an SDL 3 of their own such as Ubuntu 24.04;
+delete it to use the system's. The .NET runtime inside the program needs `libicu`, which desktop systems have (a bare
+container does not: `apt install libicu70` or `libicu74`). Your own copy of the game is found beside the program, in Steam's libraries, Heroic's installed
+games, the usual GOG and Lutris folders and Wine prefixes, or you choose it in the launcher; file names may be in any case.
+Settings and saved games stay beside the program when its folder can be written to, else in `$XDG_CONFIG_HOME/CovertAction`
+and `$XDG_DATA_HOME/CovertAction/Saves` (`~/.config` and `~/.local/share` by default).
+Made on Windows or Linux: `python -B csharp/tools/publish_release.py --platform linux-x64`.
+It has been run in clean Ubuntu 22.04 and 24.04 containers (a window-less start and the launcher's picture); sound and
+real desktops are untried, so please report what you find.
 
 ## Building from source
 
