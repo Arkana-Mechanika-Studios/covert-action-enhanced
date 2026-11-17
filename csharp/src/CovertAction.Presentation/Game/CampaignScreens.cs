@@ -53,7 +53,7 @@ public sealed class CampaignScreens
         Pictures = new LibraryPictures(world);
         Clues = new ClueTexts(state, Text);
         DataFiles = new DataFileScreens(state, this);
-        Messages = new CodedMessages(state, this);
+        Messages = new CodedMessages(state, this, this.behaviour);
         ClueLists = new ClueScreens(state, world, this);
         Animation = new LibraryAnimation(state, state.Pan, world, Output, Input, Pictures, behaviour);
         // GAME's copy of the message box redraws the place and clock plate, runs the animation beside it and draws the face

@@ -46,14 +46,14 @@ the pictures), the re-check of the 41 dead functions (6), the sound commands (7)
 | CC-8 | INTRO: unused graphics file-name table and the H/V letter folding | dormant data | likely | open |
 | CC-9 | CODE: 56 sentences of the graphics library's design notes | embedded developer text | confirmed | explained |
 | CC-10 | 41 functions nothing calls (message builder x3, `gather_intelligence`, file and picture helpers, empty stubs) | dead code | confirmed | explained |
-| CC-11 | TEXT.DTA `*FLUF12`..`*FLUF15`: four filler sentences the code never draws | unreachable text | confirmed | open |
+| CC-11 | TEXT.DTA `*FLUF12`..`*FLUF15`: four filler sentences the code never draws | unreachable text | confirmed | player option (D-663) |
 | CC-12 | TEXT.DTA message texts nothing asks for, and events without a text (CRIME1 is a trimmed CRIME4) | orphan texts | likely | open |
-| CC-13 | Shadowed duplicate tags: `*MSG0102`, `*C0102`, `*C0104`, `*PL0815`, and the stray `*C0105` | unreachable text | confirmed | open |
+| CC-13 | Shadowed duplicate tags: `*MSG0102`, `*C0102`, `*C0104`, `*PL0815`, and the stray `*C0105` | unreachable text | confirmed | open; no place in the code that would draw them (see the entry) |
 | CC-14 | Cast and event fields of the crime files no module reads | unread data | confirmed | open |
 | CC-15 | Mouse support in the graphics library (int 33h), never called | cut feature | likely | explained |
 | CC-16 | BUG circuit difficulty 4 and the TAC "wait for a visited room" walk | dormant branches | confirmed | player option (D-662, the circuit board; the TAC walk stays open) |
 | CC-17 | Plain dormant statements and arms (the remaining `// DORMANT:` markers) | dormant code | confirmed | explained |
-| CC-18 | Prose variants `*nice3`..`*nice7` the reader could ask for | missing text | possible | open |
+| CC-18 | Prose variants `*nice3`..`*nice7` the reader could ask for | missing text | possible | open; no text to draw (see the entry) |
 | CC-19 | CAPTRD01.PAN: a woman's photo (image 6) and the sex switch the script itself defeats | dormant branch | confirmed; likely (cut) | verified (replay); player option (D-660) |
 | CC-20 | Key-press exit sequences of COMM, CRYPTO, HQ and RESEARCH (`ignore_skip` is never set) | dormant branch | confirmed | verified (replay) |
 | CC-21 | Animations: no sound instruction in any of the 24 `.PAN`; one unstarted blink program; no unshown image | negative result and leftovers | confirmed | explained |
@@ -356,6 +356,10 @@ was never raised, or four lines were dropped for length.
 **How to verify.** Patch the count byte (`push 0xc` at GAME 7cf4's call) to 16 and read many coded messages; the
 four lines appear. Not yet done.
 
+**Player option (D-663, `cutContent.fillerTexts`, off by default).** The call has its place and only its count is
+changed: 16 instead of 12, so the filler of a coded message can be one of the four sentences too. Tested on a hand-made file
+(twelve distinct sentences drawn with the option off, sixteen with it on) and that the game's own TEXT.DTA holds the four.
+
 **Related.** None.
 
 ## CC-12 Message texts nothing asks for, events without a text
@@ -410,6 +414,12 @@ for a gap in the event chain.
 like another crime's block pasted in.
 
 **How to verify.** Reading the files; run the tutorial and read the bulletin of the blueprint theft.
+
+**No option (decided with D-663).** The code has no place that would draw the second text of a tag: the reader takes the
+first match and the callers have no count to skip by, except the one the CA-12 fix already uses for `*MSG0102` (the bulletin of
+"Stole Blueprints", D-650), which is how that second text is reachable. The other duplicates (`*C0102`, `*C0104` in CLUES.TXT,
+`*PL0815` in PLOT.TXT) belong to texts whose first match is the one the game means (the second two are another crime's
+block pasted in); to show them a reader would have to be changed to a text it was never given, so they are left out.
 
 **Related.** CA-12, CA-16, CA-17.
 
@@ -513,7 +523,12 @@ rank above 9 the key `*nice3`..`*nice7` would be looked up and does not exist. C
 in place and never restored, so after the first capture the same variant shows. Whether a captured person can
 have rank above 9 was not checked.
 
-**Status.** Possible; open. If a rank above 9 can be captured, the text is empty.
+**Status.** A cast member never asks for them: the ranks in the 13 crime files are 1 to 7 (checked in every `CRIMEn.DTA`),
+so the variant `(rank - 1) / 3` is 0, 1 or 2. A suspect who is no cast member does (CA-33): the original reads `ac[-1].rank`,
+which is `NACTIVITY` (the cast's size with the decoys, 5 to 8 plus four a level), so on the higher levels the variant is
+3 to 6 and the chief's comment has no text. That is the original's behaviour and the code's own place for these texts; the
+texts do not exist, and writing them (or mapping the variant to an existing one, which would change CA-33's reading) is not
+done by an option of this round. No option; open.
 
 ## CC-19 CAPTRD01.PAN: the woman's photo and a switch the script defeats
 

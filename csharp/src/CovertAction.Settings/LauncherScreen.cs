@@ -120,6 +120,7 @@ internal sealed class LauncherScreen
         CutCapturedDossier,
         CutStandaloneChase,
         CutHardestCircuit,
+        CutFillerTexts,
         TabGeneral,
         TabAdvanced,
         TabCutContent,
@@ -171,14 +172,14 @@ internal sealed class LauncherScreen
     /// <summary>A sound test is playing: the launcher draws again now and then to show its status.</summary>
     public bool Animating => _context.SoundTest is { Playing: true };
 
-    private static bool OnCutContent(Item item) => item is Item.CutCapturedDossier or Item.CutStandaloneChase or Item.CutHardestCircuit;
+    private static bool OnCutContent(Item item) => item is Item.CutCapturedDossier or Item.CutStandaloneChase or Item.CutHardestCircuit or Item.CutFillerTexts;
 
     private bool OnAdvanced(Item item) => item is Item.Roms or Item.RomsChange or Item.AmigaFiles or Item.AmigaChange or Item.AmigaOriginalOnly or Item.AmigaPictures or Item.KeyRepeat or Item.ArrowKeysWalk or Item.Music or Item.MixTest or Item.Effects or Item.Mouse or Item.FixOriginalBugs or Item.FixCampaignBugs;
 
     // Tab and the arrows go through General's rows, then Advanced's (its tab opens), then the buttons
     private IEnumerable<Item> Order =>
         new[] { Item.GameFolder, Item.GameChange, Item.Window, Item.Fullscreen, Item.Scaling, Item.Sound, Item.Test, Item.Controls, Item.Saves, Item.SavesChange,
-            Item.Roms, Item.RomsChange, Item.AmigaFiles, Item.AmigaChange, Item.AmigaOriginalOnly, Item.AmigaPictures, Item.KeyRepeat, Item.ArrowKeysWalk, Item.Music, Item.MixTest, Item.Effects, Item.Mouse, Item.FixOriginalBugs, Item.FixCampaignBugs, Item.CutCapturedDossier, Item.CutStandaloneChase, Item.CutHardestCircuit, Item.Save, Item.Play }
+            Item.Roms, Item.RomsChange, Item.AmigaFiles, Item.AmigaChange, Item.AmigaOriginalOnly, Item.AmigaPictures, Item.KeyRepeat, Item.ArrowKeysWalk, Item.Music, Item.MixTest, Item.Effects, Item.Mouse, Item.FixOriginalBugs, Item.FixCampaignBugs, Item.CutCapturedDossier, Item.CutStandaloneChase, Item.CutHardestCircuit, Item.CutFillerTexts, Item.Save, Item.Play }
             .Where(i => i is not (Item.Test or Item.MixTest) || _context.SoundTest is not null);
 
     /// <summary>Handles one input; returns the player's choice when the launcher should end.</summary>
@@ -234,7 +235,7 @@ internal sealed class LauncherScreen
 
     private static bool IsButton(Item item) => item is Item.GameChange or Item.SavesChange or Item.RomsChange or Item.AmigaChange or Item.Test or Item.MixTest or Item.Save or Item.Play;
 
-    private static bool IsSelect(Item item) => item is Item.Window or Item.Fullscreen or Item.Scaling or Item.Sound or Item.Controls or Item.AmigaOriginalOnly or Item.AmigaPictures or Item.KeyRepeat or Item.ArrowKeysWalk or Item.Music or Item.Effects or Item.Mouse or Item.FixOriginalBugs or Item.FixCampaignBugs or Item.CutCapturedDossier or Item.CutStandaloneChase or Item.CutHardestCircuit;
+    private static bool IsSelect(Item item) => item is Item.Window or Item.Fullscreen or Item.Scaling or Item.Sound or Item.Controls or Item.AmigaOriginalOnly or Item.AmigaPictures or Item.KeyRepeat or Item.ArrowKeysWalk or Item.Music or Item.Effects or Item.Mouse or Item.FixOriginalBugs or Item.FixCampaignBugs or Item.CutCapturedDossier or Item.CutStandaloneChase or Item.CutHardestCircuit or Item.CutFillerTexts;
 
     private LauncherChoice? Key(KeyPressed key)
     {
@@ -317,6 +318,7 @@ internal sealed class LauncherScreen
         Item.CutCapturedDossier => "cutContent.capturedDossier",
         Item.CutStandaloneChase => "cutContent.standaloneChase",
         Item.CutHardestCircuit => "cutContent.hardestCircuit",
+        Item.CutFillerTexts => "cutContent.fillerTexts",
         Item.FixOriginalBugs => "fixes.originalBugs",
         Item.FixCampaignBugs => "fixes.campaignBugs",
         _ => null,
@@ -424,6 +426,9 @@ internal sealed class LauncherScreen
                 break;
             case Item.CutHardestCircuit:
                 _model.CutHardestCircuit = !_model.CutHardestCircuit;
+                break;
+            case Item.CutFillerTexts:
+                _model.CutFillerTexts = !_model.CutFillerTexts;
                 break;
             case Item.FixOriginalBugs:
                 _model.FixOriginalBugs = !_model.FixOriginalBugs;
@@ -876,6 +881,7 @@ internal sealed class LauncherScreen
             y = Select(y, "Captured dossier", _model.CutCapturedDossier ? "Yes" : "No", Item.CutCapturedDossier);
             y = Select(y, "Free car chase", _model.CutStandaloneChase ? "Yes" : "No", Item.CutStandaloneChase);
             y = Select(y, "Hardest circuit board", _model.CutHardestCircuit ? "Yes" : "No", Item.CutHardestCircuit);
+            y = Select(y, "All filler sentences", _model.CutFillerTexts ? "Yes" : "No", Item.CutFillerTexts);
         }
         else if (!_advanced)
         {
@@ -1146,6 +1152,7 @@ internal sealed class LauncherScreen
             Item.CutCapturedDossier => "Not in the original (D-660). Yes: when a cast member is captured, the dossier page stamped CAPTURED that the game ships (CAPTRD01.PAN) is shown after the arrest, before the chief's comment, with the photograph of a man or of a woman. No (the default): as the original, which never plays it." + fixedNote,
             Item.CutStandaloneChase => "Not in the original (D-661). Yes: the practice menu has a fifth choice, \"Free Chase\": the car chase on its own, as the game's chase program still carries it: a new random map every time, the places labelled Loc1, Loc2 and so on, a random start and goal, and every place shown and open to enter with F2. It stays in practice: nothing is handed to a campaign. No (the default): the four practice skills of the original." + fixedNote,
             Item.CutHardestCircuit => "Not in the original (D-662). Yes: the wiretap's and the car tracer's circuit board has one difficulty more, the fourth that the game's own code carries and never uses: on the hardest level an agent of the lowest electronics rating gets a board that shows only its last column of chips and hides eight fixed ones. Every other level and rating is as before. No (the default): the hardest board is the third, as the original." + fixedNote,
+            Item.CutFillerTexts => "Not in the original (D-663). Yes: the filler sentence of an intercepted coded message is one of all sixteen that the game's TEXT.DTA holds; the game's code asks for twelve, so four sentences (\"Extreme caution is advised ...\", \"Do not hesitate to act in a decisive manner\", \"Your request for promotion is being considered\", \"Further communications may follow\") are never shown. No (the default): the twelve, as the original." + fixedNote,
             Item.TabGeneral or Item.TabAdvanced or Item.TabCutContent => "General: the game, the display, the sound card, the controls and the saves. Advanced: the MT-32 ROMs, the Amiga files, the keyboard and the player options. Cut content: scenes and modes the original's files hold and its programs never reach. Everything of Advanced and Cut content is off by default and not in the original. Ctrl+Tab goes to the next tab.",
             Item.Save => _context.SettingsPath is { } path ? $"Saves the settings into {path} and closes. Esc and the window's close button save too." : "Closes (no settings file can be written here: the changes are lost).",
             Item.Play => _model.CanPlay ? "Saves the settings and starts the game." : "Choose the folder of your copy of the game first.",

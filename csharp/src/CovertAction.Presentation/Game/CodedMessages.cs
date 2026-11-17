@@ -1,3 +1,4 @@
+using CovertAction.Core;
 using CovertAction.Core.Campaign;
 using CovertAction.Core.Shared;
 using CovertAction.Msc;
@@ -11,8 +12,12 @@ namespace CovertAction.Presentation.Game;
 /// </summary>
 /// <param name="state">The campaign.</param>
 /// <param name="screens">The campaign's screens (their text and drawing routines).</param>
-public sealed class CodedMessages(CampaignState state, CampaignScreens screens)
+/// <param name="behaviourOrNull">Which of the original's bugs to reproduce and which cut content plays; the original's own when left out.</param>
+public sealed class CodedMessages(CampaignState state, CampaignScreens screens, OriginalBehaviour? behaviourOrNull = null)
 {
+    private readonly OriginalBehaviour behaviour = behaviourOrNull ?? OriginalBehaviour.Faithful;
+
+
     /// <summary>The library's text routines (the reader of the text files).</summary>
     private LibraryText text => screens.Text;
 
@@ -36,6 +41,9 @@ public sealed class CodedMessages(CampaignState state, CampaignScreens screens)
 
     /// <summary>Variants of the paragraphs on cities and organisations, of the filler, of the helper.</summary>
     private const int PlaceVariants = 8, FillerVariants = 12, HelperVariants = 2;
+
+    /// <summary>The filler sentences TEXT.DTA holds (*FLUF00 to *FLUF15), four more than the code draws from (CC-11).</summary>
+    private const int FillerSentencesInTheFile = 16;
 
     /// <summary>A message's alarm above this value gives an alarm paragraph instead of a helper.</summary>
     private const int AlarmThreshold = 0xf;
@@ -107,7 +115,7 @@ public sealed class CodedMessages(CampaignState state, CampaignScreens screens)
                     state.Txt.Text += state.StrCodedEnd;
                     break;
                 case Filler:
-                    text.ReadRandomVariant(state.TextFileName, state.FillerTag, FillerVariants);
+                    ReadFiller();
                     break;
                 case AlarmOrHelper:
                     AppendAlarmOrHelper(message.Alert, sender, receiver);
@@ -115,6 +123,17 @@ public sealed class CodedMessages(CampaignState state, CampaignScreens screens)
             }
         }
         while (used != AllParagraphs);
+    }
+
+    /// <summary>
+    /// Appends a filler sentence: one of the first twelve of TEXT.DTA's sixteen, as the code asks for; with the player's option
+    /// (D-663, CC-11) one of all sixteen, the four the code never draws included.
+    /// </summary>
+    /// <remarks>New code: the original makes the call inline in <see cref="ComposeMessageText"/>.</remarks>
+    public void ReadFiller()
+    {
+        // DIVERGENCE: D-663 a player's option (cutContent.fillerTexts): the count is the file's 16, not the code's 12
+        text.ReadRandomVariant(state.TextFileName, state.FillerTag, behaviour.CutContent.FillerTexts ? FillerSentencesInTheFile : FillerVariants);
     }
 
     /// <summary>Reads a paragraph with variants when the player knows something of the person.</summary>

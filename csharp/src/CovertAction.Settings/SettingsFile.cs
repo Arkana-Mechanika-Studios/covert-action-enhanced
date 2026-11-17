@@ -301,6 +301,7 @@ internal static class SettingsFile
                 case "capturedDossier": settings.CutCapturedDossier = Boolean(key, property.Value) ?? settings.CutCapturedDossier; break;
                 case "standaloneChase": settings.CutStandaloneChase = Boolean(key, property.Value) ?? settings.CutStandaloneChase; break;
                 case "hardestCircuit": settings.CutHardestCircuit = Boolean(key, property.Value) ?? settings.CutHardestCircuit; break;
+                case "fillerTexts": settings.CutFillerTexts = Boolean(key, property.Value) ?? settings.CutFillerTexts; break;
                 default: Unknown(key); break;
             }
         }
@@ -474,7 +475,11 @@ internal static class SettingsFile
             // true: the electronics board has a difficulty more, the fourth the game's own code carries: on the hardest
             // level an agent of the lowest electronics rating gets a board that shows only its last column of chips and
             // has eight fixed hidden ones. false: as the original (the hardest board is the third).
-            "hardestCircuit": false
+            "hardestCircuit": false,
+            // true: the filler sentence of a coded message is one of all 16 in TEXT.DTA; the game's code asks for 12 and
+            // never shows the last four ("Extreme caution is advised ...", "Do not hesitate to act in a decisive manner",
+            // ...). false: as the original.
+            "fillerTexts": false
           }
         }
         """;

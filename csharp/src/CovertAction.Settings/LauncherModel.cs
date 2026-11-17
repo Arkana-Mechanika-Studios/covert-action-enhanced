@@ -81,7 +81,7 @@ internal sealed class LauncherModel
     private readonly bool _initialAmigaPictures;
 
     /// <summary>The cut-content options as the launcher opened.</summary>
-    private readonly bool _initialCapturedDossier, _initialStandaloneChase, _initialHardestCircuit;
+    private readonly bool _initialCapturedDossier, _initialStandaloneChase, _initialHardestCircuit, _initialFillerTexts;
 
     public LauncherModel(LauncherContext context, (int Width, int Height)? display)
     {
@@ -123,6 +123,7 @@ internal sealed class LauncherModel
         CutCapturedDossier = _initialCapturedDossier = start.CutCapturedDossier;
         CutStandaloneChase = _initialStandaloneChase = start.CutStandaloneChase;
         CutHardestCircuit = _initialHardestCircuit = start.CutHardestCircuit;
+        CutFillerTexts = _initialFillerTexts = start.CutFillerTexts;
     }
 
     private static string? Blank(string? text) => string.IsNullOrWhiteSpace(text) ? null : text;
@@ -217,6 +218,9 @@ internal sealed class LauncherModel
 
     /// <summary>The electronics board's fourth difficulty (cutContent.hardestCircuit, D-662).</summary>
     public bool CutHardestCircuit { get; set; }
+
+    /// <summary>The coded messages' filler from all 16 sentences (cutContent.fillerTexts, D-663).</summary>
+    public bool CutFillerTexts { get; set; }
 
     /// <summary>The MT-32 ROM folder chosen; null: the default (MT32_ROMS next to the program, else where the ROMs are found).</summary>
     public string? Mt32Roms
@@ -385,6 +389,10 @@ internal sealed class LauncherModel
         {
             changes["cutContent.hardestCircuit"] = CutHardestCircuit;
         }
+        if (CutFillerTexts != _initialFillerTexts)
+        {
+            changes["cutContent.fillerTexts"] = CutFillerTexts;
+        }
         return changes;
     }
 
@@ -419,6 +427,7 @@ internal sealed class LauncherModel
         s.CutCapturedDossier = CutCapturedDossier;
         s.CutStandaloneChase = CutStandaloneChase;
         s.CutHardestCircuit = CutHardestCircuit;
+        s.CutFillerTexts = CutFillerTexts;
         return s;
     }
 

@@ -80,6 +80,9 @@ internal sealed record StartSettings
     /// <summary>The electronics board may have its dormant difficulty 4 (cutContent.hardestCircuit, D-662; off by default).</summary>
     public bool CutHardestCircuit { get; init; }
 
+    /// <summary>The coded messages' filler is drawn from all 16 sentences of TEXT.DTA (cutContent.fillerTexts, D-663; off by default).</summary>
+    public bool CutFillerTexts { get; init; }
+
     /// <summary>The Amiga version's pictures in place of the PC's where it has the same one (graphics.amiga, D-642; off by default).</summary>
     public bool AmigaPictures { get; init; }
 
@@ -169,6 +172,7 @@ internal sealed record StartSettings
             CutCapturedDossier = file.CutCapturedDossier ?? false,
             CutStandaloneChase = file.CutStandaloneChase ?? false,
             CutHardestCircuit = file.CutHardestCircuit ?? false,
+            CutFillerTexts = file.CutFillerTexts ?? false,
             FixedKeys = fixedKeys,
         };
     }

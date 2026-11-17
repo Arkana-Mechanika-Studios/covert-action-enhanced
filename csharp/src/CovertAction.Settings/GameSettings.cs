@@ -108,6 +108,9 @@ internal sealed class GameSettings
     /// <summary>The electronics board may have its dormant difficulty 4 (cutContent.hardestCircuit, D-662; not in the original, off by default).</summary>
     public bool? CutHardestCircuit { get; set; }
 
+    /// <summary>The coded messages' filler is drawn from all 16 sentences of TEXT.DTA (cutContent.fillerTexts, D-663; not in the original, off by default).</summary>
+    public bool? CutFillerTexts { get; set; }
+
     /// <summary>A copy (a change to it leaves this one as it is).</summary>
     public GameSettings Copy() => (GameSettings)MemberwiseClone();
 
