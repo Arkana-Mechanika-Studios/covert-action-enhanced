@@ -296,6 +296,31 @@ public sealed class LibraryInput(ILibraryState state, Boundaries world)
     /// <remarks>New code (D-636). Without the mouse option: false, and no call of the mouse driver.</remarks>
     public bool ReadPointerRightPress() => PointerOn && world.Mouse.ButtonPresses(1).Count > 0;
 
+    /// <summary>Whether the car chase takes the mouse: the chase option (D-670) and the mouse itself are on.</summary>
+    /// <remarks>New code (D-670).</remarks>
+    public bool ChasePointerOn => world.MouseChase && PointerOn;
+
+    /// <summary>
+    /// The button press since the last look, the right button first (the left press is dropped with it), or null: the car
+    /// chase turns it into the key it stands for.
+    /// </summary>
+    /// <remarks>New code (D-670). Without the mouse option: null, and no call of the mouse driver.</remarks>
+    public PointerClick? ReadPointerClick()
+    {
+        if (!PointerOn)
+        {
+            return null;
+        }
+        var right = world.Mouse.ButtonPresses(1);
+        if (right.Count > 0)
+        {
+            world.Mouse.ButtonPresses(0);
+            return new PointerClick(true, right.X / MouseUnitsPerPixel, right.Y);
+        }
+        var left = world.Mouse.ButtonPresses(0);
+        return left.Count > 0 ? new PointerClick(false, left.X / MouseUnitsPerPixel, left.Y) : null;
+    }
+
     /// <summary>The screen pixel of the mouse driver's position.</summary>
     private static (int X, int Y) PointerPixel(Platform.MouseStatus status) => (status.X / MouseUnitsPerPixel, status.Y);
 

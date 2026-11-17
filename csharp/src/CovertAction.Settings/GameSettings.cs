@@ -96,6 +96,9 @@ internal sealed class GameSettings
     /// <summary>The mouse in the menus, lists and maps (input.mouse; not in the original, off by default).</summary>
     public bool? Mouse { get; set; }
 
+    /// <summary>The mouse in the car chase, as well (input.mouseChase; needs input.mouse; not in the original, off by default; D-670).</summary>
+    public bool? MouseChase { get; set; }
+
     /// <summary>The game's pictures are replaced, where the Amiga version has the same one, by the Amiga version's, from the player's own Amiga files (graphics.amiga, D-642; off by default).</summary>
     public bool? AmigaPictures { get; set; }
 

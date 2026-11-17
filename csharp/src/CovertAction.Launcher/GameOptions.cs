@@ -22,6 +22,10 @@ namespace CovertAction.Launcher;
 /// the host's pointer, when the host has one; off (or without a pointer), the PC has no mouse, as the original assumes
 /// (docs/faithfulness/DIVERGENCES.md D-630).
 /// </param>
+/// <param name="MouseChase">
+/// The mouse in the car chase as well (the settings' input.mouseChase, off by default; D-670): used only when <paramref name="Mouse"/>
+/// is on too. Clicks stand for the chase's keys (a turn, a gear, the other tail car, the arrest, entering the building, the speed).
+/// </param>
 /// <param name="FixOriginalBugs">The launcher's option "Fix the original's bugs" (fixes.originalBugs): the safe group of the register's bugs is fixed (<see cref="CovertAction.Core.OriginalBehaviour.ForPlayer"/>); off by default.</param>
 /// <param name="FixCampaignBugs">The launcher's option "Also fix campaign-logic bugs" (fixes.campaignBugs): the bugs of the campaign's logic as well; off by default.</param>
 /// <param name="CutStandaloneChase">The launcher's option "Free car chase" (cutContent.standaloneChase, D-661): the practice menu offers the car chase on its own; off by default.</param>
@@ -30,7 +34,7 @@ namespace CovertAction.Launcher;
 /// <param name="CutCapturedDossier">The launcher's option "Captured dossier" (cutContent.capturedDossier, D-660): CAPTRD01.PAN plays when a cast member is captured; off by default.</param>
 public sealed record GameOptions(char SoundLetter = 'A', bool Joystick = true, string? Mt32RomFolder = null, bool AskSetUpQuestions = false,
     bool ArrowKeysWalk = false, char? MusicLetter = null, char? EffectsLetter = null, bool Mouse = false, string? AmigaFolder = null, bool AmigaOnlyWhereOriginal = false, bool AmigaPictures = false,
-    bool FixOriginalBugs = false, bool FixCampaignBugs = false, bool CutCapturedDossier = false, bool CutStandaloneChase = false, bool CutHardestCircuit = false, bool CutFillerTexts = false)
+    bool FixOriginalBugs = false, bool FixCampaignBugs = false, bool MouseChase = false, bool CutCapturedDossier = false, bool CutStandaloneChase = false, bool CutHardestCircuit = false, bool CutFillerTexts = false)
 {
     /// <summary>
     /// Which of the original's bugs the game reproduces, from the two fix options: every part of the game gets this one object.

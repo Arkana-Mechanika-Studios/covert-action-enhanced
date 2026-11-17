@@ -270,6 +270,7 @@ internal static class SettingsFile
                 case "keyMap": settings.KeyMap = Pairs(key, property.Value, pad: false) ?? settings.KeyMap; break;
                 case "padMap": settings.PadMap = Pairs(key, property.Value, pad: true) ?? settings.PadMap; break;
                 case "mouse": settings.Mouse = Boolean(key, property.Value) ?? settings.Mouse; break;
+                case "mouseChase": settings.MouseChase = Boolean(key, property.Value) ?? settings.MouseChase; break;
                 default: Unknown(key); break;
             }
         }
@@ -477,7 +478,12 @@ internal static class SettingsFile
 
             // true: the mouse in the menus, lists and maps (not in the original): pointing moves the highlight, a left
             // click takes the choice, a right click is Esc. Command line: --mouse, --no-mouse.
-            "mouse": false
+            "mouse": false,
+
+            // true: the mouse in the car chase as well (needs "mouse": true; not in the original): a click on the map or
+            // the street view turns the car as the arrow key would, the windscreen and bonnet shift gears, a right click
+            // is the arrest key. Command line: --mouse-chase, --no-mouse-chase.
+            "mouseChase": false
           },
 
           "fixes": {

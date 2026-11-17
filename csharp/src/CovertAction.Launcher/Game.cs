@@ -134,7 +134,7 @@ public sealed class Game
         _files = new GameFolderFiles(folder, savesFolder);
         // DIVERGENCE: D-642 a player's option: the Amiga version's pictures, read from the player's own Amiga files, in place of the PC's where the layouts agree.
         var pictures = AmigaPictures = options.AmigaPictures ? AmigaPictureSource.Open(Graphics.PictureColours, options.AmigaFolder, folder.Path) : null;
-        _world = new Boundaries(Graphics, _sound, _keyboard = new KeyboardDriver(link), MouseDriver(host, options), new GameTimer(link), _files, pictures);
+        _world = new Boundaries(Graphics, _sound, _keyboard = new KeyboardDriver(link), MouseDriver(host, options), new GameTimer(link), _files, pictures, MouseInChase(host, options));
         _host = host;
         _link = link;
     }
@@ -155,6 +155,10 @@ public sealed class Game
     // DIVERGENCE: D-630 the mouse is a player option, off by default; with it off the game's world has no mouse, as the original assumes.
     private static IMouseDriver MouseDriver(IHost host, GameOptions options) =>
         options.Mouse && host.Input.Pointer is { } pointer ? new HostMouseDriver(pointer) : new NoMouseDriver();
+
+    /// <summary>Whether the car chase takes the mouse as well (new code): the chase option, and the mouse itself on with a host that has a pointer.</summary>
+    // DIVERGENCE: D-670 the mouse in the car chase is a second player option, off by default, used only with the mouse option (D-630).
+    private static bool MouseInChase(IHost host, GameOptions options) => options.MouseChase && options.Mouse && host.Input.Pointer is not null;
 
     /// <summary>The text page the host shows while the display is in text mode (the set-up screen), else null (for tests and tools; new code).</summary>
     public TextScreen? TextPage => _link.TextPage;

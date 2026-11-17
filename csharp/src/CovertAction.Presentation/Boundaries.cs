@@ -13,9 +13,13 @@ namespace CovertAction.Presentation;
 /// <param name="timer">The time of day and the display's frames.</param>
 /// <param name="files">The game's files.</param>
 /// <param name="pictures">The pictures shown in place of the game's own (a player's option, D-642); null, the default: the game's.</param>
+/// <param name="mouseChase">The car chase takes the mouse as well (a player's option, D-670; needs a mouse driver with a mouse); false, the default: it does not.</param>
 public sealed class Boundaries(IGraphicsDriver graphics, ISoundDriver sound, IInputDriver input, IMouseDriver mouse, IGameTimer timer, IFiles files,
-    IPictureReplacements? pictures = null)
+    IPictureReplacements? pictures = null, bool mouseChase = false)
 {
+    /// <summary>The car chase takes the mouse as well (D-670); false: it never asks the mouse driver anything.</summary>
+    public bool MouseChase { get; } = mouseChase;
+
     /// <summary>The pictures shown in place of the game's own (D-642); null: none, the game's pictures show.</summary>
     public IPictureReplacements? PictureReplacements { get; } = pictures;
 

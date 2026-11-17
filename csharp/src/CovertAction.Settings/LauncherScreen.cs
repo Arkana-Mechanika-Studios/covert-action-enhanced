@@ -378,6 +378,11 @@ internal sealed class LauncherScreen
     private bool IsFixed(Item item, out string by)
     {
         by = "";
+        // the one mouse row holds both mouse options (D-630, D-670): either one fixed fixes the row
+        if (item == Item.Mouse && _model.IsFixed("input.mouseChase", out by))
+        {
+            return true;
+        }
         return KeyOf(item) is { } key && _model.IsFixed(key, out by);
     }
 
@@ -468,7 +473,7 @@ internal sealed class LauncherScreen
                 TestMix();
                 break;
             case Item.Mouse:
-                _model.Mouse = !_model.Mouse;
+                _model.CycleMouse();
                 break;
             case Item.KeyPick:
                 _model.CycleKey(step);
@@ -1034,7 +1039,7 @@ internal sealed class LauncherScreen
             y = Select(y, "Music on", LauncherModel.Label(LauncherModel.MusicChoices, _model.MusicCard), Item.Music, mixTest, Item.MixTest);
             y = Select(y, "Effects on", LauncherModel.Label(LauncherModel.EffectsChoices, _model.EffectsCard), Item.Effects);
             y = Status(y, MixStatus());
-            y = Select(y, "Mouse in the menus", _model.Mouse ? "Yes" : "No", Item.Mouse);
+            y = Select(y, "Mouse", LauncherModel.Label(LauncherModel.MouseChoices, _model.MouseChoice), Item.Mouse);
             y = Select(y, "Fix the original's bugs", _model.FixOriginalBugs ? "Yes" : "No", Item.FixOriginalBugs);
             y = Select(y, "Also campaign-logic bugs", _model.FixCampaignBugs ? "Yes" : "No", Item.FixCampaignBugs);
         }
@@ -1258,7 +1263,7 @@ internal sealed class LauncherScreen
             Item.Effects => "The card the sound effects play on: the aeroplane, the cars, shots, doors. The sound card (the default) plays them. Amiga: the Amiga version's effects from your own Amiga files where it has them, the sound card's elsewhere (D-641). A card here plays them while the music plays on the card above (D-620); None plays none." + fixedNote,
             Item.MixTest => "Plays the theme on the music's card and a shot, the Uzi and a door on the effects' card, for a few seconds, through your game's own sound drivers.",
             Item.AmigaPictures => "Not in the original (D-642). Yes: the Amiga version's faces, icons, maps, hotel and most city pictures, in the Amiga's colours, read from your own Amiga files (the .pix files; none come with the program); pictures the Amiga redrew stay the PC's. No (the default): the PC's pictures, also when the files are missing." + fixedNote,
-            Item.Mouse => "Not in the original. Yes: the mouse works in the menus, the lists and on the flight map: point at a choice to highlight it, left click to take it, right click for Esc; a click also answers \"press a key\". The keys work as before. No: no mouse, as the original (the default)." + fixedNote,
+            Item.Mouse => "Not in the original. Menus: the mouse works in the menus, the lists, the maps and the building raid: point at a choice to highlight it, left click to take it, right click for Esc; a click also answers \"press a key\". Menus and car chase: also in the car chase, where a click stands for a key: on the map or the street view the arrow of that side of the car, the windscreen shifts up and the bonnet down, a right click the arrest key. The keys work as before. No: no mouse, as the original (the default)." + fixedNote,
             Item.FixOriginalBugs => "Not in the original. Yes: the original's bugs that do not change the story are fixed (a clue's text, a key left in the buffer, the Delete key of the name field, the chief's comment after a capture, the Tandy driver's second pause, and others the release notes list). A game saved this way loads in the original. No (the default): the original as it was played in 1990." + fixedNote,
             Item.FixCampaignBugs => "Not in the original. Yes: also the bugs of the campaign's logic are fixed; this changes the story's events. No (the default): as the original." + fixedNote,
             Item.CutCapturedDossier => "Not in the original (D-660). Yes: when a cast member is captured, the dossier page stamped CAPTURED that the game ships (CAPTRD01.PAN) is shown after the arrest, before the chief's comment, with the photograph of a man or of a woman. No (the default): as the original, which never plays it." + fixedNote,

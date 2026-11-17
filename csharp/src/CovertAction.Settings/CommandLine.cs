@@ -33,6 +33,7 @@ internal sealed class CommandLine
         --arrow-keys-walk  in a building raid the grey arrows walk like the keypad (Shift+arrow lunges)
         --key-repeat <how> pc (the PC keyboard's repeat; default) or windows (COVERT_KEY_REPEAT=system)
         --mouse, --no-mouse  the mouse in the menus, lists and maps (not in the original; default: off)
+        --mouse-chase, --no-mouse-chase  the mouse in the car chase, as well (needs --mouse; default: off)
         --settings <file>  read and save this settings file instead of the one found
         --setup            open the launcher first; its Play starts the game
         --no-launcher      never open the launcher (a missing game folder ends the program with a message)
@@ -69,6 +70,9 @@ internal sealed class CommandLine
 
     /// <summary>--mouse (true) or --no-mouse (false): the mouse in the menus (input.mouse); null: not given.</summary>
     public bool? Mouse { get; private set; }
+
+    /// <summary>--mouse-chase (true) or --no-mouse-chase (false): the mouse in the car chase (input.mouseChase); null: not given.</summary>
+    public bool? MouseChase { get; private set; }
 
     public string? SettingsFile { get; private set; }
 
@@ -120,6 +124,12 @@ internal sealed class CommandLine
                     break;
                 case "--no-mouse":
                     cli.Mouse = false;
+                    break;
+                case "--mouse-chase":
+                    cli.MouseChase = true;
+                    break;
+                case "--no-mouse-chase":
+                    cli.MouseChase = false;
                     break;
                 case "--saves":
                     cli.SavesFolder = Value() ?? cli.Fail("--saves needs a folder");

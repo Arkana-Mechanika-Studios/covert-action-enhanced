@@ -12,12 +12,13 @@ namespace CovertAction.Host.Headless;
 internal static class Program
 {
     private const string Usage = """
-        CovertAction.Host.Headless [game folder] [--practice crypto|chase] [--level 0..3] [--seed n] [--keys script] [--out picture.bmp] [--saves folder] [--mouse on|off]
+        CovertAction.Host.Headless [game folder] [--practice crypto|chase] [--level 0..3] [--seed n] [--keys script] [--out picture.bmp] [--saves folder] [--mouse on|off] [--mouse-chase on|off]
 
         game folder  without it, the folder named by COVERT_GAME_DIR, else the current folder
         --practice   a developer's shortcut: one practice session of the part, without the set-up and the menus;
                      without it the game starts as the player's does, with the set-up screen's title (no sound, keyboard only)
         --saves      the folder the game's saves are written to; without it the run cannot save (a check leaves no files)
+        --mouse-chase on: the mouse in the car chase as well (input.mouseChase; needs --mouse on); off (the default)
         --mouse      on: the mouse in the menus, lists and maps (the settings' input.mouse); off (the default): no mouse
 
         script   the keys to press, in order: a character is its key; {enter} {esc} {up} {down} {left} {right}
@@ -38,6 +39,7 @@ internal static class Program
         string? path = null, saves = null;
         int level = 0, seed = 0;
         var mouse = false;
+        var mouseChase = false;
         var first = 0;
         if (args.Length > 0 && !args[0].StartsWith('-'))
         {
@@ -60,6 +62,7 @@ internal static class Program
                 case "--out": output = args[i + 1]; break;
                 case "--saves": saves = args[i + 1]; break;
                 case "--mouse" when args[i + 1] is "on" or "off": mouse = args[i + 1] == "on"; break;
+                case "--mouse-chase" when args[i + 1] is "on" or "off": mouseChase = args[i + 1] == "on"; break;
                 default:
                     Console.Error.WriteLine(Usage);
                     return 2;
@@ -68,7 +71,7 @@ internal static class Program
         var host = new HeadlessHost(Keys(script), seed);
         var folder = path is not null ? new GameFolder(path) : GameFolder.FromEnvironment() ?? new GameFolder(Environment.CurrentDirectory);
         // the set-up's answers a host without sound and without a joystick gives: no sound, keyboard only
-        var game = new Game(folder, host, saves, new GameOptions(SoundLetter: 'N', Joystick: false, Mouse: mouse));
+        var game = new Game(folder, host, saves, new GameOptions(SoundLetter: 'N', Joystick: false, Mouse: mouse, MouseChase: mouseChase));
         if (practice == "")
         {
             game.Main();

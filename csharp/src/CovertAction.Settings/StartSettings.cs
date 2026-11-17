@@ -71,6 +71,9 @@ internal sealed record StartSettings
     /// <summary>The mouse in the menus, lists and maps (input.mouse; off by default, as the original has none).</summary>
     public bool Mouse { get; init; }
 
+    /// <summary>The mouse in the car chase, as well (input.mouseChase; off by default; used only with <see cref="Mouse"/>; D-670).</summary>
+    public bool MouseChase { get; init; }
+
     /// <summary>Fix the original's bugs, the safe group (fixes.originalBugs; off by default).</summary>
     public bool FixOriginalBugs { get; init; }
 
@@ -140,6 +143,7 @@ internal sealed record StartSettings
         var fullscreen = Switch("display.fullscreen", cli.Fullscreen, "--fullscreen", file.Fullscreen);
         var arrowsWalk = Switch("input.arrowKeysWalk", cli.ArrowKeysWalk, "--arrow-keys-walk", file.ArrowKeysWalk);
         var mouse = Switch("input.mouse", cli.Mouse, cli.Mouse == false ? "--no-mouse" : "--mouse", file.Mouse);
+        var mouseChase = Switch("input.mouseChase", cli.MouseChase, cli.MouseChase == false ? "--no-mouse-chase" : "--mouse-chase", file.MouseChase);
 
         // the window: a size on the command line (--window or --scale) replaces both keys of the file
         (int Width, int Height) size;
@@ -175,6 +179,7 @@ internal sealed record StartSettings
             AmigaOriginalOnly = file.AmigaOriginalOnly ?? false,
             AmigaPictures = file.AmigaPictures ?? false,
             Mouse = mouse,
+            MouseChase = mouseChase,
             FixOriginalBugs = file.FixOriginalBugs ?? false,
             FixCampaignBugs = file.FixCampaignBugs ?? false,
             CutCapturedDossier = file.CutCapturedDossier ?? false,

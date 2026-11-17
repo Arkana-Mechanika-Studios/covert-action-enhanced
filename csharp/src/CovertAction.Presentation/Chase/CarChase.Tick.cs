@@ -58,9 +58,16 @@ public sealed partial class CarChase
             DoSound(SoundEngineCar2);
             DoSound(SoundEngineCar1);
             Input.FlushInput();
+            Input.BeginPointer();
         }
         // C: the driver is asked first, the frame tested after
-        if (!_world.Input.NoKeyWaiting() && state.Frame > StartFrame && TakeKey())
+        var keyWaiting = !_world.Input.NoKeyWaiting();
+        if (keyWaiting && state.Frame > StartFrame && TakeKey())
+        {
+            return;
+        }
+        // DIVERGENCE: D-670 with the car-chase mouse option on (and the mouse option), when no key waits, a click is the key it stands for.
+        if (!keyWaiting && Input.ChasePointerOn && ReadChaseMouseKey() is var mouseKey && mouseKey != -1 && state.Frame > StartFrame && TakeKey(mouseKey))
         {
             return;
         }
@@ -80,13 +87,14 @@ public sealed partial class CarChase
     }
 
     /// <summary>Reads and carries out one key (see <see cref="ChaseTick"/>).</summary>
+    /// <param name="mouseKey">The key a mouse click stands for (D-670), or -1: the key the driver has.</param>
     /// <returns>True when the frame ends at once (an arrest, Esc).</returns>
-    private bool TakeKey()
+    private bool TakeKey(int mouseKey = -1)
     {
         var state = _state;
         var cars = state.Cars;
         var flee = state.ChaseMode == ChaseMode.Flee;
-        switch (Input.ReadKey())
+        switch (mouseKey != -1 ? mouseKey : Input.ReadKey())
         {
             case KeyFast:
                 state.GameSpeed = 2;

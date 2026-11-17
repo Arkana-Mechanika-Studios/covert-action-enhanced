@@ -64,6 +64,7 @@ internal sealed class LauncherModel
 
     /// <summary>The mouse option as the launcher opened.</summary>
     private readonly bool _initialMouse;
+    private readonly bool _initialMouseChase;
 
     /// <summary>The two bug-fix options as the launcher opened.</summary>
     private readonly (bool Original, bool Campaign) _initialFixes;
@@ -104,6 +105,7 @@ internal sealed class LauncherModel
         KeyRepeat = start.SystemKeyRepeat ? "windows" : "pc";
         ArrowKeysWalk = IsFixed("input.arrowKeysWalk", out _) ? start.ArrowKeysWalk : s.ArrowKeysWalk ?? false;
         Mouse = _initialMouse = start.Mouse;
+        MouseChase = _initialMouseChase = start.MouseChase;
         FixOriginalBugs = start.FixOriginalBugs;
         FixCampaignBugs = start.FixCampaignBugs;
         _initialFixes = (FixOriginalBugs, FixCampaignBugs);
@@ -270,6 +272,26 @@ internal sealed class LauncherModel
 
     /// <summary>The mouse in the menus, lists and maps (input.mouse).</summary>
     public bool Mouse { get; set; }
+
+    /// <summary>The mouse in the car chase, as well (input.mouseChase; takes effect only with <see cref="Mouse"/>).</summary>
+    public bool MouseChase { get; set; }
+
+    /// <summary>The mouse row's choices: no mouse, the mouse in the menus, the mouse in the car chase as well (input.mouse, input.mouseChase).</summary>
+    public static readonly IReadOnlyList<(string Value, string Label)> MouseChoices = [("none", "No"), ("menus", "Menus"), ("chase", "Menus and car chase")];
+
+    /// <summary>The mouse row's choice now: the car-chase option counts only with the mouse option on.</summary>
+    public string MouseChoice => !Mouse ? "none" : MouseChase ? "chase" : "menus";
+
+    /// <summary>The mouse row, one step on: no mouse, menus, menus and car chase, no mouse.</summary>
+    public void CycleMouse()
+    {
+        (Mouse, MouseChase) = MouseChoice switch
+        {
+            "none" => (true, false),
+            "menus" => (true, true),
+            _ => (false, false),
+        };
+    }
 
     /// <summary>Fix the original's bugs, the safe group (fixes.originalBugs).</summary>
     public bool FixOriginalBugs { get; set; }
@@ -443,6 +465,10 @@ internal sealed class LauncherModel
         {
             changes["input.mouse"] = Mouse;
         }
+        if (MouseChase != _initialMouseChase)
+        {
+            changes["input.mouseChase"] = MouseChase;
+        }
         if (FixOriginalBugs != _initialFixes.Original)
         {
             changes["fixes.originalBugs"] = FixOriginalBugs;
@@ -501,6 +527,7 @@ internal sealed class LauncherModel
         s.AmigaFiles = AmigaFiles;
         s.AmigaOriginalOnly = AmigaOriginalOnly;
         s.Mouse = Mouse;
+        s.MouseChase = MouseChase;
         s.FixOriginalBugs = FixOriginalBugs;
         s.FixCampaignBugs = FixCampaignBugs;
         s.AmigaPictures = AmigaPictures;

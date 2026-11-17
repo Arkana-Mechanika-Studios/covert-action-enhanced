@@ -75,6 +75,27 @@ public static class PointerHit
         return ((sector % 8 + 8) % 8) + 1;
     }
 
+    /// <summary>
+    /// The side of the map (0 up, 1 right, 2 down, 3 left: the car chase's headings) a vector points to: the longer of its
+    /// two parts decides, and a tie goes to the vertical one.
+    /// </summary>
+    /// <param name="dx">The vector's part across (positive to the right).</param>
+    /// <param name="dy">The vector's part down (positive down the screen).</param>
+    /// <returns>0..3; -1 when the vector is shorter than two pixels both ways (the pointer is on the point).</returns>
+    /// <remarks>New code (D-670).</remarks>
+    public static int Direction4(int dx, int dy)
+    {
+        if (Math.Abs(dx) < 2 && Math.Abs(dy) < 2)
+        {
+            return -1;
+        }
+        if (Math.Abs(dx) > Math.Abs(dy))
+        {
+            return dx > 0 ? 1 : 3;
+        }
+        return dy > 0 ? 2 : 0;
+    }
+
     /// <summary>The first of some rectangles that holds a pixel.</summary>
     /// <param name="x">The pixel across.</param>
     /// <param name="y">The pixel down.</param>
@@ -92,6 +113,12 @@ public static class PointerHit
         return -1;
     }
 }
+
+/// <summary>A mouse button pressed, and where (pixels of the screen). New code (D-670).</summary>
+/// <param name="Right">The right button (else the left).</param>
+/// <param name="X">The pixel across.</param>
+/// <param name="Y">The pixel down.</param>
+public readonly record struct PointerClick(bool Right, int X, int Y);
 
 /// <summary>What the mouse did since a menu or list last asked (<see cref="LibraryInput.ReadPointer"/>). New code (D-630).</summary>
 public enum PointerAction
