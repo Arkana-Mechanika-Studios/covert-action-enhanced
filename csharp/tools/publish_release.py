@@ -107,13 +107,14 @@ def main():
     out.mkdir(parents=True, exist_ok=True)
 
     # the game, self-contained in one folder (the launcher program and MT32_ROMS come with it: the host's publish targets)
-    # (Linux: the program is one compressed single file; libSDL3.so.0, libmt32emu.so and the launcher script come beside it)
+    # (the program is one compressed single file; SDL 3, mt32emu and the launcher program or script come beside it)
     publish = ["dotnet", "publish", str(HOST), "-c", "Release", "-r", runtime, "--self-contained", "true", "-nologo",
                "-o", str(folder), f"-p:Version={version}", "-p:DebugType=none", "-p:SatelliteResourceLanguages=en",
                "-p:GenerateDocumentationFile=false"]
-    if linux:
-        publish += ["-p:PublishSingleFile=true", "-p:EnableCompressionInSingleFile=true",
-                    "-p:AllowedReferenceRelatedFileExtensions=.none"]
+    # one compressed single-file program on both systems, as the Darklands Restoration Project's: only the native
+    # libraries (SDL 3, mt32emu) and the launcher stay beside it
+    publish += ["-p:PublishSingleFile=true", "-p:EnableCompressionInSingleFile=true",
+                "-p:AllowedReferenceRelatedFileExtensions=.none"]
     subprocess.run(publish, check=True)
 
     # the documents
@@ -161,8 +162,8 @@ def main():
     for path in folder.rglob("*"):
         if path.is_file() and (path.suffix.lower() in GAME_FILES or path.name.lower() in GAME_PROGRAMS):
             sys.exit(f"a game file is in the release: {path}")
-    programs = (["CovertAction", "CovertAction Launcher", "libSDL3.so.0", "libmt32emu.so"] if linux
-                else ["CovertAction.exe", "CovertAction Launcher.exe", "SDL3.dll"])
+    programs = (["CovertAction", "CovertAction Launcher", "libSDL3.so.0", "libmt32emu.so", "Mt32emu.dll"] if linux
+                else ["CovertAction.exe", "CovertAction Launcher.exe", "SDL3.dll", "libmt32emu.dll", "Mt32emu.dll"])
     for needed in [*programs, "README.txt", "RELEASE_NOTES.md", "LICENSE",
                    "THIRD_PARTY_NOTICES.md", "licences/README.txt", "licences/SDL3-zlib.txt", "licences/mt32emu-LGPL-2.1.txt",
                    "licences/mt32emu-SOURCE.txt", "licences/dotnet-LICENSE.txt", "licences/dotnet-ThirdPartyNotices.txt",

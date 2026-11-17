@@ -44,6 +44,15 @@
   </ItemGroup>
   <!-- a release carries an empty MT32_ROMS folder beside the program, where the player puts MT-32 / CM-32L ROM files
        for the Roland choice of the set-up (none is included; THIRD_PARTY_NOTICES.md); as the Darklands Restoration Project's -->
+  <!-- a single-file publish (publish_release.py) keeps Mt32emu.dll, the LGPL binding of mt32emu, beside the program and
+       out of the bundle, so a player can put another build of it in its place (licences/mt32emu-SOURCE.txt) -->
+  <Target Name="KeepMt32BindingBeside" AfterTargets="ComputeResolvedFilesToPublishList">
+    <ItemGroup>
+      <ResolvedFileToPublish Condition="'%(Filename)%(Extension)' == 'Mt32emu.dll'">
+        <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      </ResolvedFileToPublish>
+    </ItemGroup>
+  </Target>
   <Target Name="CreateMt32RomFolder" AfterTargets="Publish">
     <MakeDir Directories="$(PublishDir)MT32_ROMS" />
   </Target>
