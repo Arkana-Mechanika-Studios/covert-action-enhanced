@@ -43,7 +43,7 @@ internal static partial class Program
 
         if (cli.LauncherScreenshot is { } shot)
         {
-            return Screenshot(shot, gameFolder is null ? LauncherReason.GameNotFound : LauncherReason.Asked, settings, start, settingsPath);
+            return Screenshot(shot, gameFolder is null ? LauncherReason.GameNotFound : LauncherReason.Asked, settings, start, settingsPath, cli.LauncherScreenshotTab);
         }
 
         string? startProblem = null;
@@ -142,12 +142,12 @@ internal static partial class Program
             : GameFolderSearch.FindFirst(AppContext.BaseDirectory, Environment.CurrentDirectory)?.Folder;
 
     /// <summary>--launcher-screenshot: the launcher as it would open, drawn into a PNG file without a window.</summary>
-    private static int Screenshot(string file, LauncherReason reason, GameSettings settings, StartSettings start, string? settingsPath)
+    private static int Screenshot(string file, LauncherReason reason, GameSettings settings, StartSettings start, string? settingsPath, int tab)
     {
         try
         {
             var context = LauncherHost.Context(reason, null, settings, start, settingsPath, null);
-            var picture = Settings.Launcher.Picture(context);
+            var picture = Settings.Launcher.Picture(context, tab: tab);
             Settings.Drawing.Png.Write(file, picture.Pixels, picture.Width, picture.Height);
             Console.WriteLine($"The launcher's picture ({picture.Width} x {picture.Height}) is in {Path.GetFullPath(file)}.");
             return 0;

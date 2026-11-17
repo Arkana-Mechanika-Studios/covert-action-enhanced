@@ -38,6 +38,8 @@ internal sealed class CommandLine
         --no-launcher      never open the launcher (a missing game folder ends the program with a message)
         --launcher-screenshot <file.png>
                            draw the launcher as it would open into a PNG file, without a window, and end
+        --launcher-screenshot-tab <tab>
+                           with --launcher-screenshot: the tab to draw, general (default), advanced or cut
         --practice <part>  a developer's shortcut past the set-up and the menus: crypto (decode a message) or chase
         --level <n>        the practice's difficulty, 0 (Local Disturbance, the default) to 3 (Global Crisis)
         --help             this text
@@ -77,6 +79,9 @@ internal sealed class CommandLine
     public bool Help { get; private set; }
 
     public string? LauncherScreenshot { get; private set; }
+
+    /// <summary>--launcher-screenshot-tab: the tab drawn, 0 General (default), 1 Advanced, 2 Cut content.</summary>
+    public int LauncherScreenshotTab { get; private set; }
 
     /// <summary>"crypto", "chase", or "" (the whole game).</summary>
     public string Practice { get; private set; } = "";
@@ -124,6 +129,15 @@ internal sealed class CommandLine
                     break;
                 case "--mt32-roms":
                     cli.Mt32Roms = Value() ?? cli.Fail("--mt32-roms needs a folder");
+                    break;
+                case "--launcher-screenshot-tab":
+                    cli.LauncherScreenshotTab = Value()?.ToLowerInvariant() switch
+                    {
+                        "general" => 0,
+                        "advanced" => 1,
+                        "cut" => 2,
+                        _ => cli.FailNumber("--launcher-screenshot-tab needs general, advanced or cut") ?? 0,
+                    };
                     break;
                 case "--launcher-screenshot":
                     cli.LauncherScreenshot = Value() ?? cli.Fail("--launcher-screenshot needs a file");

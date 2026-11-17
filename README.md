@@ -79,7 +79,7 @@ folder, the keyboard's repeat and, on its Advanced tab, the player options. They
 
 ## Player options
 
-Not in the original, each off by default, on the launcher's Advanced tab ([the settings](csharp/docs/SETTINGS.md)):
+Not in the original, each off by default, on the launcher's Advanced tab (the cut-content options on its Cut content tab; [the settings](csharp/docs/SETTINGS.md)):
 
 * **The mouse** ([D-630 to D-636](csharp/docs/faithfulness/DIVERGENCES.md)): in the menus, lists and on the flight map,
   pointing at a choice highlights it, a left click takes it, a right click is Esc. At the electronics workbench it moves
@@ -111,6 +111,32 @@ Not in the original, each off by default, on the launcher's Advanced tab ([the s
   scene, a career record that overwrites a case, the hours charged after code-breaking, a new case that could hang
   while it was laid out, the Mastermind's meeting of one crime and the skills of an agent made after a practice mission.
   With both off the game is the original, bug for bug.
+* **The original's cut content** ([the page](docs/cut-content-options.md), [D-660 to D-663](csharp/docs/faithfulness/DIVERGENCES.md),
+  on the launcher's Cut content tab): four things the game's own files carry and its programs never use. **Captured
+  dossier**: the animation of a dossier page stamped CAPTURED, with a man's or a woman's photograph, plays when a cast
+  member is captured. **Free car chase**: a fifth line, "Free Chase", in the practice menu, a chase on a random map with
+  the places labelled Loc1 to Loc15. **Hardest circuit board**: the electronics board's fourth difficulty, for the hardest
+  level with an agent of the lowest electronics rating. **All filler sentences**: the four of the sixteen filler sentences
+  of coded messages that the game never draws. The page also says which cut content is left out and why.
+
+Two of the cut-content options and their launcher tab ([the page](docs/cut-content-options.md)):
+
+<table>
+<tr>
+<td><img src="docs/screenshots/cut-content/dossier-woman.png" alt="The captured dossier with a woman's photograph" height="300"></td>
+<td><img src="docs/screenshots/cut-content/free-chase.png" alt="The free chase's map with Loc labels" width="400"></td>
+</tr>
+<tr>
+<td align="center">The captured dossier</td>
+<td align="center">The free chase's map</td>
+</tr>
+<tr>
+<td colspan="2" align="center"><img src="docs/screenshots/cut-content/launcher-cut-content.png" alt="The launcher's Cut content tab" width="810"></td>
+</tr>
+<tr>
+<td colspan="2" align="center">The launcher's Cut content tab</td>
+</tr>
+</table>
 
 ## How it is made faithful
 
@@ -174,7 +200,7 @@ How to work on the code: [contributing](csharp/CONTRIBUTING.md).
 | [`csharp/`](csharp) | The C# rewrite: the game, its hosts (SDL window, headless), the launcher, tests and docs |
 | [`symbols/`](symbols), [`docs/data-model/`](docs/data-model) | Names and the data model of the original |
 | [`tools/`](tools) | The function oracle (`tools/oracle`) and the session proof (`tools/session`) that record the original's behaviour, and the programs they share |
-| [`docs/`](docs) | Research notes on the original: its bugs, its cut content, its data |
+| [`docs/`](docs) | Research notes on the original: its bugs, its cut content, its data; [the cut-content options](docs/cut-content-options.md) for players |
 | `build/` | Generated material, local and never committed |
 
 The game's files, anything extracted from them and generated translations of their code stay out of version control.

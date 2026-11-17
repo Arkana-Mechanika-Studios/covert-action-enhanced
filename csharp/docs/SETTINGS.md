@@ -72,7 +72,7 @@ them. With no controller the game sees no joystick, as on a PC without one (`Sdl
 
 Other command-line options: `--setup` (the launcher first), `--no-launcher` (never the launcher: a missing game ends the
 program with a message), `--launcher-screenshot <file.png>` (the launcher as it would open, drawn into a PNG without a
-window), `--practice crypto|chase` and `--level 0..3` (a developer's shortcut into one practice), `--help`. Developer
+window; `--launcher-screenshot-tab general|advanced|cut` picks the tab), `--practice crypto|chase` and `--level 0..3` (a developer's shortcut into one practice), `--help`. Developer
 variables stay as they were: `COVERT_FRAME_TRACE`, `COVERT_INPUT_SCRIPT` and the others of PERFORMANCE.md.
 
 ### Finding the game

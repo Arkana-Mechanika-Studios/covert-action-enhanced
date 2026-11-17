@@ -34,12 +34,13 @@ internal sealed class Launcher : ILauncher
         }
     }
 
-    /// <summary>The launcher's first picture as it would open, drawn without a window (--launcher-screenshot, the tests).</summary>
-    public static Canvas Picture(LauncherContext context, (int Width, int Height)? display = null, bool advanced = false)
+    /// <summary>The launcher's first picture as it would open, drawn without a window (--launcher-screenshot, the tests); <paramref name="tab"/>: 0 General, 1 Advanced, 2 Cut content.</summary>
+    public static Canvas Picture(LauncherContext context, (int Width, int Height)? display = null, bool advanced = false, int tab = 0)
     {
         var surface = new NoSurface(display);
         var screen = new LauncherScreen(new LauncherModel(context, display), context, surface);
-        if (advanced)
+        // Ctrl+Tab goes General, Advanced, Cut content: the tab asked for is that many presses on
+        for (var press = advanced && tab == 0 ? 1 : tab; press > 0; press--)
         {
             screen.Handle(new KeyPressed(LauncherKey.Tab, Control: true));
         }

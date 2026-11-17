@@ -150,4 +150,20 @@ public sealed class CutContentSettingTests
         Assert.False(screen.CutContentShown);
         Assert.False(screen.AdvancedShown);
     }
+
+    [Fact]
+    public void TheScreenshotOptionPicksTheTabAndThePictureOfTheCutContentTabDiffersFromTheOthers()
+    {
+        Assert.Equal(0, CommandLine.Parse(["--launcher-screenshot", "a.png"]).LauncherScreenshotTab);
+        Assert.Equal(2, CommandLine.Parse(["--launcher-screenshot", "a.png", "--launcher-screenshot-tab", "cut"]).LauncherScreenshotTab);
+        Assert.Equal(1, CommandLine.Parse(["--launcher-screenshot-tab", "Advanced"]).LauncherScreenshotTab);
+        Assert.NotNull(CommandLine.Parse(["--launcher-screenshot-tab", "other"]).Error);
+        var context = Context();
+        var general = Launcher.Picture(context, tab: 0).Pixels.ToArray();
+        var advanced = Launcher.Picture(context, tab: 1).Pixels.ToArray();
+        var cut = Launcher.Picture(context, tab: 2).Pixels.ToArray();
+        Assert.NotEqual(general, cut);
+        Assert.NotEqual(advanced, cut);
+        Assert.Equal(advanced, Launcher.Picture(context, advanced: true).Pixels.ToArray());
+    }
 }
