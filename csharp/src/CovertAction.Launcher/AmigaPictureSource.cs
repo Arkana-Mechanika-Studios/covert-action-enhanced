@@ -1,6 +1,7 @@
 using CovertAction.Content;
 using CovertAction.Drivers;
 using CovertAction.Platform;
+using CovertAction.Presentation;
 
 namespace CovertAction.Launcher;
 
@@ -25,12 +26,13 @@ namespace CovertAction.Launcher;
 /// always did, so these tests of the game read the same pixels.
 /// </para>
 /// </remarks>
-public sealed class AmigaPictureSource : IPictureReplacements
+public sealed class AmigaPictureSource : IPictureReplacements, IAnimationReplacements
 {
     private readonly PictureColours _colours;
     private readonly Func<string, byte[]?> _read;
     private readonly Action<string> _report;
     private readonly Dictionary<string, AmigaPictureFile?> _loaded = new(StringComparer.OrdinalIgnoreCase);
+    private readonly Dictionary<string, AmigaPanFile?> _animations = new(StringComparer.OrdinalIgnoreCase);
 
     /// <summary>Raised each time a picture of the game is replaced, with the game's picture's name (for tests and tools that look at what showed).</summary>
     public event Action<string>? Replaced;
@@ -124,6 +126,120 @@ public sealed class AmigaPictureSource : IPictureReplacements
             pixels[i] = (byte)display[colour];
         }
         return pixels;
+    }
+
+    /// <summary>
+    /// The Amiga's version of an animation of <see cref="AmigaAnimationList"/> (D-683): the game's own animation, as read from
+    /// its file, with the Amiga's images and background in their own display colours, and for an entry with
+    /// <see cref="AmigaAnimationEntry.AmigaProgram"/> the Amiga's program too. The Amiga's file is used only when it is the
+    /// same animation as the game's: the same size, pace, kind of background and images of the same sizes (the Amiga's may have
+    /// more images when it brings its program), and, when the game's program stays, the Amiga's program translated is the game's
+    /// own. Otherwise the game's animation plays.
+    /// </summary>
+    /// <param name="fileName">The animation's file name as the game asks for it.</param>
+    /// <param name="own">The game's animation, as read.</param>
+    /// <returns>The animation to play, or null for the game's own.</returns>
+    public PanFile? Find(string fileName, PanFile own)
+    {
+        if (AmigaAnimationList.Find(fileName) is not { } entry || LoadAnimation(entry) is not { } amiga)
+        {
+            return null;
+        }
+        if (Mismatch(entry, amiga, own, out var program) is { } why)
+        {
+            _report($"warning: the Amiga animation {entry.File} is not the same animation as the game's {entry.Name} ({why}); the game's own plays instead.");
+            return null;
+        }
+        var images = new PictureFile?[PanFile.ImagePlaces];
+        for (var i = 0; i < images.Length; i++)
+        {
+            if (amiga.Images[i] is { } image && (own.Images[i] is not null || entry.AmigaProgram))
+            {
+                images[i] = PictureFile.FromPixels(image.Width, image.Height, DisplayPixels(image.Pixels, amiga.Colours));
+            }
+        }
+        var background = amiga.Background is { } picture ? PictureFile.FromPixels(picture.Width, picture.Height, DisplayPixels(picture.Pixels, amiga.Colours)) : null;
+        var colour = amiga.BackgroundKind == 2 ? DisplayColour(amiga.BackgroundColour, amiga.Colours) : 0;
+        Replaced?.Invoke(entry.Name);
+        return own.With(background, colour, images, program);
+    }
+
+    /// <summary>Why the Amiga's animation is not the game's (what differs), or null when it is the same; the Amiga's program, translated, when the entry brings it.</summary>
+    private static string? Mismatch(AmigaAnimationEntry entry, AmigaPanFile amiga, PanFile own, out byte[]? program)
+    {
+        program = null;
+        if (amiga.Width != own.Width || amiga.Height != own.Height || amiga.Delay != own.Delay || amiga.BackgroundKind != own.BackgroundKind)
+        {
+            return $"its size, pace or kind of background differs ({amiga.Width} x {amiga.Height}, pace {amiga.Delay}, background {amiga.BackgroundKind}; the game's {own.Width} x {own.Height}, {own.Delay}, {own.BackgroundKind})";
+        }
+        if (own.BackgroundKind == 1 && (amiga.Background is not { } background || own.BackgroundPicture is not { } ownBackground || (background.Width, background.Height) != (ownBackground.Width, ownBackground.Height)))
+        {
+            return "the size of its background picture differs";
+        }
+        for (var i = 0; i < PanFile.ImagePlaces; i++)
+        {
+            var image = amiga.Images[i];
+            if (own.Images[i] is { } ownImage ? image is null || (image.Width, image.Height) != (ownImage.Width, ownImage.Height) : !entry.AmigaProgram && image is not null)
+            {
+                return $"image {i} differs";
+            }
+        }
+        try
+        {
+            if (entry.AmigaProgram)
+            {
+                program = AmigaPanProgram.ToPcProgram(amiga.Program);
+                return null;
+            }
+            // the game's program stays: the Amiga's has to be the same program (the same instructions, the same addresses)
+            return AmigaPanProgram.SameInstructions(amiga.Program, own.Program) is { } difference ? $"its program is not the game's: {difference}" : null;
+        }
+        catch (InvalidDataException e)
+        {
+            return $"its program cannot be translated ({e.Message})";
+        }
+    }
+
+    /// <summary>The display colour of a colour number of an animation: 0 stays 0 (see-through), the others are the animation's own colours as <see cref="PictureColours"/> gives them.</summary>
+    private int DisplayColour(int colour, ushort[] colours) => colour == 0 ? 0 : _colours.Entry(colours[colour]);
+
+    private byte[] DisplayPixels(byte[] pixels, ushort[] colours)
+    {
+        var display = new int[colours.Length];
+        Array.Fill(display, -1);
+        var result = new byte[pixels.Length];
+        for (var i = 0; i < pixels.Length; i++)
+        {
+            var colour = pixels[i];
+            if (display[colour] < 0)
+            {
+                display[colour] = DisplayColour(colour, colours);
+            }
+            result[i] = (byte)display[colour];
+        }
+        return result;
+    }
+
+    private AmigaPanFile? LoadAnimation(AmigaAnimationEntry entry)
+    {
+        if (_animations.TryGetValue(entry.File, out var known))
+        {
+            return known;
+        }
+        AmigaPanFile? animation = null;
+        try
+        {
+            if (_read(entry.File) is { } bytes)
+            {
+                animation = AmigaPanFile.Read(bytes);
+            }
+        }
+        catch (Exception e) when (e is IOException or UnauthorizedAccessException or InvalidDataException)
+        {
+            _report($"warning: the Amiga animation {entry.File} could not be read ({e.Message}); the game's own {entry.Name} plays instead.");
+        }
+        _animations[entry.File] = animation;
+        return animation;
     }
 
     private AmigaPictureFile? Load(AmigaPictureEntry entry)

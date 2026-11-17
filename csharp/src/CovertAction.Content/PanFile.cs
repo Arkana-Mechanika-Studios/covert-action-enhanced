@@ -179,6 +179,40 @@ public sealed class PanFile
         }
     }
 
+    /// <summary>
+    /// The same animation with other pictures and, when given, another program (D-683): the Amiga version's images and
+    /// background in the display's own colours. The header, the palette block, the place and the pace stay the file's.
+    /// </summary>
+    /// <param name="backgroundPicture">The background picture of kind 1 (ignored for the other kinds); same size as the file's.</param>
+    /// <param name="backgroundColour">The colour of a background of kind 2.</param>
+    /// <param name="images">The images by their numbers (250 places); null where there is none.</param>
+    /// <param name="program">The program in the PC's encoding, a multiple of 16 bytes; null: the file's own.</param>
+    /// <returns>The new animation.</returns>
+    public PanFile With(PictureFile? backgroundPicture, int backgroundColour, PictureFile?[] images, byte[]? program)
+    {
+        if (images.Length != ImagePlaces)
+        {
+            throw new ArgumentException($"an animation has {ImagePlaces} image places", nameof(images));
+        }
+        var background = (byte[])Background.Clone();
+        if (BackgroundKind == 1 && backgroundPicture is not null)
+        {
+            Array.Clear(background);
+            Paint(backgroundPicture, background, Width, Height);
+        }
+        else if (BackgroundKind == 2)
+        {
+            background.AsSpan().Fill((byte)backgroundColour);
+        }
+        return new PanFile(Width, Height, Delay, Palette, background, images, program ?? Program)
+        {
+            HasPalette = HasPalette, PaletteKind = PaletteKind, PaletteBlock = PaletteBlock, X = X, Y = Y, FrameLength = FrameLength,
+            BackgroundKind = BackgroundKind,
+            BackgroundPicture = BackgroundKind == 1 ? backgroundPicture ?? BackgroundPicture : null,
+            BackgroundColour = BackgroundKind == 2 ? backgroundColour : BackgroundColour,
+        };
+    }
+
     private static int Word(ReadOnlySpan<byte> file, ref int at)
     {
         at += 2;

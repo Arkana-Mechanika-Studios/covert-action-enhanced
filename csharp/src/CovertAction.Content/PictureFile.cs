@@ -56,6 +56,23 @@ public sealed class PictureFile
     /// <summary>How many bytes of the data the picture took (pictures can follow one another in a file).</summary>
     public int Length { get; }
 
+    /// <summary>
+    /// A picture made of pixels that are already decoded (D-683: an Amiga animation's image in the display's own colours, put in
+    /// the place of one of the game's). Its <see cref="Length"/> is 0 and it has no colour table.
+    /// </summary>
+    /// <param name="width">The picture's width in pixels.</param>
+    /// <param name="height">The picture's height in pixels.</param>
+    /// <param name="pixels">One value per pixel, row by row from the top.</param>
+    /// <returns>The picture.</returns>
+    public static PictureFile FromPixels(int width, int height, byte[] pixels)
+    {
+        if (width <= 0 || height <= 0 || pixels.Length != width * height)
+        {
+            throw new ArgumentException($"{pixels.Length} pixels are not a picture of {width} x {height}", nameof(pixels));
+        }
+        return new PictureFile(width, height, pixels, null, 0);
+    }
+
     /// <summary>Decodes a picture.</summary>
     /// <param name="data">The picture's bytes, from its first word; more may follow.</param>
     /// <exception cref="InvalidDataException">The bytes are not a picture, or the picture is damaged.</exception>
@@ -110,6 +127,26 @@ public sealed class PictureFile
             throw new InvalidDataException("a picture's stream starts with a code width and its codes");
         }
         return DecodeRows(new LzwCodes(stream[1..].ToArray(), stream[0]), width, height, twoToAByte);
+    }
+
+    /// <summary>The same for a stream that more follows (the Amiga animations' chunks): also tells how many bytes of the stream the picture took, to the next even byte.</summary>
+    /// <param name="stream">The stream, from the byte with the largest code width; more may follow.</param>
+    /// <param name="width">The picture's width in pixels.</param>
+    /// <param name="height">The picture's height in pixels.</param>
+    /// <param name="twoToAByte">Whether the rows are packed two pixels to a byte.</param>
+    /// <param name="used">The bytes the picture took, rounded up to an even number.</param>
+    /// <returns>One value per pixel, row by row from the top.</returns>
+    /// <exception cref="InvalidDataException">The stream is damaged or ends too early.</exception>
+    internal static byte[] DecodeStream(ReadOnlySpan<byte> stream, int width, int height, bool twoToAByte, out int used)
+    {
+        if (stream.Length < 2)
+        {
+            throw new InvalidDataException("a picture's stream starts with a code width and its codes");
+        }
+        var codes = new LzwCodes(stream[1..].ToArray(), stream[0]);
+        var pixels = DecodeRows(codes, width, height, twoToAByte);
+        used = (1 + codes.BytesRead + 1) & ~1;
+        return pixels;
     }
 
     /// <summary>

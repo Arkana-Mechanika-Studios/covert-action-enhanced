@@ -108,7 +108,7 @@ A picture is replaced only when it is on `Launcher.AmigaPictureList`, one by one
 | `cars` | the offer recolours the bodies by colour number (`CarChase.Offer`) |
 | `equip1`, `equip1m` | the equipment screen's cursor recolours a colour of the picture |
 | the Amiga-only pictures (`bchback`, `casback`, `lauback`, `offback`, `disk`, `setupscr`, `titlesnew`, `chase2`, `samerica`) | no place in the PC game |
-| all animations (`.pan`) | another container; they stay the PC's |
+| the animations (`.pan`) other than the 11 of the second round | their program or the sizes of their images differ from the PC's (see "The Amiga's animations" below) |
 
 ## The second round (version 1.3, D-681 onward)
 
@@ -149,6 +149,38 @@ in its own composition (`Backdrop` on the list; no layout score applies). On the
 PC's places and the black strips under them are where the game draws its rating boxes; the menu opens over the empty top.
 Left out: `gender` (the woman on the left and the man on the right, the reverse of the game's menu), `wiretap` (the Amiga's board is
 at the left, where the game's popup opens at 20, 20) and `camera` (the frames the game cuts out are elsewhere).
+
+### The Amiga's animations (D-683)
+
+The Amiga's `.pan` files (23 on the three disks) are another container for the PC's small animation machine. Read from the
+files and compared with the PC's `.PAN` and their disassembled programs (`Content.AmigaPanFile`, `Content.AmigaPanProgram`):
+
+| Offset | Content |
+|---|---|
+| 0 | the mark `ANIMAM` |
+| 6 | 32 colours, words `0x0RGB` (four bits each); most files use 16, the Amiga's EGA colours, with entry 0 the see-through marker |
+| 0x46 | the place (two words), the width, the height, the pause between frames (a word; the PC's field) |
+| then | `BGND`: a word for the kind; kind 1 (a picture): a word 0, the width, the height, the picture's stream; kind 2 (one colour): the colour number and the number of images |
+| then | `SPRH` for each image: its number, a word the program does not need, 5 words 0, the width and the height, 4 words 0, a word that looks like a colour count, the image's stream |
+| end | `AMPG`: a word with the program's size in bytes, the program |
+
+A stream is the pictures' compressed one (the largest code width, then the codes; not byte-swapped here) and the pixels are one to a byte, the colour
+number whole. The program is the PC's: every operation is a word (the PC's a byte); a Push is the word 5, a flag word (1: the
+value is a variable's) and the value; every other operand is a big-endian word, except the **targets of the main program's jumps and
+calls, which are little-endian** (the targets of the sprites' loops are big-endian). The sprites' programs follow the main program, which ends
+where the lowest address a sprite is started at begins. The Amiga's animation code lets the game set the
+variables from outside; its scripts differ from the PC's only where a PC script sets a variable itself (the dossier, the three rooms).
+
+Of the 21 animations the Amiga shares with the PC, **11 are the PC's own program** (each instruction and address the same, a rest or an
+image 0 after the last instruction aside) **with images of the same numbers and sizes**: `blding01` to `blding04`, `bugcar`,
+`bustout`, `escape`, `followed`, `injail`, `intrgate`, `surndr01`. For these the pace, the program, the sound requests and so the timing are the
+PC's exactly, so the game's own file plays and only the pixels of the images and the background are the Amiga's (the same display
+colours 128 and up as the pictures; 11 to 69 % of an image's pixels differ in colour from the PC's: the Amiga's dithering and
+recolouring; the backgrounds are the same colours). The rest differ in program or geometry and stay the PC's: `briefing` (other
+images), `officef` and `officem` (other image sizes and a 160-pixel port), `comm`, `crypto`, `hq` and `research` (a 160-pixel port and a wider
+side strip, image 7 of 41 pixels for the PC's 3; the three rooms also leave one variable to the game), `binos3` (fewer images, a bigger
+picture), `woundii` (another program); `tit.pan` is the Amiga's own title sequence and has no PC twin. Side by side frames of the 11 were
+written to `build/amiga-study2/animations/` (not committed; the test of the same name as for the pictures writes them).
 
 ## Without the files
 

@@ -49,6 +49,20 @@ internal static class AmigaPixBuilder
         return [.. file];
     }
 
+    /// <summary>The compressed stream of pixels one to a byte, not byte-swapped (the Amiga animations', D-683): the largest code width, then the codes, to an even length.</summary>
+    /// <param name="pixels">One colour number per pixel.</param>
+    public static byte[] Stream(byte[] pixels)
+    {
+        Assert(!pixels.Contains(RepeatMark), "no byte that would need the run escape");
+        var stream = new List<byte> { LargestWidth };
+        stream.AddRange(Codes(pixels));
+        if (stream.Count % 2 != 0)
+        {
+            stream.Add(0);
+        }
+        return [.. stream];
+    }
+
     /// <summary>The pictures of one palette have two pixels to a byte, the left in the low half, each row starting on a new byte.</summary>
     private static byte[] Pack(byte[] pixels, int width, int height)
     {

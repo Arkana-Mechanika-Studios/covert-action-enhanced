@@ -134,7 +134,7 @@ public sealed class Game
         _files = new GameFolderFiles(folder, savesFolder);
         // DIVERGENCE: D-642 a player's option: the Amiga version's pictures, read from the player's own Amiga files, in place of the PC's where the layouts agree.
         var pictures = AmigaPictures = options.AmigaPictures ? AmigaPictureSource.Open(Graphics.PictureColours, options.AmigaFolder, folder.Path) : null;
-        _world = new Boundaries(Graphics, _sound, _keyboard = new KeyboardDriver(link), MouseDriver(host, options), new GameTimer(link), _files, pictures, MouseInChase(host, options));
+        _world = new Boundaries(Graphics, _sound, _keyboard = new KeyboardDriver(link), MouseDriver(host, options), new GameTimer(link), _files, pictures, MouseInChase(host, options), pictures);
         _host = host;
         _link = link;
     }

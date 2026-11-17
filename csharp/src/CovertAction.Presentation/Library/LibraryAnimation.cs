@@ -803,6 +803,8 @@ public sealed class LibraryAnimation(ILibraryState state, PanEngineState pan, Bo
             return false;
         }
         var file = PanFile.Read(bytes);
+        // DIVERGENCE: D-683 with the player's option of the Amiga version's pictures, an animation the option has a twin for plays with the Amiga's images and background (and, for the captured dossier, its program): the game's own file is read first, and its header, palette, place and pace stay
+        file = world.AnimationReplacements?.Find(fileName, file) ?? file;
         ReadPanPaletteHeader(file);
         ReadPanPortRecord(file);
         ReadPanBackground(file);
