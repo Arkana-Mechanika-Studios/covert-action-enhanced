@@ -111,7 +111,7 @@ menus part has no Amiga effects), and the commands above 46 of the Roland driver
 
 * A command with an Amiga twin in the part's bank plays on the Amiga voices.
 * A command without one plays on the sound card's effects driver (the sound card of the set-up, so the raid keeps its
-  gunfire), or, with `sound.amigaOriginalOnly` on (the sub-setting shared with the music, "Only where the Amiga had it"), is
+  gunfire), or, with `sound.amigaOriginalOnly` on (the sub-setting shared with the music, "Amiga's sounds only" in the launcher), is
   not played.
 * The stop (0), the end of a scene (1), the pause and the resume (37, 38) go to both. Changing the part silences the Amiga voices,
   as the Amiga unloads a bank.

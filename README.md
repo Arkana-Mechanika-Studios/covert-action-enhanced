@@ -62,7 +62,7 @@ Screenshots of the rewrite running on the author's copy of the game.
 
 `CovertAction Launcher.exe` (or Shift held while the game starts) opens the settings: the game folder, the window
 size, fullscreen, the picture's scaling, the sound card (with a sound test), the controls, the saved games' folder, the MT-32 ROM
-folder, the keyboard's repeat and, on its Advanced tab, the player options. They are kept in `covertaction.settings.json`; see
+folder and, on its Advanced, Cut content and Controls tabs, the keyboard's repeat and the player options. They are kept in `covertaction.settings.json`; see
 [the settings](csharp/docs/SETTINGS.md).
 
 * **Sound:** PC speaker, AdLib, Tandy and Roland MT-32. The MT-32 is Munt's emulation and needs your own MT-32 (or
@@ -79,7 +79,7 @@ folder, the keyboard's repeat and, on its Advanced tab, the player options. They
 
 ## Player options
 
-Not in the original, each off by default, on the launcher's Advanced tab (the cut-content options on its Cut content tab; [the settings](csharp/docs/SETTINGS.md)):
+Not in the original, each off by default, on the launcher's Advanced, Cut content and Controls tabs ([the settings](csharp/docs/SETTINGS.md)):
 
 * **The mouse** ([D-630 to D-636](csharp/docs/faithfulness/DIVERGENCES.md)): in the menus, lists and on the flight map,
   pointing at a choice highlights it, a left click takes it, a right click is Esc. At the electronics workbench it moves

@@ -148,13 +148,17 @@ project, not affiliated with or endorsed by MicroProse or the game's rights hold
 * **General**: Game installation (the folder, **Change…**, a line saying it was found or what is missing), Display
   (window size, fullscreen, picture scaling), Sound and controls (the sound card with **Test sound**, a line about the
   card or the ROMs; the controls: Keyboard and joystick, or Keyboard only), Saved games (the folder, **Change…**).
-* **Advanced**: Roland MT-32 (the ROM folder, **Change…**, found or missing with the D-20 note), Keyboard (key
-  repeat), and the player options: **Arrow keys walk** (D-610), **Music on** with **Test mix** and **Effects on**
-  (each "The sound card", a card of its own or the Amiga's, a line saying what plays where, D-620, D-640, D-641), **Amiga files** (the folder, **Change…**, a line saying whether the music, sound effect and picture files are found) with **Only where the Amiga had it** and **Amiga pictures** (Yes or No, D-642, AMIGA-PICTURES.md), **Mouse**
-  (No, Menus, Menus and car chase: `input.mouse` and `input.mouseChase`, with a line saying it is not in the original, D-630, D-670), **Fix the original's bugs** and **Also campaign-logic bugs** (`fixes.originalBugs`, `fixes.campaignBugs`, D-650), and room for those planned for later, shown as planned and not offered.
+* **Advanced**: Roland MT-32 (the ROM folder, **Change…**, found or missing with the D-20 note); Amiga music, effects and
+  pictures: **Amiga files** (the folder, **Change…**, a line saying whether the music, sound effect and picture files are
+  found) with **Amiga's sounds only** (`sound.amigaOriginalOnly`) and **Amiga pictures** (Yes or No, D-642,
+  AMIGA-PICTURES.md); Music and effects on two sound cards: **Music on** with **Test mix** and **Effects on** (each "The
+  sound card", a card of its own or the Amiga's, a line saying what plays where, D-620, D-640, D-641); Fix the original's
+  bugs: **Story-safe bugs** and **Campaign-logic bugs** (`fixes.originalBugs`, `fixes.campaignBugs`, D-650).
 * **Cut content**: the original's cut content as options (`cutContent.*`, D-660 onward; docs/cut-content.md), each
   Yes or No and No by default: **Captured dossier** (D-660), **Free car chase** (D-661), **Hardest circuit board** (D-662), **All filler sentences** (D-663).
-* **Controls**: key remapping and the gamepad's extra buttons (`input.keyMap`, `input.padMap`; D-671, D-672), both empty
+* **Controls**: Keyboard and mouse: **Key repeat** (`input.keyRepeat`), **Arrow keys walk** (D-610) and **Mouse** (No,
+  Menus, Menus and car chase: `input.mouse` and `input.mouseChase`, with a line saying it is not in the original, D-630,
+  D-670); then key remapping and the gamepad's extra buttons (`input.keyMap`, `input.padMap`; D-671, D-672), both empty
   by default. **Original key** (‹ › goes through the keys of the original) shows the keys that send it in **Sent by**;
   **Set…** (or Enter) waits for a key: press the key of your keyboard that should send it (Esc cancels; Shift, Ctrl and Alt are refused).
   **Clear this key** takes away the keys mapped to it, **Reset all keys** all of them. Below, **Gamepad button** (a shoulder, a

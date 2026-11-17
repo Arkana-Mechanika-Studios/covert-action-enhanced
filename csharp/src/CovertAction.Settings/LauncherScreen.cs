@@ -192,15 +192,15 @@ internal sealed class LauncherScreen
 
     private static bool OnCutContent(Item item) => item is Item.CutCapturedDossier or Item.CutStandaloneChase or Item.CutHardestCircuit or Item.CutFillerTexts;
 
-    private static bool OnControls(Item item) => item is Item.KeyPick or Item.KeyBind or Item.KeyClear or Item.KeysReset or Item.PadPick or Item.PadKey or Item.PadReset;
+    private static bool OnControls(Item item) => item is Item.KeyRepeat or Item.ArrowKeysWalk or Item.Mouse or Item.KeyPick or Item.KeyBind or Item.KeyClear or Item.KeysReset or Item.PadPick or Item.PadKey or Item.PadReset;
 
-    private bool OnAdvanced(Item item) => item is Item.Roms or Item.RomsChange or Item.AmigaFiles or Item.AmigaChange or Item.AmigaOriginalOnly or Item.AmigaPictures or Item.KeyRepeat or Item.ArrowKeysWalk or Item.Music or Item.MixTest or Item.Effects or Item.Mouse or Item.FixOriginalBugs or Item.FixCampaignBugs;
+    private bool OnAdvanced(Item item) => item is Item.Roms or Item.RomsChange or Item.AmigaFiles or Item.AmigaChange or Item.AmigaOriginalOnly or Item.AmigaPictures or Item.Music or Item.MixTest or Item.Effects or Item.FixOriginalBugs or Item.FixCampaignBugs;
 
     // Tab and the arrows go through General's rows, then Advanced's (its tab opens), then the buttons
     private IEnumerable<Item> Order =>
         new[] { Item.GameFolder, Item.GameChange, Item.Window, Item.Fullscreen, Item.Scaling, Item.Sound, Item.Test, Item.Controls, Item.Saves, Item.SavesChange,
-            Item.Roms, Item.RomsChange, Item.AmigaFiles, Item.AmigaChange, Item.AmigaOriginalOnly, Item.AmigaPictures, Item.KeyRepeat, Item.ArrowKeysWalk, Item.Music, Item.MixTest, Item.Effects, Item.Mouse, Item.FixOriginalBugs, Item.FixCampaignBugs, Item.CutCapturedDossier, Item.CutStandaloneChase, Item.CutHardestCircuit, Item.CutFillerTexts,
-            Item.KeyPick, Item.KeyBind, Item.KeyClear, Item.KeysReset, Item.PadPick, Item.PadKey, Item.PadReset, Item.Save, Item.Play }
+            Item.Roms, Item.RomsChange, Item.AmigaFiles, Item.AmigaChange, Item.AmigaOriginalOnly, Item.AmigaPictures, Item.Music, Item.MixTest, Item.Effects, Item.FixOriginalBugs, Item.FixCampaignBugs, Item.CutCapturedDossier, Item.CutStandaloneChase, Item.CutHardestCircuit, Item.CutFillerTexts,
+            Item.KeyRepeat, Item.ArrowKeysWalk, Item.Mouse, Item.KeyPick, Item.KeyBind, Item.KeyClear, Item.KeysReset, Item.PadPick, Item.PadKey, Item.PadReset, Item.Save, Item.Play }
             .Where(i => i is not (Item.Test or Item.MixTest) || _context.SoundTest is not null);
 
     /// <summary>Handles one input; returns the player's choice when the launcher should end.</summary>
@@ -344,7 +344,7 @@ internal sealed class LauncherScreen
         _advanced = tab == 1;
         _cut = tab == 2;
         _controls = tab == 3;
-        _focus = tab switch { 1 => Item.Roms, 2 => Item.CutCapturedDossier, 3 => Item.KeyPick, _ => Item.GameFolder };
+        _focus = tab switch { 1 => Item.Roms, 2 => Item.CutCapturedDossier, 3 => Item.KeyRepeat, _ => Item.GameFolder };
     }
 
     /// <summary>The fixed settings-file key of a row, or null.</summary>
@@ -972,6 +972,11 @@ internal sealed class LauncherScreen
 
         if (_controls)
         {
+            y = Section("Keyboard and mouse", y);
+            y = Select(y, "Key repeat", LauncherModel.Label(LauncherModel.KeyRepeats, _model.KeyRepeat), Item.KeyRepeat);
+            y = Select(y, "Arrow keys walk", _model.ArrowKeysWalk ? "Yes" : "No", Item.ArrowKeysWalk);
+            y = Select(y, "Mouse", LauncherModel.Label(LauncherModel.MouseChoices, _model.MouseChoice), Item.Mouse);
+
             y = Section("Keyboard: send the original's keys from other keys", y);
             y = Status(y, ("Not in the original. Empty by default: every key is the original's.", Note));
             var shown = _model.ShownKey;
@@ -983,7 +988,7 @@ internal sealed class LauncherScreen
             y = Status(y, (_model.KeyMap.Count == 0 ? "No key remapped." : $"{_model.KeyMap.Count} key(s) remapped: " + string.Join(", ", _model.KeyMap.Select(p => KeyBindings.Find(p.From)!.Label + " = " + KeyBindings.Find(p.To)!.Label)), Note));
 
             y = Section("Gamepad buttons", y);
-            y = Status(y, ("The stick and the four face buttons are the joystick's. The others can send keys.", Note));
+            y = Status(y, ("The stick and face buttons are the joystick; the others can send keys.", Note));
             var pad = _model.ShownPad;
             y = Select(y, "Gamepad button", pad.Label, Item.PadPick);
             y = Select(y, "Sends the key", _model.PadTarget(pad)?.Label ?? "(nothing)", Item.PadKey);
@@ -1030,18 +1035,16 @@ internal sealed class LauncherScreen
             y = Section("Amiga music, effects and pictures", y);
             y = Folder(y, "Amiga files", _model.Amiga?.Folder ?? _model.AmigaFiles ?? AmigaDefaultFolder, Item.AmigaFiles, Item.AmigaChange);
             y = Status(y, AmigaStatusLine());
-            y = Select(y, "Only where the Amiga had it", _model.AmigaOriginalOnly ? "Yes" : "No", Item.AmigaOriginalOnly);
+            y = Select(y, "Amiga's sounds only", _model.AmigaOriginalOnly ? "Yes" : "No", Item.AmigaOriginalOnly);
             y = Select(y, "Amiga pictures", _model.AmigaPictures ? "Yes" : "No", Item.AmigaPictures);
-            y = Section("Keyboard and player options", y);
-            y = Select(y, "Key repeat", LauncherModel.Label(LauncherModel.KeyRepeats, _model.KeyRepeat), Item.KeyRepeat);
-            y = Select(y, "Arrow keys walk", _model.ArrowKeysWalk ? "Yes" : "No", Item.ArrowKeysWalk);
+            y = Section("Music and effects on two sound cards", y);
             var mixTest = _context.SoundTest is { } mixSound ? (mixSound.Playing ? "Stop" : "Test mix") : null;
             y = Select(y, "Music on", LauncherModel.Label(LauncherModel.MusicChoices, _model.MusicCard), Item.Music, mixTest, Item.MixTest);
             y = Select(y, "Effects on", LauncherModel.Label(LauncherModel.EffectsChoices, _model.EffectsCard), Item.Effects);
             y = Status(y, MixStatus());
-            y = Select(y, "Mouse", LauncherModel.Label(LauncherModel.MouseChoices, _model.MouseChoice), Item.Mouse);
-            y = Select(y, "Fix the original's bugs", _model.FixOriginalBugs ? "Yes" : "No", Item.FixOriginalBugs);
-            y = Select(y, "Also campaign-logic bugs", _model.FixCampaignBugs ? "Yes" : "No", Item.FixCampaignBugs);
+            y = Section("Fix the original's bugs", y);
+            y = Select(y, "Story-safe bugs", _model.FixOriginalBugs ? "Yes" : "No", Item.FixOriginalBugs);
+            y = Select(y, "Campaign-logic bugs", _model.FixCampaignBugs ? "Yes" : "No", Item.FixCampaignBugs);
         }
 
         // the foot: Play at the right, Save and quit at the left

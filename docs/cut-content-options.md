@@ -160,7 +160,7 @@ The cut content not offered at all:
 * **CC-12**, message texts nothing asks for and events without a text: texts of events removed from scripts, or lost;
   there are no events to attach them to.
 * **CC-14**, crime-file fields no module reads: data structure, not content a player could see.
-* **CC-15**, mouse support in the graphics library: library code. The mouse of the Advanced tab is a separate addition
+* **CC-15**, mouse support in the graphics library: library code. The mouse of the Controls tab is a separate addition
   (D-630), not a restoration of it.
 * **CC-17**, the other dormant statements: single statements and arms with no way to be reached; none is a feature.
 * **CC-20**, the key-press exit sequences of four scenes: the game's side that would set them (`ignore_skip`) was never

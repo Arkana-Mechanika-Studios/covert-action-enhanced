@@ -47,12 +47,16 @@ CovertAction.exe starts). Its settings:
    General:  the game folder, the window size, fullscreen, the picture's scaling (pixel art,
              nearest, smooth), the sound card (with a sound test), the controls (keyboard and
              joystick, or keyboard only), the saved games' folder.
-   Advanced: the MT-32 ROM folder, the keyboard's repeat (the PC's, or Windows' own), and the
-             player options, all off by default: the mouse, arrow keys that walk in a raid,
-             music and effects on different sound cards, the Amiga version's music, effects
-             and pictures (with the folder of your Amiga files), and the fixes for the
-             original's bugs (two options: those that leave the story as it is, and those
-             that change it).
+   Advanced: the MT-32 ROM folder, and player options, all off by default: the Amiga
+             version's music, effects and pictures (with the folder of your Amiga files),
+             music and effects on different sound cards, and the fixes for the original's
+             bugs (two options: those that leave the story as it is, and those that
+             change it).
+   Cut content: the original's unused content, as options, all off by default.
+   Controls: the keyboard's repeat (the PC's, or Windows' own), and options, all off by
+             default: arrow keys that walk in a raid, the mouse (in the menus, or in the
+             car chase too), your own keys for the original's keys, and the gamepad's
+             other buttons.
 Play saves them and starts the game; Save and quit (or Esc) saves them and closes. They are kept
 in covertaction.settings.json beside the program (or in %APPDATA%\CovertAction when this folder
 cannot be written); SETTINGS.md describes the file and the command-line options
