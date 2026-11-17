@@ -59,6 +59,16 @@ the pictures), the re-check of the 41 dead functions (6), the sound commands (7)
 | CC-21 | Animations: no sound instruction in any of the 24 `.PAN`; one unstarted blink program; no unshown image | negative result and leftovers | confirmed | explained |
 | CC-22 | Faces sheets: two 32 x 26 icons no `cut_image` takes, the lower half of FACESF.PIC, duplicate head cells | unused sprite cells | confirmed (cut_image); possible (any use) | open |
 | CC-23 | Sound commands 15 and 21 are never sent; the sent ones the drivers leave empty (gear shifts, 0x27, vacation, 0x2c) | unused and silent commands | confirmed | explained |
+| CC-24 | Raid sprites (SPRITES/SPRITESF): 24 cut cells never drawn (columns 17-19), the hands-up pair, two lying figures, a boxed inset | unused sprite cells | confirmed (never drawn / cut); possible (use) | open |
+| CC-25 | CHASE.PIC ground textures 16..19 (16 and 18 copies of 11 and 10), never picked by the generator | unused art | confirmed; possible (cut) | open |
+| CC-26 | Room tile sheets GUYS3/GUYS2: 28 cells no tile entry references; Television and Drawers never placed (extends CA-8) | unused sprite cells | confirmed; possible (Drawers y wrong) | open |
+| CC-27 | BUGS.PIC leftovers: second chip set, sample circuits, "ALARM" board edge, wire duplicates 8-15 | unused art | confirmed (untaken); possible | open |
+| CC-28 | Sound data no command reaches: AdLib tunes DS:1efa and 1f0e, speaker engine sounds DS:03a6/03b2, Roland tune DS:149e, unused instruments, commands 15/21 data | unused sound data | confirmed; likely (cut) | open |
+| CC-29 | RSOUND's dead "At controlled CRASH!" error exit | embedded developer text | confirmed | explained |
+| CC-30 | PLOT.TXT `*PL0625`, `*PL0825`, `*PL0925`, `*PL1125`: endings the original cannot draw (CA-15) | unreachable text | confirmed | player option (D-650, `fixes.campaignBugs`) |
+| CC-31 | DS:9686: settling a break-in or wiretap without playing it (U-205) | dormant mode | confirmed | open |
+| CC-32 | Pop-up menu: the "OK" button mode and `^` marks, never enabled (five programs) | dormant branch | confirmed | explained |
+| CC-33 | Small dead branches in live functions (exit-mode disk checks, photo arm, `faces_on`, `player_state` 3, `menu_pause_mode`, `map_seed`, dossier `if (0)`, pop-up animation arms, `p = 60*b/covert + 10`) | dormant code | confirmed | explained |
 
 Related registers: `docs/original-bugs.md` (CA-n), `csharp/docs/faithfulness/DIVERGENCES*.md` (D-n),
 `csharp/docs/faithfulness/UNCERTAIN*.md` (U-n), `csharp/docs/OPEN-FUNCTIONS.md`, `symbols/names.txt`.
@@ -641,10 +651,8 @@ cut table takes (`clue_method = Txt[a] & 0xf`, final_0100_69b3.c 79, can be larg
 page) instead of cutting them. For the face sheets the sheet page is overwritten by the next picture load, which makes
 that unlikely.
 
-**Not covered.** The other sheets (SPRITES/SPRITESF, BUGS, CAMERA, EQUIP2, CHASE.PIC) were rendered the same way
-(`uncut_<NAME>.png`); their uncut areas are dominated by cells the programs copy with `copy_rect` (TAC 5674/5962, BUG
-09cc/14e8, CHASE 2012/2400/2496) and were not resolved cell by cell. The first cell-by-cell result: CAMERA.PIC is
-entirely taken by its three cuts.
+**Not covered here.** The other sheets (SPRITES/SPRITESF, BUGS, EQUIP2, CHASE.PIC, GUYS2/3, ICONS, CARS) were done cell by
+cell in the third pass: CC-24..CC-27. CAMERA.PIC is entirely taken by its three cuts.
 
 ## CC-23 Sound commands: never sent, and sent into silence
 
@@ -672,8 +680,286 @@ which of the sent ones are empty routines.
 **Status.** Explained as a difference between drivers. Whether the missing commands 15 and 21 were once game effects
 (a sweep and a noise exist for them on the speaker) is not shown by anything.
 
-**Not searched.** Tune and effect data blocks of each driver that no command reaches (the C# `TunesOf` / `Noise` /
-`Sweep` tables are the starting point); the signatures and dates are in "Checked".
+**Not searched here.** Tune and effect data that no command reaches, and the data of commands 15 and 21: CC-28.
+
+## CC-24 Raid sprites: 24 cut cells never drawn, and cells nobody cut
+
+**What it is.** SPRITES.PIC and SPRITESF.PIC (male and female agent; the same layout, they differ only in 8 pixels of
+the cell at (96,128) and in the portrait strip) hold the people of the TAC raid. Part of them is cut out and never
+drawn, part is not cut at all. Renders of the regions: `build/cut-content3/sprites/uncut_SPRITES.png`,
+`crop_SPRITES_cols17_19_x272_y0.png`, `crop_SPRITES_handsup_and_lying_128_128.png` (not committed).
+
+**Evidence.**
+* The main grid is 20 columns x 8 rows of 15 x 15 cells at (16c+1, 16r+1), all cut into `sprite_handles[20r+c]`
+  (`cut_image`, tac_00e8_5b2d.c 62). The only draw formulas are `draw_sprite(0x14*dir + b - 0x14 + base)`
+  (tac_00e8_1b32.c 107, 167, 209): row = facing - 1, `base` 0, 9 or 8, `b` 0..7 (the pose is written only by
+  tac_00e8_0f4c.c 480-496, 5ca6.c 285, 310 and 7155.c 79). So columns 0..16 can be drawn (the muzzle flash uses column
+  14, 1b32.c 133). **Columns 17, 18 and 19 of all eight rows, 24 cells (273..319, 1..127), are cut and never drawn.**
+  They show the player's figure in horizontal or diagonal tumbling poses, three frames for each of the eight facings.
+* The other cuts of the sheet: 6 cells at (16a+1, 0x81) (handles 0xa0..0xa5, 5b2d.c 66), one at (0x61, 0x81) (0xa6, 71) and 8
+  at (16a+1, 0x91) (0xa8..0xaf, 69). Checked: these loops take row 0x81 cells 0..6 and row 0x91 cells 0..7 only, and no
+  `copy_rect` reads page 2 elsewhere while the sheet is loaded. Not taken by any code:
+  * (161,129) and (177,129): two 15 x 30 figures, pixel-identical, a person with both arms raised (cells 10 and 11 of
+    row 0x81);
+  * (129,145) and (145,145): two 15 x 15 poses of a lying person (cells 8 and 9 of row 0x91);
+  * (257,133)-(283,156): a 24 x 24 black box with a light-blue tab holding a figure with a small object, not aligned
+    to the 16-pixel cells.
+* The C# agrees with the draw range: `BuildingRaid.Actors.cs` 14 (`PicturesPerFacing = 0x14`, `GuardPictures = 8`,
+  `RunningPictures = 9`).
+
+**Reading (guess).** The tumbling poses could be a dive or knocked-down animation drawn for the player: the lunge exists
+as `player_state` 4 (tac_00e8_0f4c.c 455-463) but keeps the walking pose. The raised arms could be a surrender, the
+lying pair a second set next to the two body sprites 0xa4/0xa5 that are used. The boxed inset looks like an artist's
+mock-up. All from the pictures only.
+
+**Status.** Confirmed (never drawn, never cut); what they were for is possible. Open: no run.
+
+**Related.** CC-22 (the face sheets), CC-26.
+
+## CC-25 CHASE.PIC ground textures 16..19
+
+**What it is.** The car chase's ground pictures are 32 x 32 cells of CHASE.PIC, ten to a row, copied by
+`copy_rect(RpSprite, ...)` (chase_00df_2012.c 52-60). The sheet has room for 20; the generator draws 16.
+
+**Evidence.**
+* The texture number is `map_cells >> 4`; cells start at `random_below(16) << 4` (chase_00df_2c51.c 65) and carved
+  cells get 8 or 9 (2c51.c 93), so n = 0..15 only. C# `CarChase.cs` 59 and 206 (`GroundPictures = 16`).
+* Textures 16..19 are the last four cells of the second row, (192..319, 49..80) (`build/cut-content3/sprites/
+  crop_CHASE_textures16_19_190_47.png`, not committed). Texture 16 is pixel-identical to 11 and 18 to 10; 17 (a tall
+  blue and purple striped block) and 19 (a green court with a white U-shaped plaza) are new art (the closest taken
+  texture differs in 643 and 593 of 1024 pixels).
+* The other CHASE.PIC cuts (16 gauge pictures, 36 car sprites, the windows) are all reachable; STREET.PIC and CARS.PIC
+  are taken in full (chase_00df_0842.c 44, 2496.c 42-70).
+
+**Reading (guess).** Twenty kinds of ground were drawn and the generator was cut back to sixteen (two of the four extras
+are copies of earlier ones).
+
+**Status.** Confirmed (unreachable); the cut is a reading. Open.
+
+**Related.** CC-2 (the other generator leftovers of CHASE).
+
+## CC-26 Room tile sheets GUYS3 and GUYS2: cells no tile entry references; furniture never placed
+
+**What it is.** GUYS3.PIC (every break-in) and GUYS2.PIC (the one-room ambush, `GameMode == 3`) are the room tile sheets
+(tac_00e8_0018.c 159-163; the names are misleading: SPRITES/SPRITESF are the people). A tile is a 16 x 16 cell read
+through the table `ob[62]` (DS:018e, 20 bytes each; `spriteX`/`spriteY` at +0x0c/+0x0e), plus an "open" variant 16 rows
+lower for tiles with `TF_OPENABLE` (tac_00e8_5674.c 52-64, 5962.c 36-42).
+
+**Evidence.**
+* 28 cells of 16 x 16 are referenced by no tile entry and duplicate no referenced cell (pixel comparison; the same cells in
+  both sheets; `build/cut-content3/sprites/cells_GUYS3.png`, not committed): (16,48), (48,48) white cabinets, the other
+  facings of the two Computers; (128,48), (144,48) a second pair of couch halves; (160,48), (176,48) bed halves;
+  (32,64), (48,64), (32,80), (48,80) toilets in the other facings, closed and open; (64,64), (80,64), (64,80), (80,80) wash
+  basins; (128,80), (144,80) a cyan bathtub; (160,80), (176,80), (192,64), (208,64) range and cabinet fronts; (224..272,
+  64) and (224..272, 80) white panels with a cyan frame. Furniture has four slots per kind (tiles 12 + 4k .. 15 + 4k, one
+  per facing, tac_00e8_4f8d.c 79-84); these cells are pictures the table does not use.
+* Extension of CA-8. Room types 6 (Bed Room) and 8 (Kitchen) are never generated (tac_00e8_4f8d.c 50-60), so the pieces
+  whose `where` mask holds only such types are never placed: not only Bed 46/47 (mask 0x040), Range 48/49 and
+  Refrigerator 50/51 (0x100), which CA-8 names, but also **Television 53 and 55 (masks 0x440 and 0x400) and Drawers 57
+  and 59 (0x440)**: their masks hold only bits 6 and 10, room type 6 never exists and there is no type 10 (the table has
+  types 0..9, tac.h 74-82). In the one-room ambush only tiles with `where & 1` can appear, so GUYS2 has more cells
+  nobody reaches (not tabulated).
+* The two Drawers entries carry y = 96, which is the row of the 15 plot-object icons (x = 16 * type), while the white
+  cabinet art sits at (16,48) and (48,48).
+* Not cut content: the plot-object icons (strip y 96, x 0..239) exist in three versions, in GUYS3, GUYS2 and ICONS.PIC
+  (FINAL's `draw_held_objects`, final_0100_2941.c 38). Icon 4 (explosives) is a plant in ICONS and GUYS2 and a burst in
+  GUYS3 (122 pixels differ); icon 12 differs in all three; icons 13 and 14 differ in GUYS2. Each version is drawn in its
+  own context: revised art, not unused art.
+
+**Reading (guess).** The artist drew every kind in all four facings and an open row for the openable ones, and the table
+keeps fewer slots. The Drawers y is probably wrong (0x60 for 0x30, so the pictures would be the white cabinets); it does
+no harm because `where` keeps drawers from being placed. Neither is proven.
+
+**Status.** The 28 cells and the never-placed Television and Drawers: confirmed (from the table and the generator, not
+seen in a run). The wrong y: possible. Open.
+
+**Related.** CA-8, CA-31, CC-24.
+
+## CC-27 BUGS.PIC: leftover art of the electronics board
+
+**What it is.** BUGS.PIC (page 2 while the wiretap board is played) holds the board's parts. Several regions are read by
+no code (`build/cut-content3/sprites/uncut_BUGS.png`, `crop_BUGS_chip_set2_36_44.png`, not committed).
+
+**Evidence.**
+* Taken: 32 cells of 8 x 8 at (8c, 16) and (8c, 24) (`cut_image` bug_00e8_02dc.c 24), the 12 chip faces of 16 x 16 at
+  (16t, 0) (02dc.c 27), six 12 x 16 terminal icons and two 14 x 19 slot frames (`copy_rect` bug_00e8_09cc.c 67-82, 14e8.c
+  15). `draw_wire_cell` uses the indices 0..7 and 0x10..0x1f only (bug_00e8_0ff1.c 21-23).
+* Cut and never drawn: cells 8..15 of the first row of 8 x 8 pieces, (64..127, 16..23); they repeat cells 0..7 pixel
+  for pixel.
+* Not cut or copied by any code (the incoming-message banner uses page 2 only as scratch, bug_00e8_5371.c 43-60):
+  * a second set of the 12 chip pictures, 16 x 15 each, at (40,49), (64,49) ... (208,49) and (40,73) ... (112,73): the
+    same 12 symbols, blue on black with yellow pins in a grey carrier;
+  * (0,104)-(39,119): a black strip with six cyan wire stubs;
+  * (44,120)-(87,143) and (124,120)-(167,143): two sample circuits (powered wires into a chip, "tee" and "diagonal", with
+    green output wires);
+  * (0,169)-(319,199): the board's bottom edge with the label "ALARM" where BOARD.PIC has "+5V." and "GND."; 9196 of its
+    9920 pixels equal BOARD.PIC's;
+  * (224,96)-(231,103): an 8 x 8 black block with a grey edge.
+
+**Reading (guess).** The sheet is the artist's working composite (sprites on a copy of the board), so most of the
+leftover is construction material. The second chip set and the "ALARM" edge look like an earlier or alternative draft.
+
+**Status.** Confirmed (untaken); as cut content only possible. Open.
+
+**Related.** CC-16 (the circuit board's difficulty 4), CC-22.
+
+## CC-28 Sound data no command reaches
+
+**What it is.** Tunes, effects and instruments in the four sound drivers' data that no command (CC-23) can start.
+`DS:` offsets are in the driver's data segment (segment bases of the unpacked images: ISOUND 0x06f0, TSOUND 0x0a10,
+ASOUND 0x1ac0, RSOUND 0x1780; image offset = base * 16 + offset). Nobody has listened: the pass rendered WAVs with the
+C# drivers and checked only that they are not silent (`build/cut-content3/sound/wav/`, not committed; the MT-32 ones
+on Munt).
+
+**Evidence.**
+* Commands 15 and 21 (never sent, CC-23), their data per driver:
+
+  | Driver | Command 15 | Command 21 |
+  |---|---|---|
+  | ISOUND | sweep DS:02dc: 1 note, priority 0x50, 4 ticks, divisors 0x156b/0x1090, glide 0xd0 | noise DS:0324: 1 note, priority 0x63, 13 ticks, mask 2, divisor 0x3c, glide 3 |
+  | TSOUND | no data of its own: the tune at 1770 that command 13 plays, with four bytes patched in the code (0c 07 0c 0e) | none (bare `ret` at 0130) |
+  | ASOUND | tune DS:1f64, 8 bytes: instrument 4, volume 0x2f, note 0x10, 10 ticks | tune DS:1f84, 8 bytes: instrument 12, volume 0x32, note 0x11, 20 ticks |
+  | RSOUND | tune DS:14ce: program 13 ("Door opens"), velocity 0x64, note 0x40, 35 ticks, then program 14 | none (`ret` at 0a09) |
+
+* Tunes no command starts. ASOUND DS:1efa..1f01 (`fc 12 f9 3c 01 64 00 00`): instrument 0x12 (the code's `Car1Engine`
+  constant), volume 60, note 1 for 100 ticks; and DS:1f0e..1f19 (`fc 12 f9 3c fa 05 02 f5 fa 00 00 00`): the same
+  instrument, a bend of +5 a tick, note 2 for 245 ticks. Both lie beside command 23's tune at 1f02; no command table
+  entry and no code word points at them. RSOUND DS:149e..14ab (`fc 03 55 ff 00 39 06 ff 05 39 06 00 00 00`): program 3,
+  note 0x55 for 255 ticks, an inner repeat of note 0x39; the same shape as command 6's gun burst at 1490. No code word
+  149e. It sets no velocity, so on a fresh voice it is silent in the C# render.
+* Prepared sounds. ISOUND DS:03a6..03b1 and 03b2..03bd: two complete noise sounds (priority 0x50, 9 ticks, divisor
+  0x0d8e). Only the gear routines 0167 and 0186 refer to them (they rewrite duration and divisor from the table
+  DS:0452); the start routine 03ed is never given them, which fits CC-23 (commands 26 and 27 play nothing on the
+  speaker).
+* Unused instruments. ASOUND instrument 7 (DS:0184, image 0x1c44): a noise sweep (20 ticks, mask 0x03ff); no tune and no
+  code constant selects it. RSOUND timbre 16 "CloseDrawr" (name at image 0x3a32): uploaded with the other 38 timbres; no
+  tune selects program 16 (the code's own program numbers are 0 and 12).
+* Tables. RSOUND's command table (image 0x0b4b..0x0bb8) has 55 entries, 47..54 restart voice 0..7 and nothing sends
+  them (the game sends nothing above 46). ASOUND's table is at image 0x1849..0x18a6, in the code segment after the code.
+* TSOUND has no unreached tune byte: everything from DS:00f8 to 187f is tiled by tunes that commands reach.
+
+**Reading (guess).** The two ASOUND tunes with the engine instrument may be the gear tunes the AdLib driver was linked
+without (its commands 22, 24, 25 are `ret`, ISOUND and RSOUND have sounds for them); the RSOUND tune at 149e looks like a
+half-edited copy of the gun burst. Nothing names the pairing.
+
+**Status.** Confirmed (no command and no code word reaches the data); that it was cut is likely for the tunes and the
+engine sounds, possible for the instruments. Open: an audition on the original (RSOUND's needs MT-32 ROMs).
+
+**Related.** CC-23, CC-7, CC-21.
+
+## CC-29 RSOUND: "At controlled CRASH!" and the code that prints it
+
+**What it is.** The Roland driver carries a short error exit and a developer message for it.
+
+**Evidence.**
+* Code at image 0x0df0..0x0e00 sets video mode 3, prints the string at DS:17f5 (image 0x2f75) `At controlled CRASH!$` with
+  int 21h function 9 and exits with 4Ch. No jump, call or 16-bit word in the driver's code segment refers to 0df0 (a scan
+  of E8/E9/EB, the conditional jumps and all words found none).
+* It is the only developer text in the four sound drivers; their other strings are name and copyright headers. Code
+  only: not run.
+
+**Reading (guess).** A guard of the driver's author for an impossible state, never wired up.
+
+**Status.** Confirmed (dead code and text); explained: a leftover of the driver's source, like the library notes of CC-9.
+
+**Related.** CC-9, CC-28.
+
+## CC-30 PLOT.TXT pages `*PL0625`, `*PL0825`, `*PL0925`, `*PL1125`: unreachable in the original
+
+**What it is.** The "crime carried out" ending pages of the last variant (CRIME12) of plots 6, 8, 9 and 11. The original
+cannot draw them.
+
+**Evidence.**
+* The ending text of a (plot, variant) row has a page `*PLppV5` for a crime carried out; the case flag 0x40 is set only
+  when an event with VP >= 5 happened (FINAL 2e06 150-151). CRIME12 is variant 2 of plots 6, 8, 9 and 11 and its largest
+  event score is 4 ("Made Product"; the other twelve crime files reach 6, 7 or 10): CA-15. So for those four rows
+  only the "prevented" pages are drawn.
+* The four pages exist in PLOT.TXT: `*PL0625` (lines 475-479, "If I have my way, Max, that was your last case."), `*PL0825`
+  (624-625, "That was a pathetic investigation, Max."), `*PL0925` (567-569) and `*PL1125` (568-569). For the other 41
+  (plot, variant) rows the `...5` page is reachable (checked on the plot table and the scores of the 13 crime files).
+  The scan notes that other pages carry text of the same wording (`*PL0905`, `*PL1025`, `*PL1227`, `*PL0926`).
+* With the player option `fixes.campaignBugs` ("Also fix campaign-logic bugs", `FixCrimeEndingBelowFivePoints`, D-650,
+  csharp/docs/SETTINGS.md) a crime whose best event is worth less than 5 counts as carried out when that event
+  happened, and these pages are drawn.
+
+**Reading (guess).** The ending texts were written for every row; CRIME12 was scored too low (or the threshold raised)
+afterwards. CA-15 gives the effect on the case; this entry the text that goes with it.
+
+**Status.** Confirmed (unreachable in the original); player option (D-650). Not seen in a run of the original.
+
+**Related.** CA-15, CC-13, CC-5.
+
+## CC-31 DS:9686: settling a break-in or wiretap without playing it
+
+**What it is.** In GAME's building menu a flag decides whether a break-in or wiretap is played (hand-off to TAC or BUG)
+or settled at once by dice. The flag is set before the first menu and never cleared, so the settling arms run only on
+the return from the module.
+
+**Evidence.**
+* `game_00f7_1e5a.c` 138 and 153: `if (entry_mode == 0 && D_9686) { ...hand-off... } else { resolve_infiltration(...) }`,
+  the wiretap twin, and line 166 (`if (D_9686)` in the wiretap's else arm). The only writer is `D_9686 = 1;` in `game_main`
+  (`game_00f7_005a.c` 62), before the first menu; initial value 0; no other write in GAME.
+* `resolve_infiltration` (00f7:2728) rolls the outcome and charges the minutes without a raid.
+* Already known as U-205 (`csharp/docs/faithfulness/UNCERTAIN-GAME.md`) and `CampaignState.Places.cs:16`
+  (`MissionsPlayed`); not in this register until now.
+
+**Reading (guess).** A way to play the campaign without the raid and the wiretap (testing, or for machines that could not
+run the mini-games), switched on for the shipped game.
+
+**Status.** Confirmed (one writer, the constant 1); open: a patch of the byte (DS:9686 = 0) would show the arm.
+
+**Related.** CC-2, CC-17, U-205.
+
+## CC-32 Pop-up menu: the "OK" button mode and the `^` marks
+
+**What it is.** The menu routine every program shares has two looks the game never uses: a boxed "OK" at the bottom
+right instead of selectable items, and a `^` in place of an item's leading space.
+
+**Evidence.**
+* In every program the routine reads a button flag and a marked-items mask, and writes them only as resets to 0 at its end:
+  GAME `game_00f7_c6ae.c` 203, 238-239 and `cb7d.c` 106, 116 (DS:7cbe, DS:97a4); FINAL `final_0100_8f74.c` 209, 244-245
+  and `9443.c` 112, 124 (`menu_ok_button` 84b4, `menu_marked_mask` 9fa4); TAC `tac_00e8_bae6.c` 203, 238-239 and `bfb5.c`
+  109, 119 (DS:a1e0, `menu_marked` bdf4); BUG `bug_00e8_58b2.c` 190, 225-226 and `5d81.c` 102, 113 (`menu_ok_button`
+  6052, `menu_marked_items` 77b2); CHASE `chase_00df_321c.c` 208, 244-245 and `36eb.c` 107, 119 (`menu_close_box` 4782,
+  `menu_marked_items` 5c68). The program-wide translations show no other write; the initial values are 0 in all five
+  images.
+* With the flag set the box would close on any key; bit n of the mask draws item n with `^`.
+
+**Reading (guess).** Library features (message boxes, hot-key marks) that the game's own screens never needed. Whether the
+C# `PopupMenu` ports them was not looked at.
+
+**Status.** Confirmed (five programs); explained as library code, like CC-15.
+
+**Related.** CC-15, CC-33.
+
+## CC-33 Small dead branches in live functions
+
+**What it is.** Dead arms found by listing the variables of GAME, FINAL, TAC, BUG and CHASE that nothing writes or that are
+written only with constants (readable C and the program-wide translations; not every one of the 835 functions was read).
+None hides content a player could have met; they are leftovers of shared or compiled-out source. Confidence for all:
+confirmed (every writer and caller listed); what they were for is a reading.
+
+| Where | What is dead | Why | Would show |
+|---|---|---|---|
+| GAME `game_00f7_005a.c` 88-101 | the disk check for exit modes 13, 9, 11 (`CheckForDisk(3, ..)`, `CheckForDisk(1, ..)`) | `exit_mode` (DS:a3ee) is written only with 8, 10, 1, 4, 6, 3, 12, 7, 2, -1; the cases belong to a launcher table shared with other programs | a "Please insert Disk n" prompt |
+| GAME `game_00f7_91fa.c` 27 | `kind == 1` (photo) in `clear_person_knowledge` | the only caller (`8755.c` 318) passes 8, and the call sits in the branch CA-35 shows never runs | the loss of a person's photo |
+| TAC `0018.c` 129, `3081.c` 102, `5b2d.c` 36 | `faces_on` is always 1: the `!faces_on` early return of the speech balloon and the arm that skips the faces sheet | one writer, `= 1` in `tac_init` | no balloons, no faces sheet |
+| TAC `0f4c.c` 160, 485-487 | `player_state` 3 (pose 7) | written only with 0, 1, 2 and 4; C# `RaidState.Intelligence.cs:145` documents four states | nothing new |
+| CHASE `321c.c` 88, 96, 124, 132-135 | `menu_pause_mode` (DS:647c): draw the menu and return -1 at once | written only with 0 | nothing (a static message) |
+| CHASE `2c51.c` 53 | `map_seed & 0x3fff` in `srand(0x7b * InCity + ...)` | `map_seed` (DS:5c00) has no writer in CHASE; always 0 (also CC-2) | a per-case map |
+| GAME `58dc.c` 170, FINAL `6b82.c` 168, BUG `31b8.c` 161, TAC `9a3c.c` 188 | `if (0) { strcpy(Txt, ""); strcpy(Txt, "'"); strcpy(Txt, "'"); }` in `draw_person_dossier` | constant condition; the compiler emitted no code, the C keeps it for the byte match (TAC's carries a comment saying so) | probably a message line in single quotes |
+| TAC `bae6.c` 92-122 (and 124, 141-143, 181-193, 218-231), BUG `58b2.c` 80-110 (and 112, 128-130, 205-218), CHASE `321c.c` 96-121 (with `pan_resume_id`) | the "an animation is playing behind the menu" arms of the pop-up | `animation_active` is set only by `start_animation`, which these three programs never call (GAME and FINAL do) | a disk prompt and a redraw of the speaker's face |
+| the presence function: GAME 07f3:21, BUG 4a9d:24, FINAL 8467:24, TAC b321:17 | the statement `p = 60 * b / covert + 10` | `p` is a local that nothing reads; the function returns `b` | nothing; the C# keeps the division because the original stops with a divide error if `covert` is 0 |
+
+* About the presence statement: with the values of the WORLD files `p` reaches 2170, 3610 and 3310, so it was never a
+  0..100 percentage (as `campaign.h` 84-85 and `docs/data-model/game.md` said). The level `b = 6*b/covert + 1`, clamped
+  to 5, hides an unclamped level of up to 361 for 73, 73 and 67 pairs of city and organisation in the three worlds.
+* GAME `skip_requested` (`game_00f7_b3fe.c` 24) has the same dead `get_key()` as FINAL's skip test (CA-34): cross-reference
+  only.
+
+**Status.** Explained.
+
+**Related.** CC-2, CC-15, CC-17, CC-20, CC-32, CA-34, CA-35.
 
 ---
 
@@ -713,20 +999,42 @@ which of the sent ones are empty routines.
   CC-20/21 and compiler artefacts (CC-21).
 * **The dead list.** Re-checked from the programs' bytes (CC-10): all 41 dead.
 * **Sound commands.** CC-23: the numbers sent, the empty routines of ISOUND and TSOUND.
+* **Sprite sheets (third pass).** Every `cut_image` and `copy_rect` of TAC, BUG, CHASE and FINAL was tabulated against the
+  sheets: CC-24 (SPRITES/SPRITESF), CC-25 (CHASE.PIC), CC-26 (GUYS3/GUYS2), CC-27 (BUGS.PIC). EQUIP2.PIC (all 15 item
+  pictures and 11 shelf rects reach the screen; its untaken pixels equal EQUIP1.PIC), STREET.PIC (only 1-2 pixel borders
+  untaken), CARS.PIC (64000 of 64000 pixels taken) and ICONS.PIC (15 icons, types 0..14 all occur in the crime files):
+  nothing unused.
+* **Sound data (third pass).** Every tune start of the four drivers parsed with the driver's own event lengths: CC-28,
+  CC-29. TSOUND: no unreached tune byte.
+* **WORLD0..2.DTA (third pass).** Layout, the city and organisation fields against their readers: all read, no leaked text;
+  the constant-zero words are runtime state stored empty (`orgs_seen`, `seen_today`) or padding (`race_hi`). All 26
+  MasterMind numbers and the four plot-group bits are held. `race` is a start of a 16-name window (0..24); 14 values the
+  code can take are held by no file (1, 2, 3, 5, 9, 11, 12, 17..23), the union of the files reaches all 64 names. City
+  `size` and organisation `strength`/`divisor` have no unreached branch; the clamp to level 5 hides the larger values
+  (CC-33). The KGB `-1` clue word in WORLD0 and WORLD1 wastes about 1 draw in 12 of the briefing's organisation choice
+  (FINAL 0734:78).
+* **CRIME0..12.DTA, event and cast values (third pass).** Event `score` (held 0, 3, 4, 6, 7, 10; the tests `VP`, `VP >= 5`,
+  `40 * VP`): only CRIME12 holds nothing the `>= 5` test accepts (CA-15, CC-30). Event `items`: bits 0-3 and 8-11 only,
+  all held, every named object has a name and the reverse; no bit in 0x00f0 or 0xf000. Cast `exposure` (0..6): used only
+  in arithmetic, no special value. The members with exposure 0 (the 13 MasterMinds, CRIME2 and CRIME4 "Inside Contact",
+  CRIME6 "Supplier") never add a clue through the message loop (`cover * intel / 0x60`, GAME 3fa6:140): arithmetic,
+  probably deliberate.
+* **Dead branches (third pass).** The shared writers of the scalar globals of GAME, FINAL, TAC, BUG and CHASE: CC-31..CC-33.
+  Found alive: `exit_mode` 1, 7, 8, 10; `guard_behaviour` -1..2; TAC `GameMode` 0..3; `alert` -1, -2, -3; FINAL
+  `entry_mode`; `random(n)` results against constants (only the known `c == 7`, CA-9).
 
 ## Not searched (for the next pass)
 
-* Sprite sheets, the rest: the face sheets are done (CC-22; their head, strip and tile indexes were read from the
-  callers). Not done: which cells of SPRITES/SPRITESF (TAC), BUGS, EQUIP2, CHASE.PIC, GUYS2/3, ICONS, CARS the code
-  draws by `copy_rect` or by a computed handle; the uncut-pixel renders exist (`uncut_<NAME>.png`) but the blit
-  rectangles were not tabulated, so the large bright areas of those sheets mean nothing yet.
-* Tune and effect data of the four sound drivers that no command reaches; RSOUND's and ASOUND's command tables
-  (not at offset 0x48 like ISOUND's and TSOUND's); the graphics drivers' routines.
-* Fields of the WORLD files beyond the ones the code names (organisation `ethnic`, `strength`, `divisor`, city
-  `size` values) against what the code can reach.
-* Dead branches inside live functions of GAME, FINAL, TAC, BUG, CHASE that are not named by a `// DORMANT:`
-  marker (the markers are the ones the C# port met; a systematic pass over the unported-looking arms of the C would
-  find more).
-* Event `score` values, `exposure` values and the `items` word (destroy/receive masks) against the code's tests.
-* Runs of the original for CC-1..CC-3, CC-5, CC-8, CC-11, CC-16, CC-20 (every entry says what to patch). The `.PAN`
-  results of CC-19..21 come from the tool's own replay of the script machine, not from the original.
+Done in the third pass (17 Nov 2026): sprite sheets, the sound drivers' data, the WORLD and CRIME fields, and a first
+pass over dead branches (see "Checked").
+
+* Runs of the original for CC-1..CC-3, CC-5, CC-8, CC-11, CC-16, CC-20 and now CC-24..CC-26, CC-28 and CC-31 (every
+  entry says what to patch or look at). The `.PAN` results of CC-19..21 come from the tool's own replay of the script
+  machine, not from the original; the sound results of CC-28 come from C# renders, nobody has listened to the original.
+* Full-screen pictures drawn whole were not examined for sheet cuts (AD, AFRICA, BOARD, CENTRAL, EUROPE, GENDER, HOTEL,
+  LABS, SNEAKIN, TRAINING, WIRETAP); FINAL's `vacation_*` cuts take whole frames.
+* The graphics drivers' routines were not read (a routine that reads a page itself would not show in the C).
+* Dead branches: the third pass did not read each of the 835 functions, so a systematic pass over the remaining arms of
+  the C would still find more. The one-room ambush's reachable tiles (GUYS2, `where & 1`) were not tabulated.
+* Eligibility of the organisations as a plot organisation was checked at their static positions only
+  (`MoveEasternOrganisations` and the 999-try limits were not simulated).

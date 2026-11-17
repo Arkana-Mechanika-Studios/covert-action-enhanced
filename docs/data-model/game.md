@@ -72,8 +72,8 @@ position on the map, 36d3/3791). The world is chosen by the third letter of city
 ### orgs: 9fb4, 36 bytes x 16 (`struct org`, WORLDn.DTA)
 `short_name[6]` 00 (printed by 6cfa 62 / 716a 43 / 5f21 as "/<short>"), `name[20]` 06, `grid` 1a (map cell as
 for cities), `strength` 1c and `divisor` 1e (presence formula, 07f3), `flags` 20 (char; bit0 = known to the player; also
-accessed as a word by 3fa6 253: `*(int *)&orgs[x].flags |= 1`), `ethnic` 22 (0..3, picks the first-name and surname
-tables, 08ee), `u_21`, `u_23` unused. org 0 is not listed by the screens (6cfa 53), org 1 = the player's agency:
+accessed as a word by 3fa6 253: `*(int *)&orgs[x].flags |= 1`), `ethnic` 22 (a start 0..24 of a window of 16 names in the first-name and surname
+tables, `2 * ethnic`, 08ee; not a group 0..3), `u_21` unused, `u_23` (`race_hi`) always 0 and read by nothing. org 0 is not listed by the screens (6cfa 53), org 1 = the player's agency:
 `orgs[1].name` is "$US" (2eb9) and `orgs[1].grid` is the agency's base (3a95, 1e5a 73).
 
 ### cast: 97a6, 48 bytes x N (`struct cast`, CRIMEn.DTA participants)
