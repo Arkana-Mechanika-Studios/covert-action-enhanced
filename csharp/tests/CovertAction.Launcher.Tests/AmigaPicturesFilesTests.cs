@@ -150,7 +150,7 @@ public sealed class AmigaPicturesFilesTests
         Skip.If(pictures is null, "no Amiga picture files");
         var game = FindGame();
         var cities = new CatArchive(game.Read("CITIES.CAT"));
-        foreach (var name in new[] { "ad", "camera", "gender", "training", "sneakin", "wiretap", "geneva", "helsinki", "istanbul", "washingt" })
+        foreach (var name in new[] { "camera", "gender", "wiretap", "geneva", "helsinki", "istanbul", "washingt" })
         {
             var own = PcPicture(game, cities, name + ".pic");
             var amiga = AmigaPictureFile.Read(File.ReadAllBytes(AmigaFolderSearch.BankFile(pictures!, name + ".pix")!));

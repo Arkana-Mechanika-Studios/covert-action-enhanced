@@ -75,6 +75,10 @@ public static class AmigaPictureList
         new("street.pic", "street.pix", "the car chase's windscreen views (score 0.96): copied to the windscreen as they are, and the game recolours only the dashboard"),
         .. CityNames.Select(city => new AmigaPictureEntry($"{city}.pic", $"{city}.pix", City)),
         .. ThumbnailNames.Select(city => new AmigaPictureEntry($"{city}.pic", $"{city}.pix", Thumbnail, Crop: true)),
+        // DIVERGENCE: D-682 three more pictures: the ones the game puts on the screen whole
+        new("sneakin.pic", "sneakin.pix", "the picture of the break-in (D-682): loaded on a page and dissolved onto the screen whole, with nothing drawn over it and no pixel read back; the Amiga's composition (the same hands at the door, placed further right) shows as it is", Backdrop: true),
+        new("ad.pic", "ad.pix", "the picture shown when the player leaves the game (D-682): loaded on the screen whole while the game waits for a key; the Amiga's own advertisement shows", Backdrop: true),
+        new("training.pic", "training.pix", "the training screen's backdrop (D-682): the four skills' cells at the PC's places (the game's menu is drawn at the top over the empty part and its rating boxes over the black strips under the cells); no pixel is read back and the menu recolours only its own colours", Backdrop: true),
         .. WindowedCities.Select(city => new AmigaPictureEntry($"{city.City}.pic", $"{city.City}.pix", Windowed, WindowWidth: city.Width, WindowHeight: city.Height)),
     ];
 

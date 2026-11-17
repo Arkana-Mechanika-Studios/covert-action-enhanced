@@ -132,6 +132,24 @@ game would not copy it). Left out: `geneva`, `helsinki`, `istanbul`, `khartoum`,
 same view without the PC's 12 leftmost columns, so the PC's frame would hold a black strip or another view) and `washingt` (a
 repainted picture: other trees and sky).
 
+### Pictures the game shows whole (D-682)
+
+`sneakin` (the break-in), `ad` (shown when the player leaves) and `training` (the training screen). The game puts each on the
+screen as it is: no sheet to cut from, no pixel read, nothing recoloured but the menu's own colours, so the Amiga's picture shows
+in its own composition (`Backdrop` on the list; no layout score applies). On the training screen the four skills' cells are at the
+PC's places and the black strips under them are where the game draws its rating boxes; the menu opens over the empty top.
+Left out: `gender` (the woman on the left and the man on the right, the reverse of the game's menu), `wiretap` (the Amiga's board is
+at the left, where the game's popup opens at 20, 20) and `camera` (the frames the game cuts out are elsewhere).
+
+### Pictures the game shows whole (D-682)
+
+`sneakin` (the break-in), `ad` (shown when the player leaves) and `training` (the training screen). The game puts each on the
+screen as it is: no sheet to cut from, no pixel read, nothing recoloured but the menu's own colours, so the Amiga's picture shows
+in its own composition (`Backdrop` on the list; no layout score applies). On the training screen the four skills' cells are at the
+PC's places and the black strips under them are where the game draws its rating boxes; the menu opens over the empty top.
+Left out: `gender` (the woman on the left and the man on the right, the reverse of the game's menu), `wiretap` (the Amiga's board is
+at the left, where the game's popup opens at 20, 20) and `camera` (the frames the game cuts out are elsewhere).
+
 ## Without the files
 
 The folder is the one named in the launcher, else `amiga/files` (or `amiga`) next to the program, else next to the game folder
