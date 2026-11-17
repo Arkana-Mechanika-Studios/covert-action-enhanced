@@ -4,11 +4,11 @@ A rewrite of *Sid Meier's Covert Action* (MicroProse, 1990, DOS) as a native Win
 original's own code, part by part, so that it plays as the original did. You need your own copy of the game: none of its
 files come with this project, and your copy is never changed.
 
-**Status: version 1.3.** The whole game runs, from the set-up screen to the end of a career: the menus, the
+**Status: version 1.3.1.** The whole game runs, from the set-up screen to the end of a career: the menus, the
 briefings, the campaign, the building raids, the electronics workbench, the car chase, the cryptography workstation,
 saving and loading, the joystick and all four of the original's sound cards. Version 1.0 is the faithful version and
 stays the reference (its `release/1.0` branch and the tag `v1.0`; what it had to meet is in
-[release 1.0](csharp/docs/RELEASE-1.0.md)). Versions 1.1 to 1.3 add [player options](#player-options), all off by default: with them off,
+[release 1.0](csharp/docs/RELEASE-1.0.md)). Versions 1.1 to 1.3.1 add [player options](#player-options), all off by default: with them off,
 the game plays as 1.0 and the original. Its limits are in [Known limits](#known-limits).
 
 <table>
@@ -101,7 +101,7 @@ Not in the original, each off by default, on the launcher's Advanced, Cut conten
 * **The Amiga version's sound effects** ([D-641](csharp/docs/faithfulness/DIVERGENCES.md), [the table](csharp/docs/AMIGA-EFFECTS.md)):
   the shots, doors, camera, aeroplane, chips and the rest of the Amiga version's effects, played from the Amiga sound
   files you own where the Amiga game has the same sound, the sound card's effects elsewhere (or silence, if you prefer).
-* **The Amiga version's pictures and animations** ([D-642, D-681 to D-684](csharp/docs/faithfulness/DIVERGENCES.md), [the list](csharp/docs/AMIGA-PICTURES.md)):
+* **The Amiga version's pictures and animations** ([D-642, D-681 to D-688](csharp/docs/faithfulness/DIVERGENCES.md), [the list](csharp/docs/AMIGA-PICTURES.md)):
   the faces, icons, maps, the hotel and most city pictures of the Amiga version, in its colours, and eleven of its
   animations, read from the Amiga files you own; a picture or animation the Amiga made in another layout stays the PC's.
   With the captured dossier on as well, the Amiga's own unused dossier plays.
@@ -117,13 +117,15 @@ Not in the original, each off by default, on the launcher's Advanced, Cut conten
   scene, a career record that overwrites a case, the hours charged after code-breaking, a new case that could hang
   while it was laid out, the Mastermind's meeting of one crime and the skills of an agent made after a practice mission.
   With both off the game is the original, bug for bug.
-* **The original's cut content** ([the page](docs/cut-content-options.md), [D-660 to D-663](csharp/docs/faithfulness/DIVERGENCES.md),
-  on the launcher's Cut content tab): four things the game's own files carry and its programs never use. **Captured
+* **The original's cut content** ([the page](docs/cut-content-options.md), [D-660 to D-665](csharp/docs/faithfulness/DIVERGENCES.md),
+  on the launcher's Cut content tab): six things the game's own files carry and its programs never use. **Captured
   dossier**: the animation of a dossier page stamped CAPTURED, with a man's or a woman's photograph, plays when a cast
   member is captured. **Free car chase**: a fifth line, "Free Chase", in the practice menu, a chase on a random map with
   the places labelled Loc1 to Loc15. **Hardest circuit board**: the electronics board's fourth difficulty, for the hardest
   level with an agent of the lowest electronics rating. **All filler sentences**: the four of the sixteen filler sentences
-  of coded messages that the game never draws. The page also says which cut content is left out and why.
+  of coded messages that the game never draws. **All 20 chase grounds**: the four ground pictures of the car chase's
+  map the generator never draws. **Kitchens and bedrooms**: the two room types the raids' buildings never get, with
+  their bed, range, refrigerator and television. The page also says which cut content is left out and why.
 
 Two of the cut-content options and their launcher tab ([the page](docs/cut-content-options.md)):
 
