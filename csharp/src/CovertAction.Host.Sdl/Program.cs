@@ -16,6 +16,8 @@ internal static partial class Program
     private static int Main(string[] args)
     {
         AttachToParentConsole();
+        // where SDL 3 is looked for: COVERT_SDL3_PATH, then the copy beside the program (SDL3.dll, libSDL3.so.0), then the system's
+        SdlNative.ConfigureLibrary(null);
         var cli = CommandLine.Parse(args);
         if (cli.Error is { } error)
         {
@@ -69,8 +71,7 @@ internal static partial class Program
                 }
                 catch (Exception e) when (e is DllNotFoundException or SdlHostException)
                 {
-                    Console.Error.WriteLine("SDL 3 could not be started (SDL3.dll belongs next to the program): " + e.Message);
-                    return 1;
+                    return SdlFailed(e);
                 }
                 start = StartSettings.Resolve(cli, Environment.GetEnvironmentVariable, settings);
                 gameFolder = GameFolderFor(start);
@@ -96,10 +97,20 @@ internal static partial class Program
             }
             catch (Exception e) when (e is DllNotFoundException or SdlHostException)
             {
-                Console.Error.WriteLine("SDL 3 could not be started (SDL3.dll belongs next to the program): " + e.Message);
-                return 1;
+                return SdlFailed(e);
             }
         }
+    }
+
+    /// <summary>SDL could not be loaded (the player is told how to get it: <see cref="MissingSdl"/>) or started; the program's exit code.</summary>
+    private static int SdlFailed(Exception e)
+    {
+        if (e is DllNotFoundException)
+        {
+            return MissingSdl.Tell();
+        }
+        Console.Error.WriteLine("SDL 3 could not be started: " + e.Message);
+        return 1;
     }
 
     /// <summary>The game in its window with the settings of this run, from its set-up screen (or the practice asked for).</summary>

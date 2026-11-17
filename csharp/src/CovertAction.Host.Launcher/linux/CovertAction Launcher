@@ -1,0 +1,5 @@
+#!/bin/sh
+# Covert Action Launcher: opens the launcher (the settings screen) of CovertAction, beside this script; its Play starts the game.
+# CovertAction started directly goes straight to the game. (Reused from the Darklands Restoration Project's DarklandsRP-Launcher.)
+here=$(dirname "$0")
+exec "$here/CovertAction" --setup "$@"

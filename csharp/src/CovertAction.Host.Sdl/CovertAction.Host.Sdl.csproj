@@ -28,6 +28,12 @@
     <!-- SDL 3.4.20, the official Windows x64 release (zlib licence, see THIRD_PARTY_NOTICES.md), next to the program -->
     <None Include="Native/win-x64/SDL3.dll" Link="SDL3.dll" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
   </ItemGroup>
+  <ItemGroup Condition="'$(RuntimeIdentifier)' != '' and $(RuntimeIdentifier.StartsWith('linux'))">
+    <!-- SDL 3.4.20 built from the official source release on Ubuntu 22.04 by csharp/tools/linux/build_sdl3.sh (zlib licence, see
+         THIRD_PARTY_NOTICES.md), next to the program in a Linux publish: it is loaded before the system's, so systems without
+         SDL3 (Ubuntu 24.04 and older) run the game; as the Darklands Restoration Project's -->
+    <None Include="Native/linux-x64/libSDL3.so.0" Link="libSDL3.so.0" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+  </ItemGroup>
   <!-- this version's release notes (csharp/releases/<version>/release-notes.md, when there) next to the program, for the
        launcher's "What's new" -->
   <PropertyGroup>
@@ -45,5 +51,11 @@
        which starts CovertAction.exe with its setup switch; as the Darklands Restoration Project's -->
   <Target Name="PublishLauncherProgram" AfterTargets="Publish" Condition="'$(RuntimeIdentifier)' == '' or $(RuntimeIdentifier.StartsWith('win'))">
     <Exec Command="dotnet build &quot;$(MSBuildThisFileDirectory)..\CovertAction.Host.Launcher\CovertAction.Host.Launcher.csproj&quot; -c Release -nologo -v q -p:Version=$(Version) -o &quot;$(PublishDir).&quot;" />
+  </Target>
+  <!-- on Linux the launcher is a script of three lines beside CovertAction: "CovertAction Launcher" starts it with its setup switch
+       (the archive made by publish_release.py sets the executable bits; chmod here too when published on Linux itself) -->
+  <Target Name="PublishLauncherScript" AfterTargets="Publish" Condition="'$(RuntimeIdentifier)' != '' and $(RuntimeIdentifier.StartsWith('linux'))">
+    <Copy SourceFiles="$(MSBuildThisFileDirectory)..\CovertAction.Host.Launcher\linux\CovertAction Launcher" DestinationFolder="$(PublishDir)" />
+    <Exec Condition="!$([MSBuild]::IsOSPlatform('Windows'))" Command="chmod +x &quot;$(PublishDir)CovertAction Launcher&quot; &quot;$(PublishDir)CovertAction&quot;" />
   </Target>
 </Project>
