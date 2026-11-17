@@ -129,7 +129,7 @@ public sealed class AmigaPicturesFilesTests
                 amiga = window;
             }
             Assert.Equal((own.Width, own.Height), (amiga.Width, amiga.Height));
-            if (!entry.Backdrop && entry.WindowWidth == 0)
+            if (!entry.Backdrop && !entry.Cells && entry.WindowWidth == 0)
             {
                 var score = EdgeOverlap(own.Pixels, amiga.Pixels, own.Width, own.Height);
                 Assert.True(score >= LeastLayoutScore, $"{entry.Name}: layout score {score:0.00}");
@@ -197,6 +197,72 @@ public sealed class AmigaPicturesFilesTests
         Assert.True(RedIn(amiga.SwapHalves().Pixels, half) > 4 * RedIn(amiga.SwapHalves().Pixels, 0));
         // the PC's woman (the game's red, colour 4) is on its right
         Assert.True(Enumerable.Range(0, own.Height).Sum(row => Enumerable.Range(half, half).Count(x => own.Pixels[row * own.Width + x] == 4)) > 4 * Enumerable.Range(0, own.Height).Sum(row => Enumerable.Range(0, half).Count(x => own.Pixels[row * own.Width + x] == 4)));
+    }
+
+    /// <summary>
+    /// D-686: the game cuts the workbench's 32 wire pieces (8 x 8, two rows of 16 from row 16) and 12 chips (16 x 16, side by side
+    /// along the top) out of the top 32 rows of the sheet. The Amiga's cells lie one pixel to the right: moving the strip one
+    /// pixel left puts the Amiga's cells in the game's rectangles, loses no drawn pixel of the strip, and agrees with the PC's
+    /// cells in far more pixels than the unmoved sheet.
+    /// </summary>
+    [SkippableFact]
+    public void TheWorkbenchCellsTheGameCutsAreTheAmigasCellsOnePixelToTheRightWithNoDrawnPixelLost()
+    {
+        var pictures = AmigaFolderSearch.ResolvePictures(AmigaFolder());
+        Skip.If(pictures is null, "no Amiga picture files");
+        var game = FindGame();
+        var cities = new CatArchive(game.Read("CITIES.CAT"));
+        var own = PcPicture(game, cities, "bugs.pic");
+        var amiga = AmigaPictureFile.Read(File.ReadAllBytes(AmigaFolderSearch.BankFile(pictures!, "bugs.pix")!));
+        var source = AmigaPictureSource.Open(new PictureColours(new byte[3 * 256]), pictures, "", _ => { });
+        var shown = source!.Find("bugs.pic", own.Width, own.Height)!.Value.Pixels;
+        var plain = source.DisplayPixels(amiga);
+        const int width = 320;
+        var cells = new List<(int X, int Y, int Size)>();
+        cells.AddRange(Enumerable.Range(0, 32).Select(i => (i % 16 * 8, 16 + i / 16 * 8, 8)));
+        cells.AddRange(Enumerable.Range(0, 12).Select(i => (i * 16, 0, 16)));
+        int Differences(byte[] pixels, bool pcColours)
+        {
+            // where the two pictures agree about "drawn or not" (the colours are the Amiga's own and are not compared with the PC's numbers)
+            return cells.Sum(cell => Enumerable.Range(0, cell.Size).Sum(y => Enumerable.Range(0, cell.Size).Count(x =>
+                (pixels[(cell.Y + y) * width + cell.X + x] == 0) != (own.Pixels[(cell.Y + y) * width + cell.X + x] == 0))));
+        }
+        // every game rectangle holds the Amiga's cell one pixel to the right
+        foreach (var (x0, y0, size) in cells)
+        {
+            for (var y = 0; y < size; y++)
+            {
+                Assert.True(shown.AsSpan((y0 + y) * width + x0, size).SequenceEqual(plain.AsSpan((y0 + y) * width + x0 + 1, size)), $"cell at {x0}, {y0} row {y}");
+            }
+        }
+        // the strip's first column (which the move drops) has no drawn pixel on these rows, and every other drawn pixel of the strip is shown once
+        Assert.All(Enumerable.Range(0, 32), y => Assert.Equal(0, plain[y * width]));
+        var drawnBefore = Enumerable.Range(0, 32).Sum(y => Enumerable.Range(1, 192).Count(x => plain[y * width + x] != 0));
+        var drawnAfter = Enumerable.Range(0, 32).Sum(y => Enumerable.Range(0, 192).Count(x => shown[y * width + x] != 0));
+        Assert.Equal(drawnBefore, drawnAfter);
+        // nothing outside the strip changed
+        for (var i = 0; i < shown.Length; i++)
+        {
+            if (i / width >= 32 || i % width >= 192)
+            {
+                Assert.Equal(plain[i], shown[i]);
+            }
+        }
+        // the cells fit the PC's far better: the PC's cells and the Amiga's differ in the drawn pixels of the cells 216 + 362 times before the move
+        var before = Differences(plain, false);
+        var after = Differences(shown, false);
+        Assert.True(after * 2 < before, $"{after} cell pixels differ from the PC's after the move, {before} before");
+        // the drawn pixels of the chips are the same number as the PC's chips have, cell by cell (the art is the same art), except the last chip
+        // and the last wire piece: the Amiga's board begins one column earlier than the PC's, so the last column of each of the two cells is the
+        // board's edge (16 pixels of the Amiga's board in each, drawn by the Amiga there)
+        int Drawn(byte[] pixels, int x0, int y0, int size) => Enumerable.Range(0, size).Sum(y => Enumerable.Range(0, size).Count(x => pixels[(y0 + y) * width + x0 + x] != 0));
+        for (var i = 0; i < 11; i++)
+        {
+            Assert.Equal(Drawn(own.Pixels, i * 16, 0, 16), Drawn(shown, i * 16, 0, 16));
+        }
+        Assert.Equal(Drawn(own.Pixels, 176, 0, 16) + 16, Drawn(shown, 176, 0, 16));
+        Assert.All(Enumerable.Range(0, 16), y => Assert.NotEqual(0, shown[y * width + 191]));
+        Assert.All(Enumerable.Range(16, 16), y => Assert.NotEqual(0, shown[y * width + 127]));
     }
 
     /// <summary>Where the tool below writes the pictures (outside the repository); unset: none are written.</summary>

@@ -115,6 +115,43 @@ public sealed class AmigaPicturesTests : IDisposable
         Assert.Null(source.Find("gender.pic", 8, 2));
     }
 
+    [Fact]
+    public void MovingARegionCopiesItWholeAndLeavesEverythingOutsideTheTargetAsItWas()
+    {
+        byte[] pixels = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
+        var picture = AmigaPictureFile.Read(AmigaPixBuilder.Make(4, 3, pixels, ThirtyTwoColours()));
+        // the strip of columns 1..3 of the first two rows goes one place to the left (the rectangles overlap)
+        var moved = picture.MoveRegion(1, 0, 3, 2, 0, 0);
+        Assert.Equal(new byte[] { 2, 3, 4, 4, 6, 7, 8, 8, 9, 10, 11, 12 }, moved.Pixels);
+        Assert.Same(picture.Colours, moved.Colours);
+        Assert.Equal(pixels, picture.Pixels);     // the picture itself is not changed
+        Assert.Equal(new byte[] { 1, 2, 3, 4, 5, 6, 7, 8, 1, 2, 3, 4 }, picture.MoveRegion(0, 0, 4, 1, 0, 2).Pixels.Take(8).Concat(picture.MoveRegion(0, 0, 4, 1, 0, 2).Pixels.Skip(8).Take(4)).ToArray());
+        Assert.Throws<ArgumentOutOfRangeException>(() => picture.MoveRegion(1, 0, 4, 1, 0, 0));
+        Assert.Throws<ArgumentOutOfRangeException>(() => picture.MoveRegion(0, 0, 2, 2, 3, 0));
+        Assert.Throws<ArgumentOutOfRangeException>(() => picture.MoveRegion(0, 0, 0, 2, 0, 0));
+    }
+
+    [Fact]
+    public void TheWorkbenchSheetShowsTheAmigasStripMovedOnePixelLeftAndNothingElseChanges()
+    {
+        var colours = new PictureColours(new byte[3 * 256]);
+        // a sheet of 320 x 200 in which a pixel's right neighbour has another number
+        var sheet = Enumerable.Range(0, 320 * 200).Select(i => (byte)(1 + (i % 320 + 2 * (i / 320)) % 9)).ToArray();
+        var file = AmigaPixBuilder.Make(320, 200, sheet, ThirtyTwoColours());
+        var source = Source(colours, ("bugs.pix", file));
+        var shown = source.Find("bugs.pic", 320, 200)!.Value.Pixels;
+        var plain = source.DisplayPixels(AmigaPictureFile.Read(file));
+        for (var y = 0; y < 200; y++)
+        {
+            for (var x = 0; x < 320; x++)
+            {
+                var moved = y < 32 && x < 192;
+                Assert.Equal(plain[y * 320 + x + (moved ? 1 : 0)], shown[y * 320 + x]);
+            }
+        }
+        Assert.Null(source.Find("bugs.pic", 160, 100));
+    }
+
     // the replacement of a picture
 
     private static AmigaPictureSource Source(PictureColours colours, params (string File, byte[] Bytes)[] files)
@@ -354,7 +391,7 @@ public sealed class AmigaPicturesTests : IDisposable
     [Fact]
     public void ThePicturesTheGamesCodeReadsBackOrRecoloursByColourNumberAreNotOnTheList()
     {
-        string[] stay = ["board", "cars", "equip1", "equip1m", "camera", "wiretap", "guys2", "guys3", "sprites", "spritesf", "bugs",
+        string[] stay = ["board", "cars", "equip1", "equip1m", "camera", "wiretap", "guys2", "guys3", "sprites", "spritesf",
             "geneva", "helsinki", "istanbul", "khartoum", "washingt", "havana", "kingston"];
         Assert.All(stay, name => Assert.Null(AmigaPictureList.Find(name + ".pic")));
     }

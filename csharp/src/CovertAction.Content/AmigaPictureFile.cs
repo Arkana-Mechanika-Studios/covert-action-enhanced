@@ -117,6 +117,35 @@ public sealed class AmigaPictureFile
         return new AmigaPictureFile(Width, Height, swapped, Colours);
     }
 
+    /// <summary>
+    /// The picture with one rectangle of it moved (copied) to another place (D-686): the pixels of the rectangle at
+    /// (<paramref name="sourceX"/>, <paramref name="sourceY"/>) are written at (<paramref name="targetX"/>, <paramref name="targetY"/>),
+    /// whole and in their own colours; every pixel outside the target rectangle stays as it was. The rectangles may overlap
+    /// (the source is read first).
+    /// </summary>
+    /// <param name="sourceX">Left edge of the rectangle to move.</param>
+    /// <param name="sourceY">Top edge.</param>
+    /// <param name="width">The rectangle's width.</param>
+    /// <param name="height">The rectangle's height.</param>
+    /// <param name="targetX">Left edge of the place it goes to.</param>
+    /// <param name="targetY">Top edge.</param>
+    /// <returns>The picture with the rectangle moved, with the same colours.</returns>
+    /// <exception cref="ArgumentOutOfRangeException">A rectangle does not lie wholly in the picture.</exception>
+    public AmigaPictureFile MoveRegion(int sourceX, int sourceY, int width, int height, int targetX, int targetY)
+    {
+        if (width <= 0 || height <= 0 || sourceX < 0 || sourceY < 0 || targetX < 0 || targetY < 0
+            || sourceX + width > Width || targetX + width > Width || sourceY + height > Height || targetY + height > Height)
+        {
+            throw new ArgumentOutOfRangeException(nameof(width), $"moving {width} x {height} from ({sourceX}, {sourceY}) to ({targetX}, {targetY}) does not fit a picture of {Width} x {Height}");
+        }
+        var moved = (byte[])Pixels.Clone();
+        for (var row = 0; row < height; row++)
+        {
+            Pixels.AsSpan((sourceY + row) * Width + sourceX, width).CopyTo(moved.AsSpan((targetY + row) * Width + targetX));
+        }
+        return new AmigaPictureFile(Width, Height, moved, Colours);
+    }
+
     /// <summary>Gives each pixel of colour 0 on a line of the canvas the colour of the nearest pixel of the line that has one.</summary>
     private static void FillHoles(byte[] canvas, int start, int step, int count, ref int adjusted)
     {

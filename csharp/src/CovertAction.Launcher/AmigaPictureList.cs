@@ -10,8 +10,9 @@ namespace CovertAction.Launcher;
 /// <param name="Backdrop">The game puts the picture on the screen as a whole and reads nothing back from it (no sheet to cut from, nothing recoloured): the Amiga's own composition shows, and its layout is not compared with the PC's.</param>
 /// <param name="WindowWidth">For a city picture the game measures (D-681): the width the game measures the PC's picture to be; the Amiga's picture is used up to it (0: not a window).</param>
 /// <param name="WindowHeight">The height the game measures the PC's picture to be.</param>
+/// <param name="Cells">The game cuts only small cells out of the picture and shows nothing else of it (D-686): the layout of the whole picture is not compared, the cells are (tests check each cell the game cuts).</param>
 /// <param name="Arrange">Whole regions of the Amiga's picture moved to where the game's layout has them (D-685): a pure rearrangement of the Amiga's own pixels, applied first; null: none.</param>
-public sealed record AmigaPictureEntry(string Name, string File, string Reason, bool Crop = false, bool Backdrop = false, int WindowWidth = 0, int WindowHeight = 0, Func<AmigaPictureFile, AmigaPictureFile>? Arrange = null);
+public sealed record AmigaPictureEntry(string Name, string File, string Reason, bool Crop = false, bool Backdrop = false, int WindowWidth = 0, int WindowHeight = 0, Func<AmigaPictureFile, AmigaPictureFile>? Arrange = null, bool Cells = false);
 
 /// <summary>
 /// The pictures the Amiga pictures option replaces, one by one, each with the reason (D-642; new code, outside the game).
@@ -26,7 +27,7 @@ public sealed record AmigaPictureEntry(string Name, string File, string Reason, 
 /// Not on the list, and why: <c>ad</c>, <c>camera</c>, <c>training</c>, <c>sneakin</c>, <c>wiretap</c>,
 /// <c>guysnew2</c> and <c>guysnew3</c> are redrawn (different art or layout: the game's rectangles would cut the wrong
 /// parts); <c>sprites</c> and <c>spritesf</c> are redrawn with 16 colours (the raid's guards, cell by cell not the same) and
-/// the game recolours their wall colour; <c>bugs</c> (the electronics workbench's pieces) differs in layout; the cities
+/// the game recolours their wall colour; the cities
 /// <c>geneva</c>, <c>helsinki</c>, <c>istanbul</c>, <c>khartoum</c>, <c>london</c>, <c>miami</c>, <c>rome</c> and <c>washingt</c>
 /// are redrawn on another layout (scores 0.51 to 0.78); <c>havana</c> and <c>kingston</c> have another size of thumbnail;
 /// <c>paris</c>, <c>moscow</c>, <c>berlin</c>, <c>amsterda</c>, <c>baghdad</c> and <c>riyadh</c> have the same layout (0.95 to
@@ -84,6 +85,8 @@ public static class AmigaPictureList
         new("training.pic", "training.pix", "the training screen's backdrop (D-682): the four skills' cells at the PC's places (the game's menu is drawn at the top over the empty part and its rating boxes over the black strips under the cells); no pixel is read back and the menu recolours only its own colours", Backdrop: true),
         // DIVERGENCE: D-685 the Amiga's menu picture has the woman on the left and the man on the right: its halves are exchanged
         new("gender.pic", "gender.pix", "the choice of agent (D-685): the Amiga's picture shows the woman on the left and the man on the right, the reverse of the game's Max and Maxine; its two halves are exchanged (nothing is drawn: every pixel is the Amiga's, in its colour), and the game puts it on the screen whole and reads no pixel", Backdrop: true, Arrange: picture => picture.SwapHalves()),
+        // DIVERGENCE: D-686 the electronics workbench's sheet: the Amiga's cells are one pixel to the right of the PC's rectangles
+        new("bugs.pic", "bugs.pix", "the electronics workbench's wire pieces and chips (D-686): the game cuts 32 wire pieces of 8 x 8 and 12 chips of 16 x 16 from the top 32 rows and shows nothing else of the sheet; the Amiga's cells lie one pixel to the right of the PC's rectangles, so the strip (1, 0) to (192, 31) is moved one pixel to the left (every pixel the Amiga's, in its colour); the game reads no pixel of it and recolours none (the slot frames it recolours are the board's)", Cells: true, Arrange: picture => picture.MoveRegion(1, 0, 192, 32, 0, 0)),
         .. WindowedCities.Select(city => new AmigaPictureEntry($"{city.City}.pic", $"{city.City}.pix", Windowed, WindowWidth: city.Width, WindowHeight: city.Height)),
     ];
 

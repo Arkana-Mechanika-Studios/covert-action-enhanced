@@ -208,6 +208,14 @@ halves are exchanged (`AmigaPictureFile.SwapHalves`, `AmigaPictureEntry.Arrange`
 new. The Amiga's gradient between the two portraits is cut at its middle by the exchange and lies at the two edges of the screen.
 The game shows the picture whole and reads none of it (`Backdrop`).
 
+### The workbench's icons, the strip moved one pixel (D-686)
+
+`bugs`. The game cuts 32 wire pieces and 12 chips from the sheet's top 32 rows and shows nothing else of it. The Amiga's cells are
+one pixel to the right of the PC's rectangles; the strip is moved one pixel to the left (`AmigaPictureFile.MoveRegion`), after which
+every rectangle holds the Amiga's cell and no cell loses a drawn pixel. The Amiga's board begins one column earlier than the PC's, so
+the last wire piece and the last chip carry the board's edge in their last column (the Amiga drew those pixels there). The pieces are
+the Amiga's dotted redrawing, not the PC's art shifted.
+
 ## Without the files
 
 The folder is the one named in the launcher, else `amiga/files` (or `amiga`) next to the program, else next to the game folder
