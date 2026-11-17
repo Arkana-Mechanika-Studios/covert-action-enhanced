@@ -234,6 +234,21 @@ Read from the game's code and the palettes in the executables' data (`AmigaPictu
 These could be shown only if the game's recolouring and palette code also acted on the display colours 128 and up, which is a
 change of the game, not of a picture; it is not made. No picture of this round has a PNG for these sheets for that reason.
 
+### Washington, a tenth city in a window (D-688)
+
+`washingt`. The Amiga's picture is the same view of the Capitol as the PC's (the same trees at the two sides), not another
+painting: only its colours and dithering differ. The game reads a city picture's first row and column and copies what it
+measured; the PC's measures 130 x 48 and so does the Amiga's, so it is shown in a 130 x 48 window as the nine cities of D-681, with
+no pixel of the measured lines changed. Its colour 0 is a pale violet (the canvas), not black: the window has no pixel of it, so
+none is shown in a colour the Amiga did not draw. The two rows of ground below the window are not shown (the game would not copy them).
+
+### Left out in the third round
+
+| Pictures | Why |
+|---|---|
+| `board`, `cars`, `equip1`, `equip1m`, `guysnew2`, `guysnew3`, `sprites`, `spritesf` | the game recolours them by number and the Amiga's colours cannot keep the roles (D-687, above) |
+| `geneva`, `helsinki`, `istanbul`, `khartoum`, `havana`, `kingston`, `wiretap`, `camera` | as in the second round (D-681, D-682) |
+
 ## Without the files
 
 The folder is the one named in the launcher, else `amiga/files` (or `amiga`) next to the program, else next to the game folder

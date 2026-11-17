@@ -154,7 +154,7 @@ public sealed class AmigaPicturesFilesTests
         Skip.If(pictures is null, "no Amiga picture files");
         var game = FindGame();
         var cities = new CatArchive(game.Read("CITIES.CAT"));
-        foreach (var name in new[] { "camera", "wiretap", "geneva", "helsinki", "istanbul", "washingt" })
+        foreach (var name in new[] { "camera", "wiretap", "geneva", "helsinki", "istanbul" })
         {
             var own = PcPicture(game, cities, name + ".pic");
             var amiga = AmigaPictureFile.Read(File.ReadAllBytes(AmigaFolderSearch.BankFile(pictures!, name + ".pix")!));
@@ -374,6 +374,40 @@ public sealed class AmigaPicturesFilesTests
             Assert.True(Count(pc, amiga, 9, 3, 160, 200) * 10 > Of(pc, 9, 160, 200) * 8, pcName);
             Assert.NotEqual(colours[3], PaletteColour(driver, raid.PaletteSets[0], 9));
         }
+    }
+
+    /// <summary>
+    /// D-688: Washington's Amiga picture is the same view of the Capitol as the PC's, in the Amiga's colours. Its colour 0 is not black
+    /// (a pale violet, the canvas around the picture) but the game's colour 0 is what the campaign measures by, so the window must hold
+    /// no pixel of the Amiga's colour 0 (it would show black); the game's measure is the PC's 130 x 48 on both, and what the window
+    /// drops (two rows below) is not shown by the game.
+    /// </summary>
+    [SkippableFact]
+    public void WashingtonsWindowIsTheAmigasViewWithNoPixelOfItsColourZeroAndTheGameMeasuresItAsThePcs()
+    {
+        var pictures = AmigaFolderSearch.ResolvePictures(AmigaFolder());
+        Skip.If(pictures is null, "no Amiga picture files");
+        var game = FindGame();
+        var cities = new CatArchive(game.Read("CITIES.CAT"));
+        var own = PcPicture(game, cities, "washingt.pic");
+        var amiga = AmigaPictureFile.Read(File.ReadAllBytes(AmigaFolderSearch.BankFile(pictures!, "washingt.pix")!));
+        var entry = AmigaPictureList.Find("washingt.pic");
+        Assert.NotNull(entry);
+        Assert.Equal((130, 48), (entry.WindowWidth, entry.WindowHeight));
+        Assert.Equal((130, 48), Measure(own.Pixels, own.Width, own.Height));
+        // the Amiga's own picture is measured the same (its first row and column), so no pixel of the first row or column is made up
+        Assert.Equal((130, 48), Measure(amiga.Pixels, amiga.Width, amiga.Height));
+        var window = amiga.OnCanvas(130, 48, own.Width, own.Height, out var adjusted);
+        Assert.Equal(0, adjusted);
+        // the Amiga's colour 0 is a pale violet: not one pixel of the window has it, so none is shown black
+        Assert.NotEqual((ushort)0, amiga.Colours[0]);
+        Assert.Equal(0, Enumerable.Range(0, 48).Sum(row => Enumerable.Range(0, 130).Count(x => window.Pixels[row * own.Width + x] == 0)));
+        // every pixel of the window is the Amiga's, in the Amiga's place
+        Assert.All(Enumerable.Range(0, 48), row => Assert.True(amiga.Pixels.AsSpan(row * amiga.Width, 130).SequenceEqual(window.Pixels.AsSpan(row * own.Width, 130)), $"row {row}"));
+        var colours = new PictureColours(new byte[3 * 256]);
+        var shown = AmigaPictureSource.Open(colours, pictures, "", _ => { })!.Find("washingt.pic", own.Width, own.Height)!.Value.Pixels;
+        Assert.Equal(130 * 48, Enumerable.Range(0, 48).Sum(row => Enumerable.Range(0, 130).Count(x => shown[row * own.Width + x] >= PictureColours.First)));
+        Assert.Equal((130, 48), Measure(shown, own.Width, own.Height));
     }
 
     /// <summary>Where the tool below writes the pictures (outside the repository); unset: none are written.</summary>

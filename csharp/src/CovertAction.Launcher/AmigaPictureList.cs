@@ -28,7 +28,7 @@ public sealed record AmigaPictureEntry(string Name, string File, string Reason, 
 /// <c>guysnew2</c> and <c>guysnew3</c> are redrawn (different art or layout: the game's rectangles would cut the wrong
 /// parts); <c>sprites</c> and <c>spritesf</c> are redrawn with 16 colours (the raid's guards, cell by cell not the same) and
 /// the game recolours their wall colour; the cities
-/// <c>geneva</c>, <c>helsinki</c>, <c>istanbul</c>, <c>khartoum</c>, <c>london</c>, <c>miami</c>, <c>rome</c> and <c>washingt</c>
+/// <c>geneva</c>, <c>helsinki</c>, <c>istanbul</c>, <c>khartoum</c>, <c>london</c>, <c>miami</c> and <c>rome</c>
 /// are redrawn on another layout (scores 0.51 to 0.78); <c>havana</c> and <c>kingston</c> have another size of thumbnail;
 /// <c>paris</c>, <c>moscow</c>, <c>berlin</c>, <c>amsterda</c>, <c>baghdad</c> and <c>riyadh</c> have the same layout (0.95 to
 /// 0.98) but the game's measure of the picture's width and height (<c>load_picture_measure</c>: along the first row and column up
@@ -60,6 +60,8 @@ public static class AmigaPictureList
     [
         ("paris", 82, 89), ("moscow", 88, 84), ("berlin", 80, 64), ("amsterda", 112, 56), ("baghdad", 112, 64), ("riyadh", 96, 48),
         ("london", 54, 96), ("miami", 104, 64), ("rome", 80, 52),
+        // DIVERGENCE: D-688 Washington joins the cities shown in a window: the same view of the Capitol, measured 130 x 48 on both pictures
+        ("washingt", 130, 48),
     ];
 
     /// <summary>The cities whose PC picture is a thumbnail the size of the picture: the Amiga's is that thumbnail at the top left of a full canvas.</summary>

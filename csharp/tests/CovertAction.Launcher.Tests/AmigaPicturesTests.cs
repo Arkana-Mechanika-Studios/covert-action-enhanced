@@ -392,7 +392,7 @@ public sealed class AmigaPicturesTests : IDisposable
     public void ThePicturesTheGamesCodeReadsBackOrRecoloursByColourNumberAreNotOnTheList()
     {
         string[] stay = ["board", "cars", "equip1", "equip1m", "camera", "wiretap", "guys2", "guys3", "sprites", "spritesf",
-            "geneva", "helsinki", "istanbul", "khartoum", "washingt", "havana", "kingston"];
+            "geneva", "helsinki", "istanbul", "khartoum", "havana", "kingston"];
         Assert.All(stay, name => Assert.Null(AmigaPictureList.Find(name + ".pic")));
     }
 }
