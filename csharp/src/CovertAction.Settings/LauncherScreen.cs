@@ -67,6 +67,7 @@ internal sealed class LauncherScreen
     private Item _pressed;
     private Item _focus;
     private bool _advanced;
+    private bool _cut;
     private string? _message;
     private uint _messageColour = Bad;
 
@@ -116,8 +117,10 @@ internal sealed class LauncherScreen
         Mouse,
         FixOriginalBugs,
         FixCampaignBugs,
+        CutCapturedDossier,
         TabGeneral,
         TabAdvanced,
+        TabCutContent,
         Save,
         Play,
     }
@@ -138,6 +141,9 @@ internal sealed class LauncherScreen
     public Item Focus => _focus;
 
     public bool AdvancedShown => _advanced;
+
+    /// <summary>The "Cut content" tab is the one shown.</summary>
+    public bool CutContentShown => _cut;
 
     /// <summary>The message shown in the details box (what an action did, why it could not), or null.</summary>
     public string? Message => _message;
@@ -163,12 +169,14 @@ internal sealed class LauncherScreen
     /// <summary>A sound test is playing: the launcher draws again now and then to show its status.</summary>
     public bool Animating => _context.SoundTest is { Playing: true };
 
+    private static bool OnCutContent(Item item) => item is Item.CutCapturedDossier;
+
     private bool OnAdvanced(Item item) => item is Item.Roms or Item.RomsChange or Item.AmigaFiles or Item.AmigaChange or Item.AmigaOriginalOnly or Item.AmigaPictures or Item.KeyRepeat or Item.ArrowKeysWalk or Item.Music or Item.MixTest or Item.Effects or Item.Mouse or Item.FixOriginalBugs or Item.FixCampaignBugs;
 
     // Tab and the arrows go through General's rows, then Advanced's (its tab opens), then the buttons
     private IEnumerable<Item> Order =>
         new[] { Item.GameFolder, Item.GameChange, Item.Window, Item.Fullscreen, Item.Scaling, Item.Sound, Item.Test, Item.Controls, Item.Saves, Item.SavesChange,
-            Item.Roms, Item.RomsChange, Item.AmigaFiles, Item.AmigaChange, Item.AmigaOriginalOnly, Item.AmigaPictures, Item.KeyRepeat, Item.ArrowKeysWalk, Item.Music, Item.MixTest, Item.Effects, Item.Mouse, Item.FixOriginalBugs, Item.FixCampaignBugs, Item.Save, Item.Play }
+            Item.Roms, Item.RomsChange, Item.AmigaFiles, Item.AmigaChange, Item.AmigaOriginalOnly, Item.AmigaPictures, Item.KeyRepeat, Item.ArrowKeysWalk, Item.Music, Item.MixTest, Item.Effects, Item.Mouse, Item.FixOriginalBugs, Item.FixCampaignBugs, Item.CutCapturedDossier, Item.Save, Item.Play }
             .Where(i => i is not (Item.Test or Item.MixTest) || _context.SoundTest is not null);
 
     /// <summary>Handles one input; returns the player's choice when the launcher should end.</summary>
@@ -224,7 +232,7 @@ internal sealed class LauncherScreen
 
     private static bool IsButton(Item item) => item is Item.GameChange or Item.SavesChange or Item.RomsChange or Item.AmigaChange or Item.Test or Item.MixTest or Item.Save or Item.Play;
 
-    private static bool IsSelect(Item item) => item is Item.Window or Item.Fullscreen or Item.Scaling or Item.Sound or Item.Controls or Item.AmigaOriginalOnly or Item.AmigaPictures or Item.KeyRepeat or Item.ArrowKeysWalk or Item.Music or Item.Effects or Item.Mouse or Item.FixOriginalBugs or Item.FixCampaignBugs;
+    private static bool IsSelect(Item item) => item is Item.Window or Item.Fullscreen or Item.Scaling or Item.Sound or Item.Controls or Item.AmigaOriginalOnly or Item.AmigaPictures or Item.KeyRepeat or Item.ArrowKeysWalk or Item.Music or Item.Effects or Item.Mouse or Item.FixOriginalBugs or Item.FixCampaignBugs or Item.CutCapturedDossier;
 
     private LauncherChoice? Key(KeyPressed key)
     {
@@ -237,7 +245,7 @@ internal sealed class LauncherScreen
                 MoveFocus(1);
                 return null;
             case LauncherKey.Tab when key.Control:
-                ShowTab(!_advanced);
+                ShowTab(_cut ? 0 : _advanced ? 2 : 1);
                 return null;
             case LauncherKey.Tab:
                 MoveFocus(key.Shift ? -1 : 1);
@@ -270,16 +278,19 @@ internal sealed class LauncherScreen
         var order = Order.ToList();
         var i = order.IndexOf(_focus);
         _focus = order[i < 0 ? 0 : (i + step + order.Count) % order.Count];
-        if (OnAdvanced(_focus) != _advanced && _focus is not (Item.Save or Item.Play))
+        if (_focus is not (Item.Save or Item.Play))
         {
             _advanced = OnAdvanced(_focus);
+            _cut = OnCutContent(_focus);
         }
     }
 
-    private void ShowTab(bool advanced)
+    /// <summary>Shows a tab (0 General, 1 Advanced, 2 Cut content) with its first row focused.</summary>
+    private void ShowTab(int tab)
     {
-        _advanced = advanced;
-        _focus = advanced ? Item.Roms : Item.GameFolder;
+        _advanced = tab == 1;
+        _cut = tab == 2;
+        _focus = tab switch { 1 => Item.Roms, 2 => Item.CutCapturedDossier, _ => Item.GameFolder };
     }
 
     /// <summary>The fixed settings-file key of a row, or null.</summary>
@@ -301,6 +312,7 @@ internal sealed class LauncherScreen
         Item.Music => "sound.music",
         Item.Effects => "sound.effects",
         Item.Mouse => "input.mouse",
+        Item.CutCapturedDossier => "cutContent.capturedDossier",
         Item.FixOriginalBugs => "fixes.originalBugs",
         Item.FixCampaignBugs => "fixes.campaignBugs",
         _ => null,
@@ -318,8 +330,8 @@ internal sealed class LauncherScreen
         _messageColour = Bad;
         switch (item)
         {
-            case Item.TabGeneral or Item.TabAdvanced:
-                ShowTab(item == Item.TabAdvanced);
+            case Item.TabGeneral or Item.TabAdvanced or Item.TabCutContent:
+                ShowTab(item == Item.TabAdvanced ? 1 : item == Item.TabCutContent ? 2 : 0);
                 return null;
             case Item.Save:
                 return LauncherChoice.Quit;
@@ -330,6 +342,7 @@ internal sealed class LauncherScreen
                 }
                 _focus = Item.GameFolder;
                 _advanced = false;
+                _cut = false;
                 _message = "Choose the folder of your copy of Covert Action first.";
                 return null;
         }
@@ -398,6 +411,9 @@ internal sealed class LauncherScreen
                 break;
             case Item.Mouse:
                 _model.Mouse = !_model.Mouse;
+                break;
+            case Item.CutCapturedDossier:
+                _model.CutCapturedDossier = !_model.CutCapturedDossier;
                 break;
             case Item.FixOriginalBugs:
                 _model.FixOriginalBugs = !_model.FixOriginalBugs;
@@ -843,7 +859,13 @@ internal sealed class LauncherScreen
             return top + RowHeight;
         }
 
-        if (!_advanced)
+        if (_cut)
+        {
+            y = Section("The original's cut content", y);
+            y = Status(y, ("Not in the original: its own files hold these, its programs never use them. All off by default.", Note));
+            y = Select(y, "Captured dossier", _model.CutCapturedDossier ? "Yes" : "No", Item.CutCapturedDossier);
+        }
+        else if (!_advanced)
         {
             y = Section("Game installation", y);
             y = Folder(y, null, _model.GameFolder ?? "(not chosen)", Item.GameFolder, Item.GameChange);
@@ -902,7 +924,7 @@ internal sealed class LauncherScreen
     {
         const int height = 24;
         var x = x0;
-        foreach (var (name, item, open) in new[] { ("General", Item.TabGeneral, !_advanced), ("Advanced", Item.TabAdvanced, _advanced) })
+        foreach (var (name, item, open) in new[] { ("General", Item.TabGeneral, !_advanced && !_cut), ("Advanced", Item.TabAdvanced, _advanced), ("Cut content", Item.TabCutContent, _cut) })
         {
             var width = BitmapFont.Measure(name);
             if (!open && _hover == item)
@@ -1109,7 +1131,8 @@ internal sealed class LauncherScreen
             Item.Mouse => "Not in the original. Yes: the mouse works in the menus, the lists and on the flight map: point at a choice to highlight it, left click to take it, right click for Esc; a click also answers \"press a key\". The keys work as before. No: no mouse, as the original (the default)." + fixedNote,
             Item.FixOriginalBugs => "Not in the original. Yes: the original's bugs that do not change the story are fixed (a clue's text, a key left in the buffer, the Delete key of the name field, the chief's comment after a capture, the Tandy driver's second pause, and others the release notes list). A game saved this way loads in the original. No (the default): the original as it was played in 1990." + fixedNote,
             Item.FixCampaignBugs => "Not in the original. Yes: also the bugs of the campaign's logic are fixed; this changes the story's events. No (the default): as the original." + fixedNote,
-            Item.TabGeneral or Item.TabAdvanced => "General: the game, the display, the sound card, the controls and the saves. Advanced: the MT-32 ROMs, the Amiga files, the keyboard and the player options (not in the original, all off by default). Ctrl+Tab goes to the other tab.",
+            Item.CutCapturedDossier => "Not in the original (D-660). Yes: when a cast member is captured, the dossier page stamped CAPTURED that the game ships (CAPTRD01.PAN) is shown after the arrest, before the chief's comment, with the photograph of a man or of a woman. No (the default): as the original, which never plays it." + fixedNote,
+            Item.TabGeneral or Item.TabAdvanced or Item.TabCutContent => "General: the game, the display, the sound card, the controls and the saves. Advanced: the MT-32 ROMs, the Amiga files, the keyboard and the player options. Cut content: scenes and modes the original's files hold and its programs never reach. Everything of Advanced and Cut content is off by default and not in the original. Ctrl+Tab goes to the next tab.",
             Item.Save => _context.SettingsPath is { } path ? $"Saves the settings into {path} and closes. Esc and the window's close button save too." : "Closes (no settings file can be written here: the changes are lost).",
             Item.Play => _model.CanPlay ? "Saves the settings and starts the game." : "Choose the folder of your copy of the game first.",
             _ => "",

@@ -1,3 +1,4 @@
+using CovertAction.Core;
 using CovertAction.Core.Campaign;
 using CovertAction.Core.Shared;
 using CovertAction.Msc;
@@ -19,8 +20,12 @@ namespace CovertAction.Presentation.Game;
 /// <param name="world">The drivers and the machine.</param>
 /// <param name="screens">The campaign's screens.</param>
 /// <param name="saves">The campaign's save routines.</param>
-public sealed class PlotEngine(CampaignState state, SharedState shared, Boundaries world, CampaignScreens screens, CampaignSaves saves)
+/// <param name="behaviourOrNull">Which of the original's bugs to reproduce and which cut content plays; the original's own when left out.</param>
+public sealed class PlotEngine(CampaignState state, SharedState shared, Boundaries world, CampaignScreens screens, CampaignSaves saves, OriginalBehaviour? behaviourOrNull = null)
 {
+    private readonly OriginalBehaviour behaviour = behaviourOrNull ?? OriginalBehaviour.Faithful;
+
+
     /// <summary><see cref="CampaignState.Pic"/> of a clean screen.</summary>
     private const int CleanScreen = -1;
 
@@ -912,6 +917,11 @@ public sealed class PlotEngine(CampaignState state, SharedState shared, Boundari
         {
             ShowJail(person);
         }
+        // DIVERGENCE: D-660 a player's option (cutContent.capturedDossier): the dossier page CAPTRD01.PAN, which no program of the original plays (CC-1), for a captured cast member
+        if (behaviour.CutContent.CapturedDossier && member != NoCastMember)
+        {
+            ShowCapturedDossier(person);
+        }
         ShowChiefsComment(person, member);
         AdvanceWorldClock(interrogationTime, true);
     }
@@ -975,6 +985,31 @@ public sealed class PlotEngine(CampaignState state, SharedState shared, Boundari
         state.Txt.Text = "";
         CampaignTexts.AppendPersonName(state, person);
         state.Txt.Text += state.StrTakenToJail;
+        PopupMenuOnCleanScreen(state.Txt.Text, 0x18, 0x15);
+    }
+
+    /// <summary>The file of the dossier page that the original ships and never plays (CC-1).</summary>
+    public const string CapturedDossierScene = "captrd01.pan";
+
+    /// <summary>
+    /// The captured cast member's dossier page: the animation CAPTRD01.PAN (a clipped photograph, text lines and a red CAPTURED
+    /// stamp), in the frame of the scenes beside it (the jail's: 96 pixels wide at the right), with the person's name in the box.
+    /// The photograph is the man's or the woman's by the person's sex, as the script's own switch means (CC-19); the script
+    /// itself sets that switch to "man" as its first instruction, which the player (<c>LibraryAnimation</c>) takes out when the
+    /// option is on. New code (D-660): the page shows no text of its own and none is written for it.
+    /// </summary>
+    /// <param name="person">The captured person.</param>
+    // DIVERGENCE: D-660 not in the original
+    public void ShowCapturedDossier(int person)
+    {
+        const int sceneX = 0xe0;
+        var who = state.Ps[person];
+        screens.ClearScreen();
+        world.Graphics.SetColorMaps(state.SurrenderColorMap, state.SurrenderColorMap);
+        screens.Menus.StartAnimation(CapturedDossierScene, sceneX, 0);
+        screens.Animation.SetScriptVar(0, (who.Face & 1) != 0 ? -1 : 1);
+        state.Txt.Text = "";
+        CampaignTexts.AppendPersonName(state, person);
         PopupMenuOnCleanScreen(state.Txt.Text, 0x18, 0x15);
     }
 

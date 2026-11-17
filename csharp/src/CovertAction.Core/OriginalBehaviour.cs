@@ -41,13 +41,15 @@ public sealed class OriginalBehaviour
     /// </summary>
     /// <param name="fixOriginalBugs">The safe group: texts, keys, a crash and a sound driver's slip; none changes the story.</param>
     /// <param name="fixCampaignBugs">The campaign-logic group (events, scores, layouts, the career record); independent of the first option.</param>
-    public static OriginalBehaviour ForPlayer(bool fixOriginalBugs, bool fixCampaignBugs)
+    /// <param name="cutContent">The player's options for the cut content (docs/cut-content.md); none when left out.</param>
+    public static OriginalBehaviour ForPlayer(bool fixOriginalBugs, bool fixCampaignBugs, CutContentOptions? cutContent = null)
     {
         // DIVERGENCE: D-650 a player's option: the original's bugs, fixed when the player asks for it
         var safe = fixOriginalBugs;
         var campaign = fixCampaignBugs;
         return new()
         {
+            CutContent = cutContent ?? CutContentOptions.None,
             FixRaidGuardCountInCityCounter = true,
             FixChaseGameSpeedWriteBack = true,
             FixChaseGearUpSound = true,
@@ -81,6 +83,12 @@ public sealed class OriginalBehaviour
             FixSkillsKeptFromPractice = campaign,
         };
     }
+
+    /// <summary>
+    /// The player's options for the original's cut content (docs/cut-content.md; settings keys cutContent.*, D-660 onward).
+    /// None is on in <see cref="Faithful"/>, <see cref="Player"/> or by default.
+    /// </summary>
+    public CutContentOptions CutContent { get; init; } = CutContentOptions.None;
 
     /// <summary>
     /// CA-1. During a building raid the original counts the guards still awake in element 0 of the per-city activity

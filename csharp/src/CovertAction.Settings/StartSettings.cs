@@ -71,6 +71,9 @@ internal sealed record StartSettings
     /// <summary>Also fix the campaign-logic bugs (fixes.campaignBugs; off by default).</summary>
     public bool FixCampaignBugs { get; init; }
 
+    /// <summary>The captured cast member's dossier plays after an arrest (cutContent.capturedDossier, D-660; off by default).</summary>
+    public bool CutCapturedDossier { get; init; }
+
     /// <summary>The Amiga version's pictures in place of the PC's where it has the same one (graphics.amiga, D-642; off by default).</summary>
     public bool AmigaPictures { get; init; }
 
@@ -157,6 +160,7 @@ internal sealed record StartSettings
             Mouse = mouse,
             FixOriginalBugs = file.FixOriginalBugs ?? false,
             FixCampaignBugs = file.FixCampaignBugs ?? false,
+            CutCapturedDossier = file.CutCapturedDossier ?? false,
             FixedKeys = fixedKeys,
         };
     }

@@ -16,7 +16,8 @@ rediscovers them as cut content.
   it was *cut*, rather than never finished or always a stub, is stated separately in each entry as fact or guess.
   *likely*: the facts are checked, the reading as cut content is the best explanation but not the only one.
   *possible*: a pattern worth a look; there may be nothing behind it.
-* **Status.** *open*: nobody has run or rendered it to settle it. *verified*: confirmed by a run of the original, a
+* **Status.** *player option (D-n)*: the game offers it as an option of the launcher's "Cut content" tab, off by
+  default (csharp/docs/SETTINGS.md); the entry says what the option does and what it leaves out. *open*: nobody has run or rendered it to settle it. *verified*: confirmed by a run of the original, a
   render or a patched run (the entry says which). *explained*: the reason is known (library code, shared source,
   documented by the publisher) and nothing more is expected from it.
 * **Facts and guesses are kept apart.** Under *Evidence* every line can be checked from the named file, offset or
@@ -35,7 +36,7 @@ the pictures), the re-check of the 41 dead functions (6), the sound commands (7)
 
 | ID | Title | Kind | Confidence | Status |
 |---|---|---|---|---|
-| CC-1 | CAPTRD01.PAN, an animation no program names ("CAPTURED" stamp on a dossier photo) | unused asset | confirmed | open |
+| CC-1 | CAPTRD01.PAN, an animation no program names ("CAPTURED" stamp on a dossier photo) | unused asset | confirmed | player option (D-660) |
 | CC-2 | CHASE's stand-alone mode (`campaign_mode`, "Loc<n>" labels, random start and goal) | dormant mode | confirmed | open |
 | CC-3 | Module code 5: a second CHASE mode (arrest-only) that nothing starts | dormant mode | confirmed | open |
 | CC-4 | Module code 0x63: `mcv.exe cv /2 <module>` (CA-2) | dormant mode | confirmed | open |
@@ -53,7 +54,7 @@ the pictures), the re-check of the 41 dead functions (6), the sound commands (7)
 | CC-16 | BUG circuit difficulty 4 and the TAC "wait for a visited room" walk | dormant branches | confirmed | open |
 | CC-17 | Plain dormant statements and arms (the remaining `// DORMANT:` markers) | dormant code | confirmed | explained |
 | CC-18 | Prose variants `*nice3`..`*nice7` the reader could ask for | missing text | possible | open |
-| CC-19 | CAPTRD01.PAN: a woman's photo (image 6) and the sex switch the script itself defeats | dormant branch | confirmed; likely (cut) | verified (replay) |
+| CC-19 | CAPTRD01.PAN: a woman's photo (image 6) and the sex switch the script itself defeats | dormant branch | confirmed; likely (cut) | verified (replay); player option (D-660) |
 | CC-20 | Key-press exit sequences of COMM, CRYPTO, HQ and RESEARCH (`ignore_skip` is never set) | dormant branch | confirmed | verified (replay) |
 | CC-21 | Animations: no sound instruction in any of the 24 `.PAN`; one unstarted blink program; no unshown image | negative result and leftovers | confirmed | explained |
 | CC-22 | Faces sheets: two 32 x 26 icons no `cut_image` takes, the lower half of FACESF.PIC, duplicate head cells | unused sprite cells | confirmed (cut_image); possible (any use) | open |
@@ -94,6 +95,11 @@ breakpoint on DOS open (int 21h/3Dh) and look for the name over a full campaign;
 shows no program could build the name.
 
 **Related.** CC-3; `csharp/src/CovertAction.Content/PanFile.cs`.
+
+**Player option (D-660, `cutContent.capturedDossier`, off by default).** When a cast member is captured the page plays in
+the frame of the neighbouring scenes (96 pixels at the right, x = 0xe0), after the jail scene ("taken to jail", the
+capture text) and before the chief's comment, with the person's name in the box. A raid that ends in an arrest and the car
+chase's arrest both end in `InterrogateSuspect`, which is where it is shown; a suspect who is no cast member gets none.
 
 ## CC-2 CHASE's stand-alone mode
 
@@ -504,6 +510,11 @@ value, as a developer does to test one branch. CAPTRD01 is itself unused (CC-1),
 lost.
 
 **Reading (guess).** A test line left in an unfinished scene.
+
+**Player option (D-660).** With the option the man's or the woman's photograph is shown by the person's face bit: for a woman
+the loaded copy of the script has its first instruction push 1 instead of -1 (the file is not changed). Checked in
+`CutContentDossierTests` on the game's own file: the woman's page differs from the man's; with the option off the page
+is never shown.
 
 **Related.** CC-1, CC-3.
 

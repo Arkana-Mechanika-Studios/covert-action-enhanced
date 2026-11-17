@@ -812,7 +812,38 @@ public sealed class LibraryAnimation(ILibraryState state, PanEngineState pan, Bo
             return false;
         }
         pictures.CloseResource(pan.PanHandle);
+        // DIVERGENCE: D-660 a player's option (cutContent.capturedDossier, CC-19): the dossier page's script starts by setting its sex variable to "man"
+        if (behaviour.CutContent.CapturedDossier)
+        {
+            FreeTheDossiersSexVariable(fileName);
+        }
         return true;
+    }
+
+    /// <summary>The first instruction of CAPTRD01.PAN's program: push -1, store into variable 0.</summary>
+    private static readonly byte[] DossierFirstInstructions = [0x05, 0x00, 0xff, 0xff, 0x06, 0x00, 0x00];
+
+    /// <summary>
+    /// CC-19: the captured dossier's program begins "variable 0 = -1" and so always takes the man's photograph, though the
+    /// file has the woman's too and a switch on the variable, as INTRGATE.PAN has. When the caller asked for the woman
+    /// (variable 0 is 1, set with <see cref="SetScriptVar"/> before the animation starts) the loaded copy of the program
+    /// (never the file) pushes 1 instead of -1.
+    /// </summary>
+    private void FreeTheDossiersSexVariable(string fileName)
+    {
+        if (!fileName.EndsWith("captrd01.pan", StringComparison.OrdinalIgnoreCase)
+            || pan.PanSegment is not { } program
+            || program.Length < DossierFirstInstructions.Length
+            || !program.AsSpan(0, DossierFirstInstructions.Length).SequenceEqual(DossierFirstInstructions))
+        {
+            return;
+        }
+        // push the woman's value 1 when the caller asked for her; the man's -1 stays
+        if (pan.ScriptVars[0] == 1)
+        {
+            program[2] = 1;
+            program[3] = 0;
+        }
     }
 
     /// <summary>The access mode the original opens the file with: as the bytes it has.</summary>

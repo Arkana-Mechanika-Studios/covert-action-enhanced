@@ -24,13 +24,14 @@ namespace CovertAction.Launcher;
 /// </param>
 /// <param name="FixOriginalBugs">The launcher's option "Fix the original's bugs" (fixes.originalBugs): the safe group of the register's bugs is fixed (<see cref="CovertAction.Core.OriginalBehaviour.ForPlayer"/>); off by default.</param>
 /// <param name="FixCampaignBugs">The launcher's option "Also fix campaign-logic bugs" (fixes.campaignBugs): the bugs of the campaign's logic as well; off by default.</param>
+/// <param name="CutCapturedDossier">The launcher's option "Captured dossier" (cutContent.capturedDossier, D-660): CAPTRD01.PAN plays when a cast member is captured; off by default.</param>
 public sealed record GameOptions(char SoundLetter = 'A', bool Joystick = true, string? Mt32RomFolder = null, bool AskSetUpQuestions = false,
     bool ArrowKeysWalk = false, char? MusicLetter = null, char? EffectsLetter = null, bool Mouse = false, string? AmigaFolder = null, bool AmigaOnlyWhereOriginal = false, bool AmigaPictures = false,
-    bool FixOriginalBugs = false, bool FixCampaignBugs = false)
+    bool FixOriginalBugs = false, bool FixCampaignBugs = false, bool CutCapturedDossier = false)
 {
     /// <summary>
     /// Which of the original's bugs the game reproduces, from the two fix options: every part of the game gets this one object.
     /// With both options off it is the release 1.0's (<see cref="CovertAction.Core.OriginalBehaviour.Player"/>).
     /// </summary>
-    public CovertAction.Core.OriginalBehaviour Behaviour => CovertAction.Core.OriginalBehaviour.ForPlayer(FixOriginalBugs, FixCampaignBugs);
+    public CovertAction.Core.OriginalBehaviour Behaviour => CovertAction.Core.OriginalBehaviour.ForPlayer(FixOriginalBugs, FixCampaignBugs, new CovertAction.Core.CutContentOptions(CutCapturedDossier));
 }

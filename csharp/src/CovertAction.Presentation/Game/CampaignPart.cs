@@ -51,7 +51,7 @@ public sealed class CampaignPart
         this.world = world;
         screens = new CampaignScreens(state, world, shared, behaviour);
         saves = new CampaignSaves(state, shared, world);
-        plot = new PlotEngine(state, shared, world, screens, saves);
+        plot = new PlotEngine(state, shared, world, screens, saves, behaviour);
         // Alt-Q confirmed in one of the campaign's boxes saves the campaign and shows the farewell picture
         // (GAME 00f7:c6ae popup_menu calls save_and_hand_off after the confirmed Alt-Q)
         screens.Menus.LeaveTheGame = plot.SaveAndHandOff;
@@ -62,6 +62,9 @@ public sealed class CampaignPart
         // the investigation is the building menus' own; the briefing searches with it
         Briefing = new CaseBriefing(state, world, screens, plot, Cities.Buildings.Investigation);
     }
+
+    /// <summary>The passing of time and the plot's scenes (the capture, the interrogation).</summary>
+    public PlotEngine Plot => plot;
 
     /// <summary>The start of a case: the hidden turns and the chief's briefing.</summary>
     public CaseBriefing Briefing { get; }

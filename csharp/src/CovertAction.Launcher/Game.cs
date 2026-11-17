@@ -489,11 +489,9 @@ public sealed class Game
     /// </summary>
     private void PlayCampaign(SharedState shared)
     {
-        var state = new CampaignState();
-        GameDgroup.Layout.Load(Executable.Read(_folder.Read(CampaignProgram)).DataSegment(), state);
         try
         {
-            new CampaignPart(state, shared, _world, _behaviour).GameMain();
+            OpenCampaign(shared, out _).GameMain();
         }
         catch (ProgramExitException e) when (e.Code == 0)
         {
@@ -503,6 +501,14 @@ public sealed class Game
         {
             throw PartFailed("the campaign", e);
         }
+    }
+
+    /// <summary>The campaign part on the values of the player's GAME.EXE, not yet run; a test of a scene of the campaign takes it from here.</summary>
+    internal CampaignPart OpenCampaign(SharedState shared, out CampaignState state)
+    {
+        state = new CampaignState();
+        GameDgroup.Layout.Load(Executable.Read(_folder.Read(CampaignProgram)).DataSegment(), state);
+        return new CampaignPart(state, shared, _world, _behaviour);
     }
 
     /// <summary>

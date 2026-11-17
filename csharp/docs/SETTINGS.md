@@ -45,6 +45,7 @@ launcher but cannot be changed there (its details say what sets it); the launche
 | `display.scaling` | `"pixelart"` | `--scaling <name>` | how the 320x200 picture (and the set-up's text page) is enlarged: `pixelart` (every game pixel the same size, only the edges between them blended; SDL 3.4), `nearest` (hard pixels, some a window pixel wider than others), `smooth` (linear) |
 | `fixes.originalBugs` | false | none | fix the original's bugs, the safe group (D-650): a clue's text (CA-16), the key that skips an animation (CA-34), the chief's comment after a capture (CA-41), the Delete key of the name field (CA-43), the car chase's "enter the building" with an unknown location (CA-4), the wiretap puzzle's last count (CA-40), the Tandy driver's second pause (CA-55), furniture drawn over a wall (CA-59), "Stasi" in the file room (CA-61), an unwinnable electronics board (CA-62), the key repeat in a raid (CA-63) and a missing Hall of Fame file (CA-64). None changes the story; a campaign saved with it loads in the original. Off: the original's bugs as release 1.0 plays them (the five fixes of 1.0, CA-1, 5, 17, 26 and 27, stay on) |
 | `fixes.campaignBugs` | false | none | also fix the bugs of the campaign's logic (D-650), independent of the first option: the missing "Stole Blueprints" bulletin and the receive events that cancelled themselves (CA-12, CA-13), the "prevented crime" ending of CRIME12 (CA-15), the extra doors of big buildings (CA-28), the pairing of intercepted messages (CA-32), cast members seen leaving a city (CA-35), the faces and alert of new persons (CA-36), the training ratings (CA-42), the apartment scene (CA-44), the career record's end (CA-46), the hours charged after code-breaking (CA-7), a new case that hangs while laid out (CA-58), CRIME10's meeting partner (CA-60) and the skills of a new agent after a practice mission (CA-65). They change the story's events, scores and layouts; a campaign saved with it loads without it and in the original. CA-14 is left as the original has it |
+| `cutContent.capturedDossier` | false | none | the original's cut content, one option per feature (docs/cut-content.md), all off by default and not in the original. This one (D-660, CC-1, CC-19): when a cast member is captured (a raid that ends in an arrest, the car chase's arrest) the dossier page stamped CAPTURED that the game ships and never plays (`CAPTRD01.PAN`) is shown after the jail scene and before the chief's comment, with the man's or the woman's photograph |
 | `graphics.amiga` | false | none | the Amiga version's pictures (D-642, AMIGA-PICTURES.md): the faces, icons, maps, the hotel, the equipment sheet, the car chase's windscreen and 23 of the city pictures are the Amiga version's, read from your own Amiga files (`sound.amigaFiles` names their folder; the `.pix` files of the three disks), in the Amiga's colours; every picture the Amiga redrew in another layout stays the PC's. Without the files the PC's pictures show, and the launcher says so |
 | `sound.card` | `"adlib"` | `--sound <card>` | the card the game plays on, the set-up screen's sound answer (D-603): `none`, `speaker`, `tandy`, `adlib`, `mt32`. An earlier file's `"setup"` (the set-up screen asked) reads as the default, without a message |
 | `sound.mt32Roms` | `MT32_ROMS` next to the program | `--mt32-roms`; `COVERT_MT32_ROMS` | your MT-32 (or CM-32L) ROM files (found by themselves in the usual places, below); without them the AdLib driver plays instead (D-20) |
@@ -117,7 +118,7 @@ item's bold lead and the first part of its sentence; the build copies `csharp/re
 there), what the project is, and the small print (Covert Action © 1990 MicroProse Software, Inc.; an unofficial fan
 project, not affiliated with or endorsed by MicroProse or the game's rights holders; GNU GPL v3).
 
-**Right: the settings**, on two tabs.
+**Right: the settings**, on three tabs.
 
 * **General**: Game installation (the folder, **Change…**, a line saying it was found or what is missing), Display
   (window size, fullscreen, picture scaling), Sound and controls (the sound card with **Test sound**, a line about the
@@ -127,12 +128,14 @@ project, not affiliated with or endorsed by MicroProse or the game's rights hold
   (each "The sound card", a card of its own or the Amiga's, a line saying what plays where, D-620, D-640, D-641), **Amiga files** (the folder, **Change…**, a line saying whether the music, sound effect and picture files are found) with **Only where the Amiga had it** and **Amiga pictures** (Yes or No, D-642, AMIGA-PICTURES.md), **Mouse in the menus**
   (`input.mouse`, with a line saying it is not in the original, D-630), **Fix the original's bugs** and **Also campaign-logic bugs** (`fixes.originalBugs`, `fixes.campaignBugs`, D-650), and room for those planned for later (the mouse
   at the workstations, in the raid and the chase), shown as planned and not offered.
+* **Cut content**: the original's cut content as options (`cutContent.*`, D-660 onward; docs/cut-content.md), each
+  Yes or No and No by default: **Captured dossier** (D-660).
 
 Rows show `‹ value ›`: a click on ‹ or › (or ←/→) steps through the values, a click on the row or Enter/Space steps on.
 Folders: **Change…** (or Enter on the field) opens Windows' folder dialog; a folder can also be dropped on the window
 (the game folder when it holds the game, the ROM folder when it holds ROMs, the saves folder while its row is chosen)
 or pasted (Ctrl+V); ←/→ on the game folder go through the folders found. Tab / Shift+Tab and ↑/↓ go through the rows
-of both tabs and the buttons; Ctrl+Tab changes the tab. The **details box** above the buttons shows the last message
+of all tabs and the buttons; Ctrl+Tab goes to the next tab. The **details box** above the buttons shows the last message
 (why the launcher came up, what an action did, why it could not), then what the row under the pointer, or chosen, does.
 **Test sound** plays the theme tune for twelve seconds on the chosen card through the game's own driver (the player's
 ?SOUND.CA; the MT-32 with the ROMs, else the AdLib); **Test mix** plays it on the music's card with a shot, the Uzi

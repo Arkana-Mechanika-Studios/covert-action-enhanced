@@ -99,6 +99,9 @@ internal sealed class GameSettings
     /// <summary>Also fix the bugs of the campaign's logic (fixes.campaignBugs; not in the original, off by default).</summary>
     public bool? FixCampaignBugs { get; set; }
 
+    /// <summary>The captured cast member's dossier, CAPTRD01.PAN, plays after an arrest (cutContent.capturedDossier, D-660; not in the original, off by default).</summary>
+    public bool? CutCapturedDossier { get; set; }
+
     /// <summary>A copy (a change to it leaves this one as it is).</summary>
     public GameSettings Copy() => (GameSettings)MemberwiseClone();
 

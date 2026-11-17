@@ -80,6 +80,9 @@ internal sealed class LauncherModel
     private readonly (string? Files, bool OriginalOnly) _initialAmiga;
     private readonly bool _initialAmigaPictures;
 
+    /// <summary>The cut-content options as the launcher opened.</summary>
+    private readonly bool _initialCapturedDossier;
+
     public LauncherModel(LauncherContext context, (int Width, int Height)? display)
     {
         _context = context;
@@ -117,6 +120,7 @@ internal sealed class LauncherModel
         AmigaOriginalOnly = start.AmigaOriginalOnly;
         _initialAmiga = (_amigaFiles, AmigaOriginalOnly);
         AmigaPictures = _initialAmigaPictures = start.AmigaPictures;
+        CutCapturedDossier = _initialCapturedDossier = start.CutCapturedDossier;
     }
 
     private static string? Blank(string? text) => string.IsNullOrWhiteSpace(text) ? null : text;
@@ -202,6 +206,9 @@ internal sealed class LauncherModel
 
     /// <summary>The Amiga version's pictures in place of the PC's where it has the same one (graphics.amiga, D-642).</summary>
     public bool AmigaPictures { get; set; }
+
+    /// <summary>The dossier page of a captured cast member (cutContent.capturedDossier, D-660).</summary>
+    public bool CutCapturedDossier { get; set; }
 
     /// <summary>The MT-32 ROM folder chosen; null: the default (MT32_ROMS next to the program, else where the ROMs are found).</summary>
     public string? Mt32Roms
@@ -358,6 +365,10 @@ internal sealed class LauncherModel
         {
             changes["graphics.amiga"] = AmigaPictures;
         }
+        if (CutCapturedDossier != _initialCapturedDossier)
+        {
+            changes["cutContent.capturedDossier"] = CutCapturedDossier;
+        }
         return changes;
     }
 
@@ -389,6 +400,7 @@ internal sealed class LauncherModel
         s.FixOriginalBugs = FixOriginalBugs;
         s.FixCampaignBugs = FixCampaignBugs;
         s.AmigaPictures = AmigaPictures;
+        s.CutCapturedDossier = CutCapturedDossier;
         return s;
     }
 

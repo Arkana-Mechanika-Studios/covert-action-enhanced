@@ -163,6 +163,7 @@ internal static class SettingsFile
                     case "input": Section(name, value, settings, Input); break;
                     case "graphics": Section(name, value, settings, Graphics); break;
                     case "fixes": Section(name, value, settings, Fixes); break;
+                    case "cutContent": Section(name, value, settings, CutContent); break;
                     default: Unknown(name); break;
                 }
             }
@@ -288,6 +289,16 @@ internal static class SettingsFile
             {
                 case "originalBugs": settings.FixOriginalBugs = Boolean(key, property.Value) ?? settings.FixOriginalBugs; break;
                 case "campaignBugs": settings.FixCampaignBugs = Boolean(key, property.Value) ?? settings.FixCampaignBugs; break;
+                default: Unknown(key); break;
+            }
+        }
+
+        private void CutContent(string section, JsonProperty property, GameSettings settings)
+        {
+            var key = $"{section}.{property.Name}";
+            switch (property.Name)
+            {
+                case "capturedDossier": settings.CutCapturedDossier = Boolean(key, property.Value) ?? settings.CutCapturedDossier; break;
                 default: Unknown(key); break;
             }
         }
@@ -448,6 +459,12 @@ internal static class SettingsFile
             "originalBugs": false,
             // true: also fix the bugs of the campaign's logic. false: as the original.
             "campaignBugs": false
+          },
+
+          "cutContent": {
+            // true: the dossier page stamped CAPTURED (CAPTRD01.PAN, which the original ships but never plays) is shown
+            // when a cast member is captured, before the chief's comment. false: as the original.
+            "capturedDossier": false
           }
         }
         """;

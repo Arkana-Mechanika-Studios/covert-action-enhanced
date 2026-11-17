@@ -115,7 +115,7 @@ internal static partial class Program
         var options = new GameOptions(GameSettings.SoundLetter(start.SoundCard), start.Joystick, start.Mt32Roms, ArrowKeysWalk: start.ArrowKeysWalk,
             MusicLetter: GameSettings.PartLetter(start.MusicCard), EffectsLetter: GameSettings.PartLetter(start.EffectsCard), Mouse: start.Mouse,
             AmigaFolder: start.AmigaFiles, AmigaOnlyWhereOriginal: start.AmigaOriginalOnly, AmigaPictures: start.AmigaPictures,
-            FixOriginalBugs: start.FixOriginalBugs, FixCampaignBugs: start.FixCampaignBugs);
+            FixOriginalBugs: start.FixOriginalBugs, FixCampaignBugs: start.FixCampaignBugs, CutCapturedDossier: start.CutCapturedDossier);
         var game = new Game(new GameFolder(gameFolder), host, start.SavesFolder ?? SavesFolder.Default, options);
         game.PartStarting += code => host.PartStarting(code);
         if (cli.Practice == "")
