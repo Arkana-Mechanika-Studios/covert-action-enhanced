@@ -212,6 +212,14 @@ reuse); variant 7 was an apartment practice case reusing the tutorial script.
 variant 3 comes up; there is no PLOT.TXT text for it (the page loop reads nothing). For variant 7 set the slot to
 a non-negative number and `random(6)`'s upper bound to 8. Not yet done.
 
+**Variant 7 checked for a player option and left out.** Made drawable it would run the tutorial's crime file (CRIME1)
+under a plot of 1 to 9 with the hard-coded object names, but two texts of the variant are missing from the game's own
+files. PLOT.TXT has tags for the variant digits 0, 1, 2 (and 9) only: 130, 127, 109 and 49 tags by the digit, none for 3 to 7.
+The apartment scene (`apartment_scene`, page loop under `*PLppv7k`) would show the apartment's animation with no text, and the
+closing plot text of the debriefing (`*PLpp7p`, read by the same pattern) would be empty again, so the case would
+begin and end without the words the other variants have. Writing those texts would be writing new game text, which this round
+does not do; so no option, the status stays *open*. The variants 3 to 6 have no crime file and no text and stay out.
+
 **Related.** CA-9; D-/U- none; `final.h` struct `plot`.
 
 ## CC-6 INTRO: seventh and later sound cards, and the skip flag
