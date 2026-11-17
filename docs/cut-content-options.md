@@ -172,4 +172,22 @@ The cut content not offered at all:
 
 ## On the Amiga
 
-To be written.
+The Amiga version was checked item by item against the PC's: its
+program read from its code and symbol table, its data files compared byte for byte with the PC's. Nothing the PC leaves
+unused is used on the Amiga, and the Amiga adds one unused scene of its own.
+
+* **The dossier.** The Amiga ships its own unused dossier, `CAPT1FPO.PAN` (96 x 200; "FPO" may be the printer's
+  "for position only", a placeholder), and no Amiga program names it either. It holds the PC dossier's pictures and
+  two more photo frames. A capture on the Amiga, as on the PC, shows the jail scene and the chief's comment only. The
+  rewrite plays the PC's dossier; whether the Amiga's script has the same woman's-photo switch is not yet known (its
+  script format differs from the PC's).
+* **The car chase on its own, the arrest-only chase, the circuit board's fourth difficulty and the raid's corridor
+  walk**: the same dormant code as on the PC, switched off in the same places.
+* **The plot variants**: the same table, with the same three variants filled, and the same unreachable apartment case
+  with no text for it.
+* **The texts**: the same tags in TEXT.DTA, PLOT.TXT, CLUES.TXT and PROSE.DTA, the same four unused filler sentences
+  (the Amiga also draws from the first twelve), the same shadowed duplicates, and no `*nice3` to `*nice7`. The crime and
+  world files are the PC's, stored in the Amiga's byte order.
+* **One difference**: the PC's program has a dormant start code (CC-4, `mcv.exe`) that the Amiga's has not.
+
+The Amiga corrects a few of the PC's typing errors and ships a filled Hall of Fame file; neither is cut content.
