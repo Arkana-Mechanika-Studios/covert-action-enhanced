@@ -182,6 +182,18 @@ side strip, image 7 of 41 pixels for the PC's 3; the three rooms also leave one 
 picture), `woundii` (another program); `tit.pan` is the Amiga's own title sequence and has no PC twin. Side by side frames of the 11 were
 written to `build/amiga-study2/animations/` (not committed; the test of the same name as for the pictures writes them).
 
+### The Amiga's own dossier (D-684)
+
+`CAPT1FPO.PAN` (disk 2; unused by every Amiga program, like the PC's `CAPTRD01.PAN`) plays in place of the PC's page when the
+cut-content dossier option (`cutContent.capturedDossier`, D-660) and `graphics.amiga` are both on. It is the one animation
+that plays **the Amiga's program** (translated to the PC's encoding by `AmigaPanProgram`) instead of the game's: the Amiga's
+differs from the PC's. Its images are the PC's (2, 4, 6, 8, 9, 12, 14, 16, 18, 19, the same sizes) and two more, 5 and 7 (70 x 66),
+the stand-in faces drawn behind the torsos 4 and 6; its script **has the woman's-photograph switch and a working one**: it
+tests variable 0 (1: images 7 and 6, the woman; -1: images 5 and 4, the man; the game sets the variable from bit 0 of the face as for
+the jail scene) and does not begin by setting the variable to -1 as the PC's script does (CC-19). Side by side frames, for a man and
+for a woman, are in `build/amiga-study2/animations/captrd01-man.png` and `captrd01-woman.png` (not committed). The page shows the
+Amiga's placeholder faces; neither version draws the captured person's own.
+
 ## Without the files
 
 The folder is the one named in the launcher, else `amiga/files` (or `amiga`) next to the program, else next to the game folder

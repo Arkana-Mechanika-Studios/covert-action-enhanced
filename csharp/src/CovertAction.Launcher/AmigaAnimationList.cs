@@ -18,6 +18,9 @@ public sealed record AmigaAnimationEntry(string Name, string File, string Reason
 /// images' sizes or their size (the briefing room, the offices, the headquarters, the communications and cryptography rooms,
 /// the research room, the binoculars and the wounded agent) and stay the PC's; so do the title sequence (the Amiga's own
 /// <c>tit.pan</c> is not one of the PC's three) and the building scenes' variant names that the Amiga does not have.
+/// The captured dossier (the cut-content option, D-660) is the one that plays the Amiga's program (D-684): the Amiga's
+/// <c>CAPT1FPO.PAN</c> is the same page with two more images and a script that has the woman's photograph switch the PC's
+/// has not.
 /// </summary>
 public static class AmigaAnimationList
 {
@@ -28,6 +31,8 @@ public static class AmigaAnimationList
     [
         .. new[] { "blding01", "blding02", "blding03", "blding04", "bugcar", "bustout", "escape", "followed", "injail", "intrgate", "surndr01" }
             .Select(name => new AmigaAnimationEntry($"{name}.pan", $"{name}.pan", Same)),
+        // DIVERGENCE: D-684 the Amiga's own unused dossier page plays in place of the PC's when the cut-content dossier option is on too
+        new("captrd01.pan", "capt1fpo.pan", "the captured dossier of the cut-content option (D-684): the Amiga's own page (its CAPT1FPO.PAN, which no Amiga program names either), the same size and images with two more photographs; its program is the Amiga's, translated, with the switch for the woman's photograph that the PC's script cannot reach", AmigaProgram: true),
     ];
 
     /// <summary>The entry for an animation file name of the game (compared without regard to letter case); null when the animation stays the PC's.</summary>

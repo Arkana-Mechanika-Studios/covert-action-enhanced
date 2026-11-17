@@ -111,6 +111,51 @@ public sealed class AmigaAnimationsFilesTests
         Assert.Contains("not the same animation", told[0]);
     }
 
+    /// <summary>The game's captured dossier script as the cut-content option loads it for a woman (D-660): its first instruction pushes 1 instead of -1.</summary>
+    private static byte[] WomanProgram(byte[] program)
+    {
+        var woman = (byte[])program.Clone();
+        Assert.Equal(new byte[] { 0x05, 0x00, 0xff, 0xff, 0x06, 0x00, 0x00 }, woman.AsSpan(0, 7).ToArray());
+        (woman[2], woman[3]) = (1, 0);
+        return woman;
+    }
+
+    [SkippableFact]
+    public void TheCapturedDossierPlaysTheAmigasProgramWithTheSwitchForTheWomansPhotograph()
+    {
+        var folder = AmigaFolder();
+        var game = FindGame();
+        var own = PanFile.Read(game.Read("CAPTRD01.PAN"));
+        var replacement = Source(new PictureColours(new byte[3 * 256]), folder).Find("captrd01.pan", own);
+        Assert.NotNull(replacement);
+        // the Amiga page has the PC's images and two more (the photographs 5 and 7: a stand-in face each)
+        Assert.All(Enumerable.Range(0, PanFile.ImagePlaces).Where(i => own.Images[i] is not null), i => Assert.NotNull(replacement.Images[i]));
+        Assert.All(new[] { 5, 7 }, i => Assert.NotNull(replacement.Images[i]));
+        Assert.Null(own.Images[5]);
+        // its script does not set the variable itself: with the variable the game sets the man's page and the woman's differ, with none neither photograph is drawn
+        byte[][] pages = [Page(replacement, -1), Page(replacement, 1), Page(replacement, null)];
+        Assert.False(pages[0].SequenceEqual(pages[1]), "the woman's photographs differ from the man's");
+        Assert.False(pages[0].SequenceEqual(pages[2]));
+        Assert.False(pages[1].SequenceEqual(pages[2]));
+        // the game's own script begins by setting the variable (push -1, store in variable 0); the Amiga's does not
+        Assert.True(own.Program.AsSpan(0, 7).SequenceEqual(new byte[] { 0x05, 0x00, 0xff, 0xff, 0x06, 0x00, 0x00 }));
+        Assert.False(replacement.Program.AsSpan(0, 7).SequenceEqual(own.Program.AsSpan(0, 7)));
+    }
+
+    private static byte[] Page(PanFile file, int? variable)
+    {
+        var player = new PanPlayer(file);
+        if (variable is { } value)
+        {
+            player.SetVariable(0, value);
+        }
+        for (var tick = 0; tick < 60; tick++)
+        {
+            Assert.True(player.Tick());
+        }
+        return (byte[])player.Frame.Clone();
+    }
+
     /// <summary>Where the tool below writes the frames (outside the repository); unset: none are written.</summary>
     private const string ScreensVariable = "COVERT_AMIGA_SCREENS_DIR";
 
@@ -138,36 +183,45 @@ public sealed class AmigaAnimationsFilesTests
             var own = PanFile.Read(game.Read(entry.Name.ToUpperInvariant()));
             var replacement = source.Find(entry.Name, own);
             Assert.NotNull(replacement);
-            var lengths = new List<int>();
-            var players = new[] { (Player: new PanPlayer(own), Suffix: "-pc", Pc: true), (Player: new PanPlayer(replacement), Suffix: "", Pc: false) };
-            var total = 0;
-            for (var player = new PanPlayer(own); total < MostTicks && player.Tick(); total++)
+            // the captured dossier is shown for a man (the game sets variable 0 to -1) and for a woman (1); the game's own script
+            // sets the variable itself to the man's, and the woman's is what the option makes of it (the first push is 1)
+            (string Name, int? Variable)[] variants = entry.AmigaProgram ? [("-man", -1), ("-woman", 1)] : [("", null)];
+            foreach (var (variantName, variable) in variants)
             {
-            }
-            var frames = new[] { 0, 1, 3, 6, 10, 20, 40, 80, 160, 320, 640 }.Where(frame => frame < total).ToList();
-            foreach (var (player, suffix, isPc) in players)
-            {
-                var tick = 0;
-                var screen = new byte[320 * 200];
-                foreach (var frame in frames)
+                var pcFile = variable == 1 ? own.With(null, 0, own.Images, WomanProgram(own.Program)) : own;
+                var players = new[] { (Player: new PanPlayer(pcFile), Suffix: "-pc", Pc: true), (Player: new PanPlayer(replacement), Suffix: "", Pc: false) };
+                if (variable is { } value)
                 {
-                    while (tick <= frame && player.Tick())
+                    players[1].Player.SetVariable(0, value);
+                }
+                var total = 0;
+                for (var player = new PanPlayer(pcFile); total < MostTicks && player.Tick(); total++)
+                {
+                }
+                var frames = new[] { 0, 1, 3, 6, 10, 20, 40, 80, 160, 320, 640 }.Where(frame => frame < total).ToList();
+                foreach (var (player, suffix, isPc) in players)
+                {
+                    var tick = 0;
+                    var screen = new byte[320 * 200];
+                    foreach (var frame in frames)
                     {
-                        tick++;
-                    }
-                    Array.Clear(screen);
-                    for (var y = 0; y < Math.Min(own.Height, 200); y++)
-                    {
-                        for (var x = 0; x < Math.Min(own.Width, 320); x++)
+                        while (tick <= frame && player.Tick())
                         {
-                            var pixel = player.Frame[y * own.Width + x];
-                            screen[y * 320 + x] = isPc ? own.Palette[pixel] : pixel;
+                            tick++;
                         }
+                        Array.Clear(screen);
+                        for (var y = 0; y < Math.Min(own.Height, 200); y++)
+                        {
+                            for (var x = 0; x < Math.Min(own.Width, 320); x++)
+                            {
+                                var pixel = player.Frame[y * own.Width + x];
+                                screen[y * 320 + x] = isPc ? own.Palette[pixel] : pixel;
+                            }
+                        }
+                        File.WriteAllBytes(Path.Combine(screens!, $"anim-{entry.Name[..^4]}{variantName}-{frame:D3}{suffix}.png"), PngFile.Screen(screen, palette));
                     }
-                    File.WriteAllBytes(Path.Combine(screens!, $"anim-{entry.Name[..^4]}-{frame:D3}{suffix}.png"), PngFile.Screen(screen, palette));
                 }
             }
-            lengths.Add(total);
         }
     }
 }

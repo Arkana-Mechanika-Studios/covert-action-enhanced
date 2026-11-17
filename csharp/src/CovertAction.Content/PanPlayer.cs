@@ -84,6 +84,11 @@ public sealed class PanPlayer
         }
     }
 
+    /// <summary>Sets one of the program's variables before it runs (D-684): the game sets variable 0 for the scenes that show a man or a woman.</summary>
+    /// <param name="variable">The variable's number, 0 to 50.</param>
+    /// <param name="value">Its value.</param>
+    public void SetVariable(int variable, int value) => _registers[Checked(variable, Registers, "variable")] = (short)value;
+
     /// <summary>The picture of the current frame: one palette index per pixel, row by row.</summary>
     public byte[] Frame { get; }
 

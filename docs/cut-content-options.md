@@ -179,8 +179,14 @@ unused is used on the Amiga, and the Amiga adds one unused scene of its own.
 * **The dossier.** The Amiga ships its own unused dossier, `CAPT1FPO.PAN` (96 x 200; "FPO" may be the printer's
   "for position only", a placeholder), and no Amiga program names it either. It holds the PC dossier's pictures and
   two more photo frames. A capture on the Amiga, as on the PC, shows the jail scene and the chief's comment only. The
-  rewrite plays the PC's dossier; whether the Amiga's script has the same woman's-photo switch is not yet known (its
-  script format differs from the PC's).
+  Amiga's script was read (its `.pan` container is decoded, D-683: the PC's machine with wider fields) and it **has the
+  woman's-photograph switch, and a working one**: it tests variable 0 (1: a woman, -1: a man, as the game sets it for the
+  jail scene) and does not begin by setting the variable to -1 as the PC's `CAPTRD01.PAN` does (CC-19). The two extra
+  frames are placeholder faces: image 5 an unnamed man in a grey cap, image 7 a smiling woman with green earrings, each
+  drawn behind the torso (image 4 or 6) that the PC's dossier has without any face. With the dossier option and the Amiga
+  pictures option (`graphics.amiga`) both on, the rewrite plays the Amiga's `CAPT1FPO.PAN` in place of the PC's page
+  (D-684), so the page has a face (the Amiga's stand-in; the game draws no face of the captured person on either
+  version) and shows the woman's photograph for a woman. With the dossier option alone it plays the PC's page as before.
 * **The car chase on its own, the arrest-only chase, the circuit board's fourth difficulty and the raid's corridor
   walk**: the same dormant code as on the PC, switched off in the same places.
 * **The plot variants**: the same table, with the same three variants filled, and the same unreachable apartment case
