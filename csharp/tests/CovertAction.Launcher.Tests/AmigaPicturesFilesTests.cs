@@ -1,7 +1,11 @@
 using CovertAction.Content;
+using CovertAction.Core.Chase;
+using CovertAction.Core.Electronics;
+using CovertAction.Core.Raid;
 using CovertAction.Drivers;
 using CovertAction.Host.Headless;
 using CovertAction.Msc;
+using CovertAction.Persistence.Dgroup;
 using CovertAction.Presentation;
 using CovertAction.Presentation.Library;
 using CovertAction.Tests;
@@ -263,6 +267,113 @@ public sealed class AmigaPicturesFilesTests
         Assert.Equal(Drawn(own.Pixels, 176, 0, 16) + 16, Drawn(shown, 176, 0, 16));
         Assert.All(Enumerable.Range(0, 16), y => Assert.NotEqual(0, shown[y * width + 191]));
         Assert.All(Enumerable.Range(16, 16), y => Assert.NotEqual(0, shown[y * width + 127]));
+    }
+
+    /// <summary>The colour (0x0RGB, four bits each) the game's driver shows for a palette entry of a part's table (the table's value is an entry of the driver's 64 colours).</summary>
+    private static int PaletteColour(byte[] driverColours, byte[] palette, int index) =>
+        Enumerable.Range(0, 3).Aggregate(0, (colour, k) => colour << 4 | driverColours[3 * palette[index] + k] * 15 / 63);
+
+    /// <summary>
+    /// D-687: the sheets whose colours the game changes by number (the raid's flashes and status bar, the car offers' body colours,
+    /// the workbench board's frames, the equipment screen's cursor) cannot be shown with the Amiga's pictures under the rule of
+    /// D-685: the pixels the game changes would have to sit at the game's numbers (0 to 15), where they show the game's colour of
+    /// that number, and every pixel has to keep the Amiga's colour. This reads the game's own palettes (the executables' data)
+    /// and the two pictures and pins the facts that stop each sheet: an Amiga colour that serves two of the game's roles, or an
+    /// Amiga colour that is not the colour of the number the game's role has.
+    /// </summary>
+    [SkippableFact]
+    public void TheSheetsTheGameRecoloursByNumberCannotKeepTheGamesRolesAndTheAmigasColoursAtOnce()
+    {
+        var pictures = AmigaFolderSearch.ResolvePictures(AmigaFolder());
+        Skip.If(pictures is null, "no Amiga picture files");
+        var game = FindGame();
+        var cities = new CatArchive(game.Read("CITIES.CAT"));
+        var driver = McgaDriverFile.Read(game.Read("MGRAPHIC.EXE")).DefaultColours;
+        var raid = new RaidState();
+        TacDgroup.Layout.Load(Executable.Read(game.Read("TAC.EXE")).DataSegment(), raid);
+        var bug = new ElectronicsState();
+        BugDgroup.Layout.Load(Executable.Read(game.Read("BUG.EXE")).DataSegment(), bug);
+        var chase = new ChaseState();
+        ChaseDgroup.Layout.Load(Executable.Read(game.Read("CHASE.EXE")).DataSegment(), chase);
+
+        (byte[] Pc, byte[] Amiga, ushort[] Colours) Both(string pc, string amiga)
+        {
+            var own = PcPicture(game, cities, pc + ".pic");
+            var other = AmigaPictureFile.Read(File.ReadAllBytes(AmigaFolderSearch.BankFile(pictures!, amiga + ".pix")!));
+            Assert.Equal((own.Width, own.Height), (other.Width, other.Height));
+            return (own.Pixels, other.Pixels, other.Colours);
+        }
+        // how many of the game's pixels of number "role" (in the rows from..to) the Amiga draws with colour number "amigaColour"
+        static int Count(byte[] pc, byte[] amiga, int role, int amigaColour, int fromRow = 0, int toRow = 200) =>
+            Enumerable.Range(fromRow * 320, (toRow - fromRow) * 320).Count(i => pc[i] == role && amiga[i] == amigaColour);
+        static int Of(byte[] pixels, int colour, int fromRow = 0, int toRow = 200) =>
+            Enumerable.Range(fromRow * 320, (toRow - fromRow) * 320).Count(i => pixels[i] == colour);
+
+        // the raid's screen (equip1 for Maxine, equip1m for Max): the alarm turns the game's grey (7) red, the flashes and the room's
+        // palette change number 3 (cyan, white in the room, yellow, black), the kit cursor recolours number 1 in the item boxes
+        foreach (var name in new[] { "equip1", "equip1m" })
+        {
+            var (pc, amiga, colours) = Both(name, name);
+            // the grey is clean: every pixel of number 7 is the Amiga's colour 30, which is the grey the game's number 7 shows
+            Assert.Equal(Of(pc, 7), Count(pc, amiga, 7, 30));
+            Assert.Equal(Of(pc, 7), Of(amiga, 30));
+            Assert.Equal(PaletteColour(driver, raid.PaletteSets[0], 7), colours[30]);
+            Assert.Equal(PaletteColour(driver, raid.PaletteSets[1], 7), colours[30]);
+            // number 3 is not: its 22 pixels are the Amiga's colour 3, which also fills the 9,494 pixels the game draws with number 9
+            // (and 6 of number 15), so colour 3 serves the flashing role and two quiet ones; and it is not the game's colour of 3
+            Assert.Equal(22, Of(pc, 3));
+            Assert.Equal(22, Count(pc, amiga, 3, 3));
+            Assert.True(Count(pc, amiga, 9, 3) > 9000, name);
+            Assert.NotEqual(colours[3], PaletteColour(driver, raid.PaletteSets[0], 3));
+            Assert.NotEqual(colours[3], PaletteColour(driver, raid.PaletteSets[1], 3));
+        }
+
+        // the workbench's board: the fixed chips' frames recolour numbers 2 and 3 (the grid's cyan lines) to grey
+        {
+            var (pc, amiga, colours) = Both("board", "board");
+            Assert.Equal(Of(pc, 2), Count(pc, amiga, 2, 2));
+            Assert.Equal(PaletteColour(driver, bug.Palettes[4], 2), colours[2]);
+            Assert.Equal(Of(pc, 3), Count(pc, amiga, 3, 3));
+            Assert.True(Count(pc, amiga, 9, 3) > 200);
+            Assert.NotEqual(colours[3], PaletteColour(driver, bug.Palettes[4], 3));
+            // the wires (read as number 10 at the cell centres) are clean: the same pixels, the game's own green
+            Assert.Equal(Of(pc, 10), Count(pc, amiga, 10, 10));
+            Assert.Equal(PaletteColour(driver, bug.Palettes[4], 10), colours[10]);
+        }
+
+        // the car offers: the bodies are recoloured by level (numbers 11 and 3), but only the first offer of each level is; the others
+        // show the game's own colours of those numbers (cyan) on the screen
+        {
+            var (pc, amiga, colours) = Both("cars", "cars");
+            Assert.Equal(Of(pc, 11), Count(pc, amiga, 11, 11));
+            Assert.Equal(Of(pc, 3), Count(pc, amiga, 3, 3));
+            Assert.NotEqual(colours[11], PaletteColour(driver, chase.PaletteChase, 11));
+            Assert.NotEqual(colours[3], PaletteColour(driver, chase.PaletteChase, 3));
+            // and the highlight recolours the background (number 1) of a whole offer, where the Amiga draws 103 pixels of the game's number 5 in the colour of 1
+            Assert.Equal(103, Count(pc, amiga, 5, 1));
+        }
+
+        // the raid's guards' sheets (the Amiga's are redrawn: no pixel-by-pixel roles): the alarm's red turns the game's grey (7), whose
+        // Amiga colour 7 is another grey (999) that covers less than half of them
+        foreach (var (pcName, amigaName) in new[] { ("guys2", "guysnew2"), ("guys3", "guysnew3") })
+        {
+            var (pc, amiga, colours) = Both(pcName, amigaName);
+            Assert.NotEqual(colours[7], PaletteColour(driver, raid.PaletteSets[0], 7));
+            Assert.True(Count(pc, amiga, 7, 7) * 2 < Of(pc, 7), pcName);
+            Assert.Equal(0, Of(amiga, 30));     // the Amiga's own aaa is not used on these sheets
+        }
+
+        // the raid's sprite sheets: the status bar (rows 160 to 199 of the people's page) is recoloured by number: the disguise's number 13
+        // (black in the raid's palette) and the gas's blue 9; the Amiga draws the first in white and the second in 48e, neither the colour of the number
+        foreach (var (pcName, amigaName) in new[] { ("sprites", "sprites"), ("spritesf", "spritesf") })
+        {
+            var (pc, amiga, colours) = Both(pcName, amigaName);
+            Assert.True(Count(pc, amiga, 13, 15, 160, 200) * 10 > Of(pc, 13, 160, 200) * 6, pcName);
+            Assert.Equal(0xfff, colours[15]);
+            Assert.NotEqual(colours[15], PaletteColour(driver, raid.PaletteSets[0], 13));
+            Assert.True(Count(pc, amiga, 9, 3, 160, 200) * 10 > Of(pc, 9, 160, 200) * 8, pcName);
+            Assert.NotEqual(colours[3], PaletteColour(driver, raid.PaletteSets[0], 9));
+        }
     }
 
     /// <summary>Where the tool below writes the pictures (outside the repository); unset: none are written.</summary>

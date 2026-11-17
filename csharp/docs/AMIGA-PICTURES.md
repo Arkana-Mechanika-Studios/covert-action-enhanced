@@ -216,6 +216,24 @@ every rectangle holds the Amiga's cell and no cell loses a drawn pixel. The Amig
 the last wire piece and the last chip carry the board's edge in their last column (the Amiga drew those pixels there). The pieces are
 the Amiga's dotted redrawing, not the PC's art shifted.
 
+### The sheets the game recolours by number (D-687): none added
+
+`board`, `cars`, `equip1`, `equip1m`, `guysnew2`, `guysnew3`, `sprites`, `spritesf` stay the PC's. The game changes their colours
+by number while it plays (the raid's flashes and alarm: numbers 3 and 7 of the five palettes; its status bar: 13, 9 and 12; the
+walls: 14; the kit cursor: 1 to 11; the car offers: 11 and 3; the board's frames: 2 and 3; the wires: read as 10). Those pixels have
+to be at the numbers 0 to 15, where they show the game's colour of that number, and every pixel has to keep the Amiga's colour.
+Read from the game's code and the palettes in the executables' data (`AmigaPicturesFilesTests`), per sheet:
+
+| Sheets | Clean | What stops it |
+|---|---|---|
+| `equip1`, `equip1m` | the grey (1,914 pixels of number 7 are the Amiga's colour 30, the grey of number 7); the kit cursor's 1; number 2, 4, 8, 10, 12 | the Amiga's colour 3 (48e) fills the 9,494 pixels of number 9 and the 22 of number 3, which the flashes and the room's palette change: one colour for a flashing role and a quiet one; and it is not the game's colour of 3 |
+| `board` | the wires (10), the green (2) | the grid lines (9,049 pixels of 3, grey in a fixed chip's frame) are 48e, also on 269 pixels of 9; 48e is not the game's cyan |
+| `cars` | the bodies are exactly colours 11 and 3 | they are 8df and 48e, not the game's 5ff and 0aa, which the second offer of a level shows (only the first is recoloured); 103 pixels of the game's 5 are the highlight's 1 |
+| `guysnew2`, `guysnew3`, `sprites`, `spritesf` | nothing | redrawn: 23 to 46 % of the game's grey 7 are the Amiga's grey, which is 999, not aaa; the status bar's disguise (13, black in the raid) is the Amiga's white and its gas blue (9) is 48e |
+
+These could be shown only if the game's recolouring and palette code also acted on the display colours 128 and up, which is a
+change of the game, not of a picture; it is not made. No picture of this round has a PNG for these sheets for that reason.
+
 ## Without the files
 
 The folder is the one named in the launcher, else `amiga/files` (or `amiga`) next to the program, else next to the game folder

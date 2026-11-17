@@ -65,6 +65,7 @@ public static class AmigaPictureList
     /// <summary>The cities whose PC picture is a thumbnail the size of the picture: the Amiga's is that thumbnail at the top left of a full canvas.</summary>
     private static readonly string[] ThumbnailNames = ["caracas", "losangel", "managua", "medellin", "mexicoci", "panama", "rio", "sanjuan"];
 
+    // DIVERGENCE: D-687 board, cars, equip1, equip1m, guys2, guys3, sprites and spritesf are not on this list: the game recolours them by number and the Amiga's colours cannot keep the roles (the register has the measures)
     /// <summary>The pictures that may be replaced.</summary>
     public static IReadOnlyList<AmigaPictureEntry> Entries { get; } =
     [
