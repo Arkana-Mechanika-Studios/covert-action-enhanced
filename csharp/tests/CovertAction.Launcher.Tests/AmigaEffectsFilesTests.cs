@@ -93,6 +93,7 @@ public sealed class AmigaEffectsFilesTests : IDisposable
         Assert.Equal(Path.Combine(_root, "mine", "disk3", "chasesnd.dat"), AmigaFolderSearch.BankFile(disk2, "chasesnd.dat"));
         File.Delete(Path.Combine(_root, "mine", "disk3", "chasesnd.dat"));
         File.Delete(Path.Combine(disk2, "bugsnd.dat"));
+        HostFiles.Forget(); // the listings are kept by the folder's time stamp, which a quick delete may leave as it was (Linux)
         Assert.Equal(["bugsnd.dat", "chasesnd.dat"], AmigaFolderSearch.MissingBanks(disk2));
         Assert.Equal(AmigaSoundBanks.FileNames, AmigaFolderSearch.MissingBanks(null));
     }

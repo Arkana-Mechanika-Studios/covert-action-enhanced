@@ -68,9 +68,10 @@ public sealed class SettingsFileTests : IDisposable
         Assert.Equal((1000, 750), SettingsFile.ParseResolution(load.Settings.Resolution));
     }
 
-    [Fact]
+    [SkippableFact]
     public void TheLaunchersEditsKeepTheCommentsAndReadBackAsSaved()
     {
+        Skip.IfNot(OperatingSystem.IsWindows(), "Windows paths and a Windows registry value: nothing here runs on Linux");
         var path = Path.Combine(_folder, SettingsFile.FileName);
         Assert.True(SettingsFile.TryWriteTemplate(path, out _));
         Assert.False(SettingsFile.TryWriteTemplate(path, out _), "an existing file is never overwritten");

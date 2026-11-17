@@ -134,9 +134,10 @@ public sealed class GameFolderSearchTests : IDisposable
         Assert.Equal([(withLocation, "Windows' installed programs"), (withUninstaller, "Windows' installed programs")], found);
     }
 
-    [Fact]
+    [SkippableFact]
     public void TheUninstallersFolderIsReadFromQuotedAndUnquotedCommands()
     {
+        Skip.IfNot(OperatingSystem.IsWindows(), "Windows paths and a Windows registry value: nothing here runs on Linux");
         Assert.Equal(@"C:\GOG Games\X", GameFolderSearch.UninstallerFolder("\"C:\\GOG Games\\X\\unins000.exe\" /SILENT"));
         Assert.Equal(@"C:\GOG\X", GameFolderSearch.UninstallerFolder(@"C:\GOG\X\unins000.exe /SILENT"));
         Assert.Null(GameFolderSearch.UninstallerFolder("msiexec /x {GUID}"));

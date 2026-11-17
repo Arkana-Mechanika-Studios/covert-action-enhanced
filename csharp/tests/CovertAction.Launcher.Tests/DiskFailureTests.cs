@@ -43,9 +43,10 @@ public sealed class DiskFailureTests : IDisposable
 
     private const OpenMode MakeEmpty = OpenMode.Write | OpenMode.Create | OpenMode.Truncate | OpenMode.Binary;
 
-    [Fact]
+    [SkippableFact]
     public void AReadOnlySaveCannotBeMadeAndStaysAsItWas()
     {
+        Skip.If(OperatingSystem.IsLinux() && Environment.UserName == "root", "root writes to read-only files (the test containers run as root)");
         // a save the player marked read-only: DOS's create fails with "access denied" (GAME 00f7:a833 then says "File Error")
         var save = Path.Combine(_saves.FullName, "CV0.SVE");
         File.WriteAllBytes(save, [1, 2, 3]);
@@ -104,7 +105,7 @@ public sealed class DiskFailureTests : IDisposable
         Assert.Equal(3, files.Seek(handle, 0, 2));
     }
 
-    [Fact]
+    [SkippableFact]
     public void WhatTheGamePrintsOnTheConsoleIsKeptForTheLauncher()
     {
         var files = Files();
@@ -142,6 +143,7 @@ public sealed class DiskFailureTests : IDisposable
     [SkippableFact]
     public void TheCampaignsSaveScreenSaysFileErrorForASaveThatCannotBeMade()
     {
+        Skip.If(OperatingSystem.IsLinux() && Environment.UserName == "root", "root writes to read-only files (the test containers run as root)");
         // GAME 00f7:a833 save_to_named_file: the file is made first to see that it can be; if not, "File Error: <path>"
         var players = GameFiles();
         var state = new CampaignState();

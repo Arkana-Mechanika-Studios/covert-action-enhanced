@@ -125,6 +125,13 @@ internal static partial class GameFolderSearch
         {
             yield return (steam, "Steam's library");
         }
+        if (OperatingSystem.IsLinux() && lookup.Environment("HOME") is { Length: > 0 } home)
+        {
+            foreach (var linux in LinuxCandidates(home, lookup.Environment))
+            {
+                yield return linux;
+            }
+        }
         foreach (var installed in InstalledProgramFolders(lookup))
         {
             yield return (installed, "Windows' installed programs");
