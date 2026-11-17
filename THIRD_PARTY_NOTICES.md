@@ -13,8 +13,8 @@ folder (`licences/README.txt` lists them):
 | In the release | What it is | Licence | In `licences/` |
 |---|---|---|---|
 | the .NET runtime (self-contained beside the program) | Microsoft's .NET 10 runtime | MIT | `dotnet-LICENSE.txt`, `dotnet-ThirdPartyNotices.txt` (copied from the .NET SDK) |
-| `SDL3.dll` | SDL 3.4.20 (below) | zlib | `SDL3-zlib.txt` |
-| `libmt32emu.dll` | Munt's mt32emu, as the `Mt32emu.net` package builds it (below) | LGPL 2.1 or later | `mt32emu-LGPL-2.1.txt`, `mt32emu-SOURCE.txt` |
+| `SDL3.dll` (Windows), `libSDL3.so.0` (Linux, experimental) | SDL 3.4.20 (below) | zlib | `SDL3-zlib.txt` |
+| `libmt32emu.dll` (Windows), `libmt32emu.so` (Linux) | Munt's mt32emu, as the `Mt32emu.net` package builds it (below) | LGPL 2.1 or later | `mt32emu-LGPL-2.1.txt`, `mt32emu-SOURCE.txt` |
 | `Mt32emu.dll` | the `Mt32emu.net` package's .NET binding of mt32emu, by Greg Divis (below) | LGPL 2.1 or later | the same |
 | the launcher's and the set-up screen's text font (inside the program) | the VGA 8x16 text font as DOSBox-X supplies it (below) | GPL 2 or later | (this project's `LICENSE`, GPL 3) |
 | the readers of the game's packed programs and animations (inside the program) | written after CovertActionTools' code (below) | MIT | `CovertActionTools-MIT.txt` |
@@ -81,8 +81,12 @@ MT32_ROMS next to the program, or the folder `COVERT_MT32_ROMS` names).
 official Windows x64 release (`SDL3-3.4.20-win32-x64.zip`, https://github.com/libsdl-org/SDL/releases,
 SHA-256 of the archive 368bed8b24e44ad9ea372990814f2343fcfb9e468abb7f8f4a3bc146c7304752, of the DLL
 66844f10251cc1c10619ed5d8e4e3224f564900ee6d69ba87d63de782addae40). The SDL host's build output
-carries it next to the program. On Linux the program uses the system's `libSDL3.so.0`, which is not
-shipped. Source code: https://www.libsdl.org/. Its licence (zlib):
+carries it next to the program. `csharp/src/CovertAction.Host.Sdl/Native/linux-x64/libSDL3.so.0` is the same
+SDL 3.4.20, unmodified, built on Ubuntu 22.04 from the official source release (`SDL3-3.4.20.tar.gz`, SHA-256
+of the archive f3bb06f55bed9557227a700af2ea62e49497ebdf58037732a731a5fb3ef8581f, of the library
+8bd5e82d7371c77562b815c681883341e96805921061b0ec8a0baa5b4fd6f159) by `csharp/tools/linux/build_sdl3.sh` (as the
+Darklands Restoration Project does); the Linux release carries it next to the program, where it is loaded before
+the system's. Source code: https://www.libsdl.org/. Its licence (zlib):
 
 ```text
 Simple DirectMedia Layer

@@ -33,8 +33,12 @@ public sealed class RepositoryTests
         Assert.True(breaks.Count == 0, "oracle vectors under csharp/ (they belong in build/oracle):\n" + string.Join("\n", breaks));
     }
 
-    /// <summary>The one binary file of the rewrite: SDL 3 for Windows, unmodified, as THIRD_PARTY_NOTICES.md describes it.</summary>
+    /// <summary>The binary files of the rewrite: SDL 3 for Windows, unmodified, and SDL 3 for Linux, built unmodified from SDL's source release (THIRD_PARTY_NOTICES.md describes both).</summary>
     private const string SdlLibrary = "src/CovertAction.Host.Sdl/Native/win-x64/SDL3.dll";
+
+    private const string SdlLinuxLibrary = "src/CovertAction.Host.Sdl/Native/linux-x64/libSDL3.so.0";
+
+    private const string SdlLinuxLibrarySha256 = "8bd5e82d7371c77562b815c681883341e96805921061b0ec8a0baa5b4fd6f159";
 
     /// <summary>The text font taken from Darklands as it is (not a source file, so it is not found by its first line).</summary>
     private const string TextFontResource = "src/CovertAction.Host.Sdl/Resources/vga-8x16.b64";
@@ -48,7 +52,7 @@ public sealed class RepositoryTests
         var breaks = Repository.TrackedFiles()
             .Where(file => new FileInfo(file).Length > limit)
             .Select(file => Path.GetRelativePath(Repository.CSharp, file).Replace('\\', '/'))
-            .Where(file => file != SdlLibrary)
+            .Where(file => file != SdlLibrary && file != SdlLinuxLibrary)
             .ToList();
         Assert.True(breaks.Count == 0, "files over 1 MiB under csharp/:\n" + string.Join("\n", breaks));
     }
@@ -62,6 +66,18 @@ public sealed class RepositoryTests
         if (File.Exists(notices))
         {
             Assert.Contains(SdlLibrarySha256, File.ReadAllText(notices));
+        }
+    }
+
+    [Fact]
+    public void TheLinuxSdlLibraryIsTheOneTheNoticesName()
+    {
+        var hash = Convert.ToHexStringLower(System.Security.Cryptography.SHA256.HashData(File.ReadAllBytes(Path.Combine(Repository.CSharp, SdlLinuxLibrary))));
+        Assert.Equal(SdlLinuxLibrarySha256, hash);
+        var notices = Path.Combine(Repository.Root, "THIRD_PARTY_NOTICES.md");
+        if (File.Exists(notices))
+        {
+            Assert.Contains(SdlLinuxLibrarySha256, File.ReadAllText(notices));
         }
     }
 
@@ -80,6 +96,7 @@ public sealed class RepositoryTests
             .Where(Repository.IsFromDarklands)
             .Select(file => Path.GetRelativePath(Repository.CSharp, file).Replace('\\', '/'))
             .Append(SdlLibrary)
+            .Append(SdlLinuxLibrary)
             .Append(TextFontResource)
             .ToHashSet();
         Assert.True(marked.SetEquals(listed), "docs/REUSED.md and the files' first lines disagree about: " + string.Join(", ", marked.Except(listed).Concat(listed.Except(marked))));

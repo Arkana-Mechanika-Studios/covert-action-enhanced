@@ -1,0 +1,4 @@
+# The Linux release's SDL 3 is a binary file; the scripts that run on Linux keep their LF line ends.
+csharp/src/CovertAction.Host.Sdl/Native/linux-x64/libSDL3.so.0 binary
+*.sh text eol=lf
+csharp/src/CovertAction.Host.Launcher/linux/* text eol=lf
