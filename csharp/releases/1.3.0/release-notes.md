@@ -7,17 +7,20 @@ plays exactly as 1.0 and the original.
 
 ## What's new
 
-- **The original's cut content** (D-660 to D-663): four things the game's own files carry and its programs never
-  use, on the launcher's new Cut content tab. docs/cut-content-options.md shows each, and says what was left out and why.
-- **The mouse in the car chase** (D-670): a click stands for one of the chase's keys; the keys work as before.
-- **Your own keys and the gamepad's other buttons** (D-671, D-672): any key of your keyboard can send one of the
-  original's keys, and the gamepad's shoulders, triggers, Start, Back and stick clicks can each send one.
-- **More of the Amiga version** (D-681 to D-684): twelve more of its pictures, eleven of its animations, and its own
-  unused dossier.
-- **Linux x64, experimental**: a release for Linux, with SDL 3 beside the program.
-- **A tidier launcher**: the keyboard, the mouse, your keys and the gamepad on a new Controls tab; every label fits.
-- **Everything of 1.2, 1.1.5, 1.1 and 1.0.** The bug-fix options, the Amiga music, effects and pictures, the mouse
-  in the menus and the action parts, and the whole faithful game.
+- **The original's cut content.** Four things the game's files carry and its programs never use.
+  On the launcher's new Cut content tab (D-660 to D-663); docs/cut-content-options.md shows each, and says what was
+  left out and why.
+- **The mouse in the car chase.** A click stands for one of the chase's keys.
+  The keys work as before (D-670).
+- **Your own keys and the gamepad's other buttons.** Any key can send one of the original's keys.
+  So can the gamepad's shoulders, triggers, Start, Back and stick clicks (D-671, D-672).
+- **More of the Amiga version.** Twelve more pictures, eleven animations and its own unused dossier.
+  (D-681 to D-684.)
+- **Linux x64, experimental.** A release for Linux, with SDL 3 beside the program.
+- **A tidier launcher.** A new Controls tab for the keyboard, the mouse, your keys and the gamepad.
+  Every label fits.
+- **Everything of 1.2, 1.1.5, 1.1 and 1.0.** The bug fixes, the Amiga sounds and pictures, the mouse in the menus.
+  And the whole faithful game.
 
 ## Getting started
 

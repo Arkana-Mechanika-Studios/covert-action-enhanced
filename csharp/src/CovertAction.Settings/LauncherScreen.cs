@@ -999,7 +999,7 @@ internal sealed class LauncherScreen
         else if (_cut)
         {
             y = Section("The original's cut content", y);
-            y = Status(y, ("Not in the original: its own files hold these, its programs never use them. All off by default.", Note));
+            y = Status(y, ("Not in the original: kept in its files, never used. All off by default.", Note));
             y = Select(y, "Captured dossier", _model.CutCapturedDossier ? "Yes" : "No", Item.CutCapturedDossier);
             y = Select(y, "Free car chase", _model.CutStandaloneChase ? "Yes" : "No", Item.CutStandaloneChase);
             y = Select(y, "Hardest circuit board", _model.CutHardestCircuit ? "Yes" : "No", Item.CutHardestCircuit);
