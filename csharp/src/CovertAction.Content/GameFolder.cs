@@ -26,8 +26,7 @@ public sealed class GameFolder(string path)
 
     /// <summary>The host path of the game file with the DOS name <paramref name="dosName"/> (for example "CRIME1.DTA"), or null when the folder has no such file.</summary>
     public string? Find(string dosName) =>
-        Directory.EnumerateFiles(Path)
-            .FirstOrDefault(file => string.Equals(System.IO.Path.GetFileName(file), dosName, StringComparison.OrdinalIgnoreCase));
+        HostFiles.Find(Path, dosName);
 
     /// <summary>All bytes of a game file.</summary>
     /// <exception cref="FileNotFoundException">The folder has no file of that name.</exception>

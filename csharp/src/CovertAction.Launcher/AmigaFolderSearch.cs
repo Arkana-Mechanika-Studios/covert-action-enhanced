@@ -1,3 +1,4 @@
+using CovertAction.Content;
 using CovertAction.Audio.Amiga;
 
 namespace CovertAction.Launcher;
@@ -59,7 +60,7 @@ public static class AmigaFolderSearch
     {
         foreach (var below in Below)
         {
-            yield return (Path.Combine([programFolder, .. below]), "beside the program");
+            yield return (HostFiles.CombineDirectories(programFolder, below), "beside the program");
         }
         if (string.IsNullOrWhiteSpace(gameFolder))
         {
@@ -70,7 +71,7 @@ public static class AmigaFolderSearch
         {
             foreach (var below in Below)
             {
-                yield return (Path.Combine([folder, .. below]), level == 0 ? "in the game's folder" : "next to the game");
+                yield return (HostFiles.CombineDirectories(folder, below), level == 0 ? "in the game's folder" : "next to the game");
             }
             folder = Path.GetDirectoryName(folder) ?? "";
         }
@@ -140,17 +141,17 @@ public static class AmigaFolderSearch
             {
                 return null;
             }
-            if (File.Exists(Path.Combine(folder, marker)))
+            if (HostFiles.Exists(folder, marker))
             {
                 return folder;
             }
-            var disk = Path.Combine(folder, preferred);
-            if (File.Exists(Path.Combine(disk, marker)))
+            var disk = HostFiles.FindDirectory(folder, preferred) ?? Path.Combine(folder, preferred);
+            if (HostFiles.Exists(disk, marker))
             {
                 return disk;
             }
             return Directory.EnumerateDirectories(folder).Order(StringComparer.OrdinalIgnoreCase)
-                .FirstOrDefault(below => File.Exists(Path.Combine(below, marker)));
+                .FirstOrDefault(below => HostFiles.Exists(below, marker));
         }
         catch (Exception e) when (e is IOException or UnauthorizedAccessException or ArgumentException)
         {
@@ -175,7 +176,7 @@ public static class AmigaFolderSearch
                 places.Add(parent);
                 places.AddRange(Directory.EnumerateDirectories(parent).Order(StringComparer.OrdinalIgnoreCase));
             }
-            return places.Select(place => Path.Combine(place, name)).FirstOrDefault(File.Exists);
+            return places.Select(place => HostFiles.Find(place, name)).FirstOrDefault(path => path is not null);
         }
         catch (Exception e) when (e is IOException or UnauthorizedAccessException or ArgumentException)
         {
@@ -191,5 +192,5 @@ public static class AmigaFolderSearch
     /// <summary>The names of the three music files a folder lacks (none when it holds all).</summary>
     /// <param name="folder">A folder as <see cref="Resolve"/> gives it.</param>
     public static IReadOnlyList<string> Missing(string folder) =>
-        [.. new[] { AmigaTunes.ThemeFile, AmigaTunes.FinalFile, AmigaTunes.SpyFile }.Where(name => !File.Exists(Path.Combine(folder, name)))];
+        [.. new[] { AmigaTunes.ThemeFile, AmigaTunes.FinalFile, AmigaTunes.SpyFile }.Where(name => !HostFiles.Exists(folder, name))];
 }

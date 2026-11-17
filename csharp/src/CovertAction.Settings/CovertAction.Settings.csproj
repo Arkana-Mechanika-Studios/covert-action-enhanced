@@ -7,6 +7,13 @@
     <InternalsVisibleTo Include="CovertAction" />
     <InternalsVisibleTo Include="CovertAction.Settings.Tests" />
   </ItemGroup>
+  <PropertyGroup>
+    <DefineConstants>$(DefineConstants);COVERT_LINKED</DefineConstants>
+  </PropertyGroup>
+  <ItemGroup>
+    <!-- the case-insensitive file lookup, compiled in as an internal type (this project references nothing) -->
+    <Compile Include="..\CovertAction.Content\HostFiles.cs" Link="HostFiles.cs" />
+  </ItemGroup>
   <ItemGroup>
     <!-- art for the launcher, supplied later (none is in the repository: everything is drawn in code when a picture is
          missing); csharp/docs/SETTINGS.md "The launcher" names them -->

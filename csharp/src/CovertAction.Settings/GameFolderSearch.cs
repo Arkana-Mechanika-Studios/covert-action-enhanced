@@ -1,6 +1,7 @@
 // Adapted from the Darklands Restoration Project, code/src/Darklands.Platform/GameFolderSearch.cs; same author.
 // Adapted: Covert Action's product ids, folder names, files and subfolders; the registry and the environment are read
 // through IMachineLookup (tests give a fake one); Steam's usual folders on Linux and macOS are looked at too.
+using CovertAction.Content;
 using System.Text.RegularExpressions;
 
 namespace CovertAction.Settings;
@@ -99,7 +100,7 @@ internal static partial class GameFolderSearch
 
     /// <summary>The required files that are not in <paramref name="folder"/> (all of them when it does not exist).</summary>
     public static IReadOnlyList<string> Missing(string folder) =>
-        Directory.Exists(folder) ? [.. RequiredFiles.Where(f => !File.Exists(Path.Combine(folder, f)))] : RequiredFiles;
+        Directory.Exists(folder) ? [.. RequiredFiles.Where(f => !HostFiles.Exists(folder, f))] : RequiredFiles;
 
     private static bool HoldsGame(string folder) => Missing(folder).Count == 0;
 

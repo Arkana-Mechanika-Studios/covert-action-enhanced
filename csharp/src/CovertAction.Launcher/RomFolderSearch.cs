@@ -1,3 +1,4 @@
+using CovertAction.Content;
 using CovertAction.Audio.Mt32;
 
 namespace CovertAction.Launcher;
@@ -21,7 +22,7 @@ public static class RomFolderSearch
     /// The folder looked in when none is chosen and none of the places holds a set: MT32_ROMS beside the program (a release
     /// carries it empty), where the player is told to put the ROMs.
     /// </summary>
-    public static string DefaultFolder => Path.Combine(AppContext.BaseDirectory, "MT32_ROMS");
+    public static string DefaultFolder => HostFiles.FindDirectory(AppContext.BaseDirectory, "MT32_ROMS") ?? Path.Combine(AppContext.BaseDirectory, "MT32_ROMS");
 
     /// <summary>
     /// The folder to use when none is chosen: the first place of <see cref="Candidates"/> that holds a usable ROM set, with
@@ -56,7 +57,7 @@ public static class RomFolderSearch
     /// </summary>
     public static IEnumerable<(string Folder, string Source)> Candidates(string? gameFolder, string programFolder, Func<string, string?> environment)
     {
-        yield return (Path.Combine(programFolder, "MT32_ROMS"), "beside the program");
+        yield return (HostFiles.FindDirectory(programFolder, "MT32_ROMS") ?? Path.Combine(programFolder, "MT32_ROMS"), "beside the program");
         if (!string.IsNullOrWhiteSpace(gameFolder))
         {
             var folder = Path.TrimEndingDirectorySeparator(gameFolder);
@@ -64,7 +65,7 @@ public static class RomFolderSearch
             {
                 foreach (var name in RomFolderNames)
                 {
-                    yield return (Path.Combine(folder, name), level == 0 ? "in the game's folder" : "next to the game");
+                    yield return (HostFiles.FindDirectory(folder, name) ?? Path.Combine(folder, name), level == 0 ? "in the game's folder" : "next to the game");
                 }
                 folder = Path.GetDirectoryName(folder) ?? "";
             }

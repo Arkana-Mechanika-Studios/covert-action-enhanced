@@ -1,3 +1,4 @@
+using CovertAction.Content;
 using CovertAction.Platform;
 
 namespace CovertAction.Audio.Amiga;
@@ -27,7 +28,7 @@ public sealed record AmigaTunes(GmcTune Theme, GmcTune Final, GmcTune Spy)
         {
             try
             {
-                return GmcTune.Parse(File.ReadAllBytes(Path.Combine(folder, name)));
+                return GmcTune.Parse(HostFiles.ReadAllBytes(folder, name));
             }
             catch (InvalidDataException e)
             {
