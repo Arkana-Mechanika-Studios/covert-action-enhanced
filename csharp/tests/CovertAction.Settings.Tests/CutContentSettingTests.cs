@@ -19,6 +19,7 @@ public sealed class CutContentSettingTests
         (Item.CutStandaloneChase, "standaloneChase", s => s.CutStandaloneChase, m => m.CutStandaloneChase),
         (Item.CutHardestCircuit, "hardestCircuit", s => s.CutHardestCircuit, m => m.CutHardestCircuit),
         (Item.CutFillerTexts, "fillerTexts", s => s.CutFillerTexts, m => m.CutFillerTexts),
+        (Item.CutChaseGrounds, "chaseGrounds", s => s.CutChaseGrounds, m => m.CutChaseGrounds),
     ];
 
     private static LauncherContext Context(GameSettings? settings = null)

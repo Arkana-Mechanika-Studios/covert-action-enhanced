@@ -60,7 +60,7 @@ the pictures), the re-check of the 41 dead functions (6), the sound commands (7)
 | CC-22 | Faces sheets: two 32 x 26 icons no `cut_image` takes, the lower half of FACESF.PIC, duplicate head cells | unused sprite cells | confirmed (cut_image); possible (any use) | open |
 | CC-23 | Sound commands 15 and 21 are never sent; the sent ones the drivers leave empty (gear shifts, 0x27, vacation, 0x2c) | unused and silent commands | confirmed | explained |
 | CC-24 | Raid sprites (SPRITES/SPRITESF): 24 cut cells never drawn (columns 17-19), the hands-up pair, two lying figures, a boxed inset | unused sprite cells | confirmed (never drawn / cut); possible (use) | open |
-| CC-25 | CHASE.PIC ground textures 16..19 (16 and 18 copies of 11 and 10), never picked by the generator | unused art | confirmed; possible (cut) | open |
+| CC-25 | CHASE.PIC ground textures 16..19 (16 and 18 copies of 11 and 10), never picked by the generator | unused art | confirmed; possible (cut) | player option (D-664) |
 | CC-26 | Room tile sheets GUYS3/GUYS2: 28 cells no tile entry references; Television and Drawers never placed (extends CA-8) | unused sprite cells | confirmed; possible (Drawers y wrong) | open |
 | CC-27 | BUGS.PIC leftovers: second chip set, sample circuits, "ALARM" board edge, wire duplicates 8-15 | unused art | confirmed (untaken); possible | open |
 | CC-28 | Sound data no command reaches: AdLib tunes DS:1efa and 1f0e, speaker engine sounds DS:03a6/03b2, Roland tune DS:149e, unused instruments, commands 15/21 data | unused sound data | confirmed; likely (cut) | open |
@@ -734,7 +734,9 @@ mock-up. All from the pictures only.
 **Reading (guess).** Twenty kinds of ground were drawn and the generator was cut back to sixteen (two of the four extras
 are copies of earlier ones).
 
-**Status.** Confirmed (unreachable); the cut is a reading. Open.
+**Status.** Confirmed (unreachable); the cut is a reading. Player option (D-664, cutContent.chaseGrounds): the draw is
+`random_below(20)`, the same call; a picture 16..19 is kept as a flag beside the cell, since the high nibble holds 0..15.
+The Amiga pictures option leaves CHASE.PIC as the PC's (only `street` is the Amiga's), so the same cells show.
 
 **Related.** CC-2 (the other generator leftovers of CHASE).
 

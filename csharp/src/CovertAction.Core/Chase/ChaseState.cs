@@ -260,6 +260,13 @@ public sealed class ChaseState : ILibraryState
     /// </summary>
     public byte[] MapCells { get; } = new byte[MapTiles * MapTiles];
 
+    /// <summary>
+    /// Not in the original (D-664, CC-25): per cell, the ground picture is 16 plus the number in the high four bits of
+    /// <see cref="MapCells"/>. Only the player's option "All 20 chase grounds" sets it; the original's picture numbers
+    /// 0..15 fit the four bits, which five bits would not.
+    /// </summary>
+    public bool[] HighGround { get; } = new bool[MapTiles * MapTiles];
+
     /// <summary>CHASE DS:17ba road_x_ends: per direction, the x offsets of the road segment the map generator paints over.</summary>
     public LineEnds[] RoadXEnds { get; } = [new(), new(), new(), new()];
 

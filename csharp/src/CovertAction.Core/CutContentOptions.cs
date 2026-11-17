@@ -9,7 +9,8 @@ namespace CovertAction.Core;
 /// <param name="StandaloneChase">CC-2 (settings key cutContent.standaloneChase, D-661): the practice menu offers the car chase on its own, the mode CHASE.EXE carries for a play without a campaign: a random map with "Loc" labels, a random start and goal, every place shown.</param>
 /// <param name="HardestCircuit">CC-16 (settings key cutContent.hardestCircuit, D-662): the electronics board's dormant difficulty 4, which the hardest level reaches for an agent of the lowest electronics rating (the original cuts it down to 3).</param>
 /// <param name="FillerTexts">CC-11 (settings key cutContent.fillerTexts, D-663): the filler sentences of the coded messages are drawn from all 16 of TEXT.DTA's *FLUF00 to *FLUF15, not from the first 12 the code asks for.</param>
-public sealed record CutContentOptions(bool CapturedDossier = false, bool StandaloneChase = false, bool HardestCircuit = false, bool FillerTexts = false)
+/// <param name="ChaseGrounds">CC-25 (settings key cutContent.chaseGrounds, D-664): the car chase's map draws its ground pictures from all 20 cells of CHASE.PIC, not from the first 16 the generator asks for.</param>
+public sealed record CutContentOptions(bool CapturedDossier = false, bool StandaloneChase = false, bool HardestCircuit = false, bool FillerTexts = false, bool ChaseGrounds = false)
 {
     /// <summary>The original: none of the cut content.</summary>
     public static CutContentOptions None { get; } = new();

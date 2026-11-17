@@ -85,7 +85,7 @@ internal sealed class LauncherModel
     private readonly string[] _initialKeyMap, _initialPadMap;
 
     /// <summary>The cut-content options as the launcher opened.</summary>
-    private readonly bool _initialCapturedDossier, _initialStandaloneChase, _initialHardestCircuit, _initialFillerTexts;
+    private readonly bool _initialCapturedDossier, _initialStandaloneChase, _initialHardestCircuit, _initialFillerTexts, _initialChaseGrounds;
 
     public LauncherModel(LauncherContext context, (int Width, int Height)? display)
     {
@@ -129,6 +129,7 @@ internal sealed class LauncherModel
         CutStandaloneChase = _initialStandaloneChase = start.CutStandaloneChase;
         CutHardestCircuit = _initialHardestCircuit = start.CutHardestCircuit;
         CutFillerTexts = _initialFillerTexts = start.CutFillerTexts;
+        CutChaseGrounds = _initialChaseGrounds = start.CutChaseGrounds;
         var ignored = new List<string>();
         KeyMap = KeyBindings.ParsePairs(start.KeyMap, false, "input.keyMap", ignored);
         PadMap = KeyBindings.ParsePairs(start.PadMap, true, "input.padMap", ignored);
@@ -314,6 +315,9 @@ internal sealed class LauncherModel
     /// <summary>The coded messages' filler from all 16 sentences (cutContent.fillerTexts, D-663).</summary>
     public bool CutFillerTexts { get; set; }
 
+    /// <summary>The car chase's ground pictures from all 20 of CHASE.PIC (cutContent.chaseGrounds, D-664).</summary>
+    public bool CutChaseGrounds { get; set; }
+
     /// <summary>The MT-32 ROM folder chosen; null: the default (MT32_ROMS next to the program, else where the ROMs are found).</summary>
     public string? Mt32Roms
     {
@@ -497,6 +501,10 @@ internal sealed class LauncherModel
         {
             changes["cutContent.fillerTexts"] = CutFillerTexts;
         }
+        if (CutChaseGrounds != _initialChaseGrounds)
+        {
+            changes["cutContent.chaseGrounds"] = CutChaseGrounds;
+        }
         return changes;
     }
 
@@ -535,6 +543,7 @@ internal sealed class LauncherModel
         s.CutStandaloneChase = CutStandaloneChase;
         s.CutHardestCircuit = CutHardestCircuit;
         s.CutFillerTexts = CutFillerTexts;
+        s.CutChaseGrounds = CutChaseGrounds;
         return s;
     }
 

@@ -57,6 +57,9 @@ public sealed partial class CarChase
     private const int CarveMargin = 2;
     private const int CarveRange = 21;
     private const int GroundPictures = 16;
+
+    /// <summary>CHASE.PIC holds this many ground pictures (ten to a row, two rows); the original's generator draws the first 16.</summary>
+    private const int GroundPicturesInTheSheet = 20;
     private const int StreetGround = 8;
     private const byte AllSidesOpen = 0xf;
     private const int MapSeedFactor = 0x7b;
@@ -199,13 +202,7 @@ public sealed partial class CarChase
         _world.Graphics.CopyRect(_state.RpSprite, PanelLeft, PanelSourceY, ViewWidth, ViewHeight, _state.Rp1, PanelLeft, 0);
         Output.DrawLine(PanelLeft, 0, PanelRight, 0, White);
 
-        for (var x = 0; x < ChaseState.MapTiles; x++)
-        {
-            for (var y = 0; y < ChaseState.MapTiles; y++)
-            {
-                _state.MapCells[ChaseState.CellIndex(x, y)] = (byte)((GameLibrary.RandomBelow(_state.Random, GroundPictures) << 4) + AllSidesOpen);
-            }
-        }
+        FillGround();
         DrawStreetGrid();
         for (var attempt = 0; attempt < CarveAttempts; attempt++)
         {
@@ -249,6 +246,7 @@ public sealed partial class CarChase
         }
         cells[cell] &= (byte)~(1 << side);
         cells[cell] = (byte)((((x + y) & 1) << 4) + (cells[cell] & AllSidesOpen) + (StreetGround << 4));
+        _state.HighGround[cell] = false;
         cells[neighbour] &= (byte)~(1 << ((attempt + 2) & 3));
 
         // paint the stretch of grid over: the segment's ends for this direction, and the line beside it
@@ -419,6 +417,28 @@ public sealed partial class CarChase
     /// <summary>The camera's lowest top edge: the city's height less the view's.</summary>
     private const int CameraLimitY = ChaseState.MapTiles * ChaseState.TileUnits - ViewHeight;
 
+    /// <summary>
+    /// Gives every cell of the map a random ground picture and all four sides open: one random call per cell, column by
+    /// column (the first loop of generate_map, chase_00df_2c51.c 63-66). With the option of CC-25 the picture is one of
+    /// the sheet's 20, not of the first 16; the number of calls is the same.
+    /// </summary>
+    public void FillGround()
+    {
+        // DIVERGENCE: D-664 a player's option (cutContent.chaseGrounds): the draw is among the sheet's 20 pictures, not the first 16
+        var pictures = _behaviour.CutContent.ChaseGrounds ? GroundPicturesInTheSheet : GroundPictures;
+        for (var x = 0; x < ChaseState.MapTiles; x++)
+        {
+            for (var y = 0; y < ChaseState.MapTiles; y++)
+            {
+                var picture = GameLibrary.RandomBelow(_state.Random, pictures);
+                var cell = ChaseState.CellIndex(x, y);
+                // the high four bits hold 0..15; a picture 16..19 (the option only) is its number less 16 there, and the cell's flag in HighGround
+                _state.MapCells[cell] = (byte)(((picture & 0xf) << 4) + AllSidesOpen);
+                _state.HighGround[cell] = picture >= GroundPictures;
+            }
+        }
+    }
+
     /// <summary>Draws the 5 x 5 tiles from tile (x, y) into the off-screen page: ground pictures and kerb strips.</summary>
     private void DrawViewTiles(int tileX, int tileY)
     {
@@ -428,7 +448,7 @@ public sealed partial class CarChase
             {
                 var cell = _state.MapCells[ChaseState.CellIndex(tileX + column, tileY + row)];
                 // the ground picture: number cell >> 4, ten 32-pixel tiles to a row of chase.pic
-                var sourceX = (cell >> 4) * ChaseState.TileUnits;
+                var sourceX = ((cell >> 4) + (_state.HighGround[ChaseState.CellIndex(tileX + column, tileY + row)] ? GroundPictures : 0)) * ChaseState.TileUnits;
                 var sourceY = GroundTop;
                 while (sourceX >= GroundRowWidth)
                 {

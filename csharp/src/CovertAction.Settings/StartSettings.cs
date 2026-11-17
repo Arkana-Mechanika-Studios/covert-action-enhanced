@@ -92,6 +92,9 @@ internal sealed record StartSettings
     /// <summary>The coded messages' filler is drawn from all 16 sentences of TEXT.DTA (cutContent.fillerTexts, D-663; off by default).</summary>
     public bool CutFillerTexts { get; init; }
 
+    /// <summary>The car chase's map draws from all 20 ground pictures of CHASE.PIC (cutContent.chaseGrounds, D-664; off by default).</summary>
+    public bool CutChaseGrounds { get; init; }
+
     /// <summary>The Amiga version's pictures in place of the PC's where it has the same one (graphics.amiga, D-642; off by default).</summary>
     public bool AmigaPictures { get; init; }
 
@@ -186,6 +189,7 @@ internal sealed record StartSettings
             CutStandaloneChase = file.CutStandaloneChase ?? false,
             CutHardestCircuit = file.CutHardestCircuit ?? false,
             CutFillerTexts = file.CutFillerTexts ?? false,
+            CutChaseGrounds = file.CutChaseGrounds ?? false,
             FixedKeys = fixedKeys,
         };
     }

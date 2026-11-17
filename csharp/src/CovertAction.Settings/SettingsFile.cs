@@ -305,6 +305,7 @@ internal static class SettingsFile
                 case "standaloneChase": settings.CutStandaloneChase = Boolean(key, property.Value) ?? settings.CutStandaloneChase; break;
                 case "hardestCircuit": settings.CutHardestCircuit = Boolean(key, property.Value) ?? settings.CutHardestCircuit; break;
                 case "fillerTexts": settings.CutFillerTexts = Boolean(key, property.Value) ?? settings.CutFillerTexts; break;
+                case "chaseGrounds": settings.CutChaseGrounds = Boolean(key, property.Value) ?? settings.CutChaseGrounds; break;
                 default: Unknown(key); break;
             }
         }
@@ -510,7 +511,10 @@ internal static class SettingsFile
             // true: the filler sentence of a coded message is one of all 16 in TEXT.DTA; the game's code asks for 12 and
             // never shows the last four ("Extreme caution is advised ...", "Do not hesitate to act in a decisive manner",
             // ...). false: as the original.
-            "fillerTexts": false
+            "fillerTexts": false,
+            // true: the car chase's map draws its ground pictures from all 20 cells of CHASE.PIC; the generator asks for
+            // 16 and never shows the last four. false: as the original.
+            "chaseGrounds": false
           }
         }
         """;

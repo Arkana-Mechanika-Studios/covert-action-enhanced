@@ -1,15 +1,15 @@
 # The cut-content options
 
-Version 1.3 has four options for things the original game's own files and programs carry and never use. They are on
-the launcher's **Cut content** tab, they are off by default, and none of them is in the original. With all four off the
+Version 1.3 has five options for things the original game's own files and programs carry and never use. They are on
+the launcher's **Cut content** tab, they are off by default, and none of them is in the original. With all five off the
 game plays as version 1.0 and the original. Nothing is drawn or written new, except one menu line (the name "Free
 Chase"); the pictures, the code and the texts are the game's own. Where each came from is in
 [the register of cut content](cut-content.md) (the entries CC-n) and, as changes to the original's behaviour, in
-[DIVERGENCES.md](../csharp/docs/faithfulness/DIVERGENCES.md) (D-660 to D-663).
+[DIVERGENCES.md](../csharp/docs/faithfulness/DIVERGENCES.md) (D-660 to D-664).
 
 To turn one on, open the launcher (Shift held while the game starts, or `CovertAction Launcher.exe`), choose the
 **Cut content** tab, set the row to **Yes** and press **Save and quit** or **Play**. The settings file keys are
-`cutContent.capturedDossier`, `cutContent.standaloneChase`, `cutContent.hardestCircuit` and `cutContent.fillerTexts`
+`cutContent.capturedDossier`, `cutContent.standaloneChase`, `cutContent.hardestCircuit`, `cutContent.fillerTexts` and `cutContent.chaseGrounds`
 ([the settings](../csharp/docs/SETTINGS.md)).
 
 ![The launcher's Cut content tab](screenshots/cut-content/launcher-cut-content.png)
@@ -124,6 +124,24 @@ promotion is being considered." and "Further communications may follow."
 
 **Limits.** The call and the place are the same; only the count differs. With 16 outcomes instead of 12 the random draw
 takes a different number, and so the numbers the game draws after it differ.
+
+## All 20 chase grounds
+
+Row: **All 20 chase grounds**. Key: `cutContent.chaseGrounds`. Register: CC-25; divergence D-664. No picture is shown here.
+
+**What the original left unused.** The car chase's ground pictures are 32 x 32 cells of `CHASE.PIC`, ten to a row. The
+sheet has room for twenty; the map generator draws one of the first sixteen for each block of the city.
+
+**Evidence.** `generate_map` draws `random_below(16)` per cell; the four last cells of the second row are drawn by nothing
+(CC-25). Two of them are copies of earlier grounds (16 of 11, 18 of 10); 17 (a tall blue and purple striped block) and 19
+(a green court with a white U-shaped plaza) are new art.
+
+**What you see.** The draw is among twenty, so these four grounds appear in the city's blocks. The free car chase (the
+**Free car chase** option) uses the same map generator and has them too.
+
+**Limits.** The generator makes the same random calls in the same places; only the range of the ground's draw differs. So the
+streets, the places and every later draw are the original's, and only the ground pictures of the blocks are not. The Amiga
+pictures option changes only the chase's windscreen views, not CHASE.PIC, so the same four cells show with it.
 
 ## Left out, and why
 
