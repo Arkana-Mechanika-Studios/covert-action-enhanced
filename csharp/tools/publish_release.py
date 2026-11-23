@@ -88,7 +88,7 @@ def make_tar(folder, archive, name):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    parser.add_argument("--version", default="1.3.1")
+    parser.add_argument("--version", default="1.3.2")
     parser.add_argument("--out", default=str(ROOT / "build" / "release"), help="the folder the version's folder is made in")
     parser.add_argument("--platform", default="win-x64", choices=PLATFORMS, help="the release to make (default win-x64)")
     args = parser.parse_args()
