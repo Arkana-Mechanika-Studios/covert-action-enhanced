@@ -199,11 +199,12 @@ public sealed class CodedMessages(CampaignState state, CampaignScreens screens, 
             pair = DecodeParts(msg);
             var other = state.Sn[pair];
             state.Ps[message.Who].Clues |= (short)(other.Clues & MessageParts);
-            state.Ps[other.Who].Clues |= (short)(message.Clues & MessageParts);
+            // BUG: CA-66 the pair can be a message without person (the arrest's own, Who -1): ps[-1] is the text in front of the table
+            OrCluesOf(other.Who, (short)(message.Clues & MessageParts));
             // C: shifts of a 16-bit int by the event's cast member and by the low byte of its status (the partner)
             state.Ps[message.Who].Rknown |= C16.Shl(1, state.Ev[happening].Act);
             state.Ps[message.Who2].Rknown |= C16.Shl(1, state.Ev[happening].Status & 0xff);
-            message.Clues |= (short)(state.Ps[other.Who].Clues & MessageParts);
+            message.Clues |= (short)(CluesOf(other.Who) & MessageParts);
             other.Clues |= (short)(state.Ps[message.Who].Clues & MessageParts);
         }
         else
@@ -230,6 +231,32 @@ public sealed class CodedMessages(CampaignState state, CampaignScreens screens, 
         screens.Screens.WaitForKey();
         message.Clues |= MessageRead;
         state.Sn[pair].Clues |= MessageRead;
+    }
+
+    /// <summary>The clue word of a person; for -1 the word the original reads in front of the persons table (<see cref="CampaignState.TextBeforePersons"/>, characters 12 and 13).</summary>
+    private short CluesOf(int person) => person >= 0 ? state.Ps[person].Clues : unchecked((short)(TextByte(12) | TextByte(13) << 8));
+
+    /// <summary>Sets bits in a person's clue word; for -1 in the same two bytes of the text in front of the table, as the original writes them.</summary>
+    private void OrCluesOf(int person, short bits)
+    {
+        if (person >= 0)
+        {
+            state.Ps[person].Clues |= bits;
+            return;
+        }
+        var word = CluesOf(person) | bits;
+        var text = state.TextBeforePersons.ToCharArray();
+        text[12] = (char)(word & 0xff);
+        text[13] = (char)((word >> 8) & 0xff);
+        state.TextBeforePersons = new string(text);
+    }
+
+    private int TextByte(int position)
+    {
+        // C: ps[-1] lies over the text's bytes; a text shorter than the record is outside what the program holds there
+        return state.TextBeforePersons.Length > position + 1
+            ? (byte)state.TextBeforePersons[position]
+            : throw new InvalidOperationException("the text in front of the persons table is shorter than the record the original reads there");
     }
 
     /// <summary>
