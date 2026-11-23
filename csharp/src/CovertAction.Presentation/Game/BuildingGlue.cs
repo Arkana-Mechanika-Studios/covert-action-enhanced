@@ -32,4 +32,16 @@ internal static class BuildingGlue
         state.Nloc = (short)buildings;
         return link;
     }
+
+    /// <summary>
+    /// The low byte of a building's knowledge word, as the original reads it with the index <c>find_or_add_link</c> gave
+    /// back; for -1 (no record) it is the byte at <c>lc[-1].clues</c>, DS:048c, in front of the table: the low byte of
+    /// the last person's <c>role</c> (<c>ps[63]</c> ends at DS:0494, where <c>lc</c> begins).
+    /// </summary>
+    /// <param name="state">The campaign.</param>
+    /// <param name="link">The index the lookup gave, or -1.</param>
+    /// <returns>The byte.</returns>
+    // DIVERGENCE: D-689 the byte is read from the person's record; the original's lc[-1] is those very bytes
+    internal static int LinkClues(CampaignState state, int link) =>
+        link == -1 ? state.Ps[CampaignState.PersonCount - 1].Role & 0xff : state.Lc[link].Clues & 0xff;
 }

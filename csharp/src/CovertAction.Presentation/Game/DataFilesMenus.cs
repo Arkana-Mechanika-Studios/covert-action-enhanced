@@ -138,7 +138,7 @@ public sealed class DataFilesMenus(CampaignState state, CampaignScreens screens,
         {
             // C: a shift by a variable count of a 16-bit int, and the evaluation stops at the first false test
             if (WorldRules.OrgPresence(state, city, org) != 0 && (state.Ct[city].OrgClues & C16.Shl(1, org)) != 0
-                && (LinkClues(CampaignLibrary.AddLink(state.Lc, state.Ct, state.Nloc, org, city, 0, out _)) & buildingKnown) != 0)
+                && (BuildingGlue.LinkClues(state, CampaignLibrary.AddLink(state.Lc, state.Ct, state.Nloc, org, city, 0, out _)) & buildingKnown) != 0)
             {
                 CampaignLibrary.AppendBuildingType(state.Txt, state.BuildingKinds, (c, o) => WorldRules.OrgPresence(state, c, o), city, org);
                 state.Txt.Text += state.StrBuildingIn;
@@ -147,13 +147,6 @@ public sealed class DataFilesMenus(CampaignState state, CampaignScreens screens,
             }
         }
     }
-
-    /// <summary>
-    /// The low byte of a building's knowledge word; for -1 (no building) the byte the original reads in front of the
-    /// buildings table: the low byte of the last person's investigation score.
-    /// </summary>
-    private int LinkClues(int link) =>
-        link == -1 ? state.Ps[CampaignState.PersonCount - 1].Intel & 0xff : state.Lc[link].Clues & 0xff;
 
     /// <summary>
     /// The documents of the "Inside Information": the Master Plan and the personnel files the player has seen (or

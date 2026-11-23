@@ -217,6 +217,54 @@ public sealed class CampaignTests
         Assert.Equal(LeaveTheGame, shared.NextModule);
     }
 
+    /// <summary>
+    /// A contact of an organisation whose building the player has no record of is a line of the city screen's menu
+    /// (the contact's organisation is what the line leads to). Choosing it opens the building's menu with
+    /// find_or_add_link's -1, and the original tests lc[-1].clues, the bytes in front of lc (D-689, GitHub issue #1):
+    /// the low byte of the last person's role. The rewrite threw IndexOutOfRangeException. A role without the
+    /// "identified" bit gives the unknown building; the walk goes on from it.
+    /// </summary>
+    [SkippableTheory]
+    [InlineData(0)]
+    [InlineData(4)]
+    public void AContactsBuildingWithoutARecordOpensItsMenuReadingTheBytesInFrontOfTheTable(int lastPersonsRole)
+    {
+        const int contactOrg = 3, contactKey = 2, contactInfo = 8, contactLine = FirstBuildingLine;
+        var folder = GameFiles();
+        var shared = CampaignUnderWay(folder);
+        var tables = shared.Campaign;
+        // the contact: a person of the organisation in the first city, named by a clue
+        tables.Persons[0].Org = contactOrg;
+        tables.Persons[0].Loc = 0;
+        tables.Persons[CovertAction.Core.Records.CampaignTables.PersonCount - 1].Role = (short)lastPersonsRole;
+        tables.Cast.Add(new CovertAction.Core.Records.Activity { Who = 0 });
+        tables.CastProgress.Add(new CovertAction.Core.Records.Activity2());
+        shared.NCast = 1;
+        foreach (var clue in tables.Clues)
+        {
+            clue.Act = -1;
+        }
+        tables.Clues[0].Act = 0;
+        tables.Clues[0].Key1 = contactKey << 8;
+        tables.Clues[0].Info1 = contactInfo << 8;
+        int[] keys =
+        [
+            .. Choose(contactLine),         // the city screen: to the contact's building
+            .. Choose(LeaveBuilding),       // the building's menu: leave
+            .. Choose(0),                   // the city screen again: to the airport
+            .. Choose(2),                   // the flight map: to the second city
+            .. Choose(1),                   // the second city's screen: to the hotel
+            .. Choose(8),                   // the hotel: quit the game
+            .. Choose(0),                   // the farewell picture
+        ];
+        var host = new HeadlessHost(keys, unixSeconds: 600_000_000);
+
+        new Game(folder, host).RunPart(shared);
+
+        Assert.Equal(1, shared.City);
+        Assert.Equal(LeaveTheGame, shared.NextModule);
+    }
+
     [SkippableFact]
     public void TheHotelSavesTheGameToASlotAndLoadsItBack()
     {

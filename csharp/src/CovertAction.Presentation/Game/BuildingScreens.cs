@@ -172,7 +172,8 @@ public sealed class BuildingScreens
         state.Txt.Text = words.YouAreAt;
         // the building's record is there: the city's menu only lists buildings that have one
         var link = BuildingGlue.FindOrAddLink(state, org, city, 0);
-        if ((state.Lc[link].Clues & BuildingIdentified) != 0)
+        // C: no record (-1) is read all the same, from the bytes in front of lc (D-689)
+        if ((BuildingGlue.LinkClues(state, link) & BuildingIdentified) != 0)
         {
             state.Txt.Text += state.Orgs[org].Name;
             level = BuildingGlue.AppendBuildingType(state, city, org);
